@@ -11,9 +11,9 @@
 // Yen-Jie: systematics table for B meson
 // Unit: In percentage
 const int nPtBins=1;
-double PtBins[nPtBins+1] = {7.,50.};//add a margin so that "FindBin" can work at the bin end
-const int AnaBins=5;
-double AnaPtBins[AnaBins+1] = {7.,10.,15.,20.,30.,50.};
+double PtBins[nPtBins+1] = {5.,100.};//add a margin so that "FindBin" can work at the bin end
+const int AnaBins=7;
+double AnaPtBins[AnaBins+1] = {5.,7.,10.,15.,20.,30.,50.,100.};
 
 const int nCentBins=4;
 double CentBins[nCentBins+1] = {0.,10.,30.,50.,100.};
@@ -102,14 +102,14 @@ void initializationPP()
 	ppSignalExtraction->SetBinContent(1,		2.9);//paper
 
 	ppTagAndProbe = new TH1D("ppTagAndProbe","",AnaBins,AnaPtBins); 
-	double tnpUnc_pp[5] = {5.386053, 3.814706, 3.235419, 3.014523, 2.819569, };
+	double tnpUnc_pp[7] = {5.386053, 5.386053, 3.814706, 3.235419, 3.014523, 2.819569, 2.819569};
 	for(int i = 0; i < AnaBins; i++){
 //		ppTagAndProbe->SetBinContent(i+1,		10.0);//PAS
 		ppTagAndProbe->SetBinContent(i+1,tnpUnc_pp[i]);//paper
 	}
 
 	ppAccUnc = new TH1D("ppAccUnc","",AnaBins,AnaPtBins);
-	double AccUnc_pp[5] = {0.111370, 0.100721, 0.248762, 0.292358, 0.411680};
+	double AccUnc_pp[7] = {0.111370, 0.111370, 0.100721, 0.248762, 0.292358, 0.411680, 0.411680};
 	for(int i = 0; i < AnaBins; i++){
 //		ppAccUnc->SetBinContent(i+1,0);//PAS
 		ppAccUnc->SetBinContent(i+1,AccUnc_pp[i]);//paper
@@ -129,7 +129,7 @@ void initializationPbPbCent0100()
 	PbPbSignalExtraction->SetBinContent(1,		2.6);//paper
 
 	PbPbTagAndProbe = new TH1D("PbPbTagAndProbe","",AnaBins,AnaPtBins);
-	double tnpUnc_pbpb[5] = {6.291468, 4.653674, 3.889682, 3.593492, 3.405239, };
+	double tnpUnc_pbpb[7] = {6.291468, 6.291468, 4.653674, 3.889682, 3.593492, 3.405239, 3.405239};
 	for(int i = 0; i < AnaBins; i++){
 //		PbPbTagAndProbe->SetBinContent(i+1,		13.0);//PAS
 		PbPbTagAndProbe->SetBinContent(i+1,tnpUnc_pbpb[i]);//paper 20170224
@@ -137,7 +137,7 @@ void initializationPbPbCent0100()
 
 	PbPbAccUnc = new TH1D("PbPbAccUnc","",AnaBins,AnaPtBins);
 	//double AccUnc_PbPb[5] = {0.106659, 0.095249, 0.220865, 0.272690, 0.412991};//wrong CWRv8 
-    double AccUnc_PbPb[5] = {0.716141, 1.015990, 0.971805, 1.216616, 1.596899};
+	double AccUnc_PbPb[7] = {0.716141, 0.716141, 1.015990, 0.971805, 1.216616, 1.596899, 1.596899};
 	for(int i = 0; i < AnaBins; i++){
 //		PbPbAccUnc->SetBinContent(i+1,0);//PAS
 		PbPbAccUnc->SetBinContent(i+1,AccUnc_PbPb[i]);//paper 20170314
@@ -182,7 +182,7 @@ void initialization(double centL=0,double centH=100){
 	initializationPP();
 	initializationRAA();
 	initializationRAACent();
-	if (centL==0&&centH==100) initializationPbPbCent0100();
+	if (centL==0&&(centH==100||centH==90)) initializationPbPbCent0100();
 	if (centL==0&&centH==10) initializationPbPbCent010();
 	initialized=1;
 
@@ -211,7 +211,7 @@ float normalizationUncertaintyForRAA(bool TAAhi = 1, double centL=0,double centH
 
 float systematicsForRAA(double pt,double centL=0,double centH=100, double HLT=0, int stage=0)
 {
-	if (!initialized && centL==0&&centH==100) initialization(centL,centH);
+  if (!initialized && centL==0&&(centH==100||centH==90)) initialization(centL,centH);
 	if (!initialized && centL==0&&centH==10) initialization(centL,centH);
 
 	double sys=0;
@@ -267,7 +267,7 @@ float systematicsForRAA(double pt,double centL=0,double centH=100, double HLT=0,
 
 float systematicsForRAA_Correlated(double pt,double centL=0,double centH=100, double HLT=0, int stage=0)
 {
-	if (!initialized && centL==0&&centH==100) initialization(centL,centH);
+  if (!initialized && centL==0&&(centH==100||centH==90)) initialization(centL,centH);
 	if (!initialized && centL==0&&centH==10) initialization(centL,centH);
 
 	double sys=0;
@@ -297,7 +297,7 @@ float systematicsForRAA_Correlated(double pt,double centL=0,double centH=100, do
 
 float systematicsForRAA_UnCorrelated(double pt,double centL=0,double centH=100, double HLT=0, int stage=0)
 {
-	if (!initialized && centL==0&&centH==100) initialization(centL,centH);
+  if (!initialized && centL==0&&(centH==100||centH==90)) initialization(centL,centH);
 	if (!initialized && centL==0&&centH==10) initialization(centL,centH);
 
 	double sys=0;
@@ -331,7 +331,7 @@ float systematicsForRAA_UnCorrelated(double pt,double centL=0,double centH=100, 
 // =============================================================================================================
 float systematicsForRAAY(double cent,double centL=0,double centH=100, double HLT=0, int stage=0)
 {
-	if (!initialized && centL==0&&centH==100) initialization(centL,centH);
+  if (!initialized && centL==0&&(centH==100||centH==90)) initialization(centL,centH);
 	if (!initialized && centL==0&&centH==10) initialization(centL,centH);
 
 	double sys=0;
@@ -392,7 +392,7 @@ float normalizationUncertaintyForRAACent(double centL=0,double centH=100)
 
 float systematicsForRAACent(double cent,double centL=0,double centH=100, double HLT=0, int stage=0)
 {
-	if (!initialized && centL==0&&centH==100) initialization(centL,centH);
+  if (!initialized && centL==0&&(centH==100||centH==90)) initialization(centL,centH);
 	if (!initialized && centL==0&&centH==10) initialization(centL,centH);
 
 	double sys=0;
@@ -456,7 +456,7 @@ float normalizationUncertaintyForRCP(double centL=0,double centH=100)
 
 float systematicsForRCP(double pt, double HLT=0,double centL=0,double centH=100)
 {
-	if (!initialized && centL==0&&centH==100) initializationPbPbCent0100();
+  if (!initialized && centL==0&&(centH==100||centH==90)) initializationPbPbCent0100();
 	if (!initialized && centL==0&&centH==10) initializationPbPbCent010();
 	return 0.2;
 
@@ -559,7 +559,7 @@ float normalizationUncertaintyForPbPb(bool TAAhi = 1, double centL=0,double cent
 
 float systematicsPbPb(double pt, bool TAAhi = 1, double centL=0,double centH=100, double HLT=0)
 {
-    if (!initialized && centL==0&&centH==100) initialization(centL,centH);
+  if (!initialized && centL==0&&(centH==100||centH==90)) initialization(centL,centH);
     if (!initialized && centL==0&&centH==10) initialization(centL,centH);
 
 	double sys=0;
@@ -590,7 +590,7 @@ float systematicsPbPb(double pt, bool TAAhi = 1, double centL=0,double centH=100
 
 float systematicsPbPb_Correlated(double pt, bool TAAhi = 1, double centL=0,double centH=100, double HLT=0)
 {
-    if (!initialized && centL==0&&centH==100) initialization(centL,centH);
+  if (!initialized && centL==0&&(centH==100||centH==90)) initialization(centL,centH);
     if (!initialized && centL==0&&centH==10) initialization(centL,centH);
 	double sys=0;
 
@@ -609,7 +609,7 @@ float systematicsPbPb_Correlated(double pt, bool TAAhi = 1, double centL=0,doubl
 
 float systematicsPbPb_UnCorrelated(double pt, bool TAAhi = 1, double centL=0,double centH=100, double HLT=0)
 {
-    if (!initialized && centL==0&&centH==100) initialization(centL,centH);
+    if (!initialized && centL==0&&(centH==100||centH==90)) initialization(centL,centH);
     if (!initialized && centL==0&&centH==10) initialization(centL,centH);
 	double sys=0;
 

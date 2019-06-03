@@ -19,7 +19,7 @@ bool drawDRAA = 0;
 bool drawJpsi = 0;
 
 bool drawBRpA = 0;
-bool drawThm = 1;
+bool drawThm = 0;
 
 bool BSepSys = 0;
 
@@ -185,8 +185,9 @@ void NuclearModificationFactor(TString inputPP="ROOTfiles/CrossSectionPP.root", 
 		bSystnorm->SetFillColorAlpha(kAzure+7, 0.5);
 	}
 	//if(drawB) bSystnorm->Draw(); //Draw at the very end to avoid being covered by other stuff
-
-	TLatex * tlatexeff2=new TLatex(0.40,0.595,"Centrality 0-100%");
+	
+	TString texper="%";
+	TLatex * tlatexeff2=new TLatex(0.40,0.595,Form("Centrality %.0f-%.0f%s",centMin,centMax,texper.Data()));
 	tlatexeff2->SetNDC();
 	tlatexeff2->SetTextColor(1);
 	tlatexeff2->SetTextFont(42);
@@ -199,7 +200,7 @@ void NuclearModificationFactor(TString inputPP="ROOTfiles/CrossSectionPP.root", 
 	texY->SetTextFont(42);
 	texY->SetTextSize(0.045);
 	texY->SetLineWidth(2);
-	//texY->Draw();
+	texY->Draw();
 
 	TLatex* texlumi = new TLatex(0.20,0.936,"28.0 pb^{-1} (pp 5.02 TeV) + 1.5 nb^{-1} (PbPb 5.02 TeV)");
 	texlumi->SetNDC();
@@ -223,14 +224,7 @@ void NuclearModificationFactor(TString inputPP="ROOTfiles/CrossSectionPP.root", 
 	texcms->SetTextSize(0.06);
 	texcms->SetLineWidth(2);
 	texcms->Draw();
-
-	texY = new TLatex(0.16,0.72,"|y| < 2.4");
-	texY->SetNDC();
-	texY->SetTextFont(42);
-	texY->SetTextSize(0.04);
-	texY->SetLineWidth(2);
-	texY->Draw();
-
+	
 	TLatex* texpre = new TLatex(0.15,0.84,"Preliminary");
 	texpre->SetNDC();
 	texpre->SetTextAlign(13);
@@ -510,10 +504,10 @@ void NuclearModificationFactor(TString inputPP="ROOTfiles/CrossSectionPP.root", 
 	}
 
 
-	canvasRAA->SaveAs(Form("plotRAA/canvasRAA%s_%.0f_%.0f%s.pdf",label.Data(),centMin,centMax,AddOn.Data()));
-	canvasRAA->SaveAs(Form("plotRAA/canvasRAA%s_%.0f_%.0f%s.png",label.Data(),centMin,centMax,AddOn.Data()));
-	canvasRAA->SaveAs(Form("plotRAA/canvasRAA%s_%.0f_%.0f%s.eps",label.Data(),centMin,centMax,AddOn.Data()));
-	canvasRAA->SaveAs(Form("plotRAA/canvasRAA%s_%.0f_%.0f%s.C",label.Data(),centMin,centMax,AddOn.Data()));
+	canvasRAA->SaveAs(Form("plotRAA/canvasRAA%s_cent%.0f-%.0f%s.pdf",label.Data(),centMin,centMax,AddOn.Data()));
+	canvasRAA->SaveAs(Form("plotRAA/canvasRAA%s_cent%.0f-%.0f%s.png",label.Data(),centMin,centMax,AddOn.Data()));
+	canvasRAA->SaveAs(Form("plotRAA/canvasRAA%s_cent%.0f-%.0f%s.eps",label.Data(),centMin,centMax,AddOn.Data()));
+	canvasRAA->SaveAs(Form("plotRAA/canvasRAA%s_cent%.0f-%.0f%s.C",label.Data(),centMin,centMax,AddOn.Data()));
 	TFile *fRAA=new TFile(outputfile.Data(),"recreate");
 	fRAA->cd();
 	gNuclearModification->Write();

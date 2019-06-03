@@ -1,19 +1,19 @@
 void canvas1DhEff_PbPb()
 {
 //=========Macro generated from canvas: canvas1D/
-//=========  (Fri May 10 19:24:19 2019) by ROOT version 6.12/07
+//=========  (Mon Jun  3 13:56:40 2019) by ROOT version 6.12/07
    TCanvas *canvas1D = new TCanvas("canvas1D", "",0,0,600,600);
    gStyle->SetOptStat(0);
    gStyle->SetOptTitle(0);
    canvas1D->SetHighLightColor(2);
-   canvas1D->Range(-13.125,-0.07500001,118.125,0.675);
+   canvas1D->Range(-13.125,-0.125,118.125,1.125);
    canvas1D->SetFillColor(0);
    canvas1D->SetBorderMode(0);
    canvas1D->SetBorderSize(2);
    canvas1D->SetFrameBorderMode(0);
    canvas1D->SetFrameBorderMode(0);
    
-   TH2F *hemptyEff__1 = new TH2F("hemptyEff__1","",50,0,105,10,0,0.6);
+   TH2F *hemptyEff__1 = new TH2F("hemptyEff__1","",50,0,105,10,0,1);
    hemptyEff__1->SetMinimum(0);
    hemptyEff__1->SetMaximum(0.6);
    hemptyEff__1->SetStats(0);
@@ -23,7 +23,7 @@ void canvas1DhEff_PbPb()
    ci = TColor::GetColor("#000099");
    hemptyEff__1->SetLineColor(ci);
    hemptyEff__1->SetMarkerStyle(20);
-   hemptyEff__1->GetXaxis()->SetTitle("p_{T} GeV^{-1}c)");
+   hemptyEff__1->GetXaxis()->SetTitle("p_{T} (GeV/c)");
    hemptyEff__1->GetXaxis()->CenterTitle(true);
    hemptyEff__1->GetXaxis()->SetLabelFont(42);
    hemptyEff__1->GetXaxis()->SetLabelSize(0.035);
@@ -45,21 +45,23 @@ void canvas1DhEff_PbPb()
    Double_t xAxis1[8] = {5, 7, 10, 15, 20, 30, 50, 100}; 
    
    TH1D *hEff__2 = new TH1D("hEff__2","",7, xAxis1);
-   hEff__2->SetBinContent(1,0.0008780964);
-   hEff__2->SetBinContent(2,0.01021191);
-   hEff__2->SetBinContent(3,0.03842158);
-   hEff__2->SetBinContent(4,0.09941672);
-   hEff__2->SetBinContent(5,0.176533);
-   hEff__2->SetBinContent(6,0.2500655);
-   hEff__2->SetBinContent(7,0.2932769);
-   hEff__2->SetBinError(1,0.0003440027);
-   hEff__2->SetBinError(2,0.001060319);
-   hEff__2->SetBinError(3,0.002006256);
-   hEff__2->SetBinError(4,0.003966831);
-   hEff__2->SetBinError(5,0.005267498);
-   hEff__2->SetBinError(6,0.007301655);
-   hEff__2->SetBinError(7,0.01177554);
-   hEff__2->SetEntries(3135.577);
+   hEff__2->SetBinContent(1,0.001266398);
+   hEff__2->SetBinContent(2,0.007806407);
+   hEff__2->SetBinContent(3,0.03877295);
+   hEff__2->SetBinContent(4,0.09050098);
+   hEff__2->SetBinContent(5,0.1632558);
+   hEff__2->SetBinContent(6,0.2241424);
+   hEff__2->SetBinContent(7,0.2878392);
+   hEff__2->SetBinContent(8,0.1542346);
+   hEff__2->SetBinError(1,0.0003463654);
+   hEff__2->SetBinError(2,0.0007781264);
+   hEff__2->SetBinError(3,0.001897324);
+   hEff__2->SetBinError(4,0.003398601);
+   hEff__2->SetBinError(5,0.004693874);
+   hEff__2->SetBinError(6,0.006664412);
+   hEff__2->SetBinError(7,0.01321507);
+   hEff__2->SetBinError(8,0.01961153);
+   hEff__2->SetEntries(2575.956);
    hEff__2->SetStats(0);
    hEff__2->SetLineColor(2);
    hEff__2->SetMarkerColor(2);
@@ -80,7 +82,7 @@ void canvas1DhEff_PbPb()
    hEff__2->GetZaxis()->SetTitleSize(0.035);
    hEff__2->GetZaxis()->SetTitleFont(42);
    hEff__2->Draw("same");
-   TLatex *   tex = new TLatex(0.5,0.815,"Centrality 0-100%");
+   TLatex *   tex = new TLatex(0.5,0.815,"Centrality 0-90%");
 tex->SetNDC();
    tex->SetTextFont(42);
    tex->SetLineWidth(2);

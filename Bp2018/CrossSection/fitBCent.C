@@ -44,7 +44,7 @@ void fitBCent(int usePbPb=0, TString inputdata="" , TString inputmc="", TString 
     {
       seldata = Form("%s&&%s",trgselection.Data(),cut.Data());
       selmceff = Form("%s",cut.Data());
-      selmcgen = Form("%s",cutmcgen.Data());o previously, Ta-wei did centrality reweighting 
+      selmcgen = Form("%s",cutmcgen.Data()); 
     }
   else
     {
@@ -142,9 +142,11 @@ void fitBCent(int usePbPb=0, TString inputdata="" , TString inputmc="", TString 
       TF1* f = fit(nt,ntMC,_ptBins,_ptBins,isMC,isPbPb, totalmass, centmin, centmax, npfit);
       hMean->SetBinContent(i+1,f->GetParameter(1));
       hMean->SetBinError(i+1,f->GetParError(1));  
-      double yield = f->Integral(minhisto,maxhisto)/binwidthmass;
-      double yieldErr = f->Integral(minhisto,maxhisto)/binwidthmass*f->GetParError(0)/f->GetParameter(0);
-      printf("centrality bin %.0f-%.0f of p_t bin %.0f-%.0f     Yield: %f     YieldErr: %f     RelYieldErr: %f\n", _ptBins[i]/2, _ptBins[i+1]/2, ptBinsInc[0], ptBinsInc[1], yield, yieldErr, yieldErr/yield);
+
+      //double yield = f->Integral(minhisto,maxhisto)/binwidthmass;
+      //double yieldErr = f->Integral(minhisto,maxhisto)/binwidthmass*f->GetParError(0)/f->GetParameter(0);
+      
+      //printf("centrality bin %.0f-%.0f of p_t bin %.0f-%.0f     Yield: %f     YieldErr: %f     RelYieldErr: %f\n", _ptBins[i]/2, _ptBins[i+1]/2, ptBinsInc[0], ptBinsInc[1], yield, yieldErr, yieldErr/yield);
       yieldErr = yieldErr*_ErrCor;
       hPt->SetBinContent(i+1,yield/(ptBinsInc[1]-ptBinsInc[0]));
       hPt->SetBinError(i+1,yieldErr/(ptBinsInc[1]-ptBinsInc[0]));
