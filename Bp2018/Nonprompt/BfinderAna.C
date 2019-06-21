@@ -7,7 +7,7 @@ void printDa(GenInfoBranches *GenInfo, int idx, int space);
 int getBAncestor(GenInfoBranches *GenInfo, int idx, int BancestorId);
 int matcher(BInfoBranches *BInfo, TrackInfoBranches *TrackInfo, MuonInfoBranches *MuonInfo, GenInfoBranches *GenInfo, int j, float BId, float MId, float tk1Id, float tk2Id, bool twoTks);
 int BfinderAna(
-		TString infile="/data/twang/BfinderRun2/DoubleMu/BfinderData_pp_20151130/finder_pp_merged.root", 
+	       TString infile="",
 		TString outfile="test.root", 
 		Bool_t REAL=false, 
 		Bool_t isPbPb=false, 

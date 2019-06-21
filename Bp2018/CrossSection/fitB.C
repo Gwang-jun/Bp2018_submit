@@ -83,15 +83,15 @@ TF1* fit (TTree* nt, TTree* ntMC, double ptmin, double ptmax, int isMC,bool, TF1
  weightdata="1";
  if(!isPbPb)
    {
-     weightgen="pthatweight*(0.599212+-0.020703*Gpt+0.003143*Gpt*Gpt+-0.000034*Gpt*Gpt*Gpt)*(1.055564*TMath::Exp(-0.001720*(PVz+2.375584)*(PVz+2.375584)))";
+     weightgen="pthatweight*(0.599212+-0.020703*Gpt+0.003143*Gpt*Gpt+-0.000034*Gpt*Gpt*Gpt)*((1.055564*TMath::Exp(-0.001720*(PVz+2.375584)*(PVz+2.375584))))";
      weight="pthatweight*(0.599212+-0.020703*Bpt+0.003143*Bpt*Bpt+-0.000034*Bpt*Bpt*Bpt)*(1.055564*TMath::Exp(-0.001720*(PVz+2.375584)*(PVz+2.375584)))";
    }
  else
    {
-     weightgen="pthatweight*Ncoll";
-     weight="pthatweight*Ncoll";
-     //     weightgen="pthatweight*Ncoll*(0.599212+-0.020703*Gpt+0.003143*Gpt*Gpt+-0.000034*Gpt*Gpt*Gpt)*(1.055564*TMath::Exp(-0.001720*(PVz+2.375584)*(PVz+2.375584)))";
-     //     weight="pthatweight*Ncoll*(0.599212+-0.020703*Bpt+0.003143*Bpt*Bpt+-0.000034*Bpt*Bpt*Bpt)*(1.055564*TMath::Exp(-0.001720*(PVz+2.375584)*(PVz+2.375584)))";
+     //weightgen="pthatweight*Ncoll";
+     //weight="pthatweight*Ncoll";
+     weightgen="pthatweight*Ncoll*(1.032231*TMath::Exp(-0.000763*(PVz+3.728292)*(PVz+3.728292)))*(0.000001+0.128279*Gpt-0.003814*Gpt*Gpt+0.000071*Gpt*Gpt*Gpt)";
+     weight="pthatweight*Ncoll*(1.032231*TMath::Exp(-0.000763*(PVz+3.728292)*(PVz+3.728292)))*(0.000001+0.128279*Bpt-0.003814*Bpt*Bpt+0.000071*Bpt*Bpt*Bpt)";
    }
 
 //if(doDataCor == 1){
@@ -111,17 +111,19 @@ TFile* infMC = new TFile(inputmc.Data());
 TTree* nt = (TTree*)inf->Get("Bfinder/ntKp");
 nt->AddFriend("hltanalysis/HltTree");
 nt->AddFriend("hiEvtAnalyzer/HiTree");
-nt->AddFriend("skimanalysis/HltTree");
+//nt->AddFriend("skimanalysis/HltTree");
 
 //For 2018 PbPb MC
 TTree* ntGen = (TTree*)infMC->Get("Bfinder/ntGen");
 ntGen->AddFriend("hltanalysis/HltTree");
 ntGen->AddFriend("hiEvtAnalyzer/HiTree");
+ntGen->AddFriend("Bfinder/ntKp"); //call PVz
+//ntGen->AddFriend("skimanalysis/HltTree");
 TTree* ntMC = (TTree*)infMC->Get("Bfinder/ntKp");
 ntMC->AddFriend("hltanalysis/HltTree");
 ntMC->AddFriend("hiEvtAnalyzer/HiTree");
-ntMC->AddFriend("skimanalysis/HltTree");
-ntMC->AddFriend("Bfinder/ntGen");
+ntMC->AddFriend("Bfinder/ntGen"); //call Bgen
+//ntMC->AddFriend("skimanalysis/HltTree");
 
 //For 2015 PbPb, pp data
 //TTree* nt = (TTree*)inf->Get("ntKp");
@@ -454,7 +456,7 @@ void getNPFnPar(TString npfname, float par[]){
   texChi->Draw();
   printf("NDF: %d, chi2: %f, prob: %f\n", f->GetNDF(), f->GetChisquare(), f->GetProb());
   
-  TLatex* texcms = new TLatex(0.22,0.87,"CMS Preliminary");
+  TLatex* texcms = new TLatex(0.22,0.87,"CMS");
   texcms->SetNDC();
   texcms->SetTextAlign(13);
   texcms->SetTextFont(62);

@@ -3,7 +3,7 @@
 #include "TF1.h"
 
 const int nBins=1;
-double ptBins[nBins+1] = {10.,1000};
+double ptBins[nBins+1] = {5.,100};
 
 Double_t minhisto=5.0;
 Double_t maxhisto=6.0;
@@ -19,7 +19,7 @@ TString selmcgen;
 TString collisionsystem;
 Float_t hiBinMin,hiBinMax,centMin,centMax;
 
-void fitNP(int usePbPb=0, TString inputdata="/data/HeavyFlavourRun2/MC2015/Bntuple/pp/Bntuple20160618_BJpsiMM_5p02TeV_TuneCUETP8M1.root" , TString inputmc="/data/HeavyFlavourRun2/MC2015/Bntuple/pp/Bntuple20160618_BJpsiMM_5p02TeV_TuneCUETP8M1.root", TString trgselection="1",  TString cut="TMath::Abs(By)<2.4&&TMath::Abs(Bmumumass-3.096916)<0.15&&Bmass>5&&Bmass<6&&Btrk1Pt>0.9&&Bchi2cl>1.32e-02&&(Bd0/Bd0Err)>3.41&&cos(Bdtheta)>-3.46e-01&&Bmu1pt>1.5&&Bmu2pt>1.5&&Blxy>0.025", TString cutmcgen="TMath::Abs(Gy)<2.4&&abs(GpdgId)==521&&GisSignal==1", int isMC=0, Double_t luminosity=1., int doweight=0, TString collsyst="PP", TString outputfile="ROOTfiles/mytest.root", Float_t centmin=0., Float_t centmax=0.)
+void fitNP(int usePbPb=1, TString inputdata="" , TString inputmc="", TString trgselection="1",  TString cut="", TString cutmcgen="", int isMC=1, Double_t luminosity=1., int doweight=0, TString collsyst="", TString outputfile="ROOTfiles/NPFitPbPb.root", Float_t centmin=0., Float_t centmax=0.)
 {
 	collisionsystem=collsyst;
 	hiBinMin = centmin*2;
@@ -35,17 +35,17 @@ void fitNP(int usePbPb=0, TString inputdata="/data/HeavyFlavourRun2/MC2015/Bntup
 	if(!isPbPb)
 	{
 		seldata = Form("%s&&%s",trgselection.Data(),cut.Data());
-		selmceff = Form("%s",cut.Data());
+		selmceff = Form("%s&&%s",trgselection.Data(),cut.Data());
 		selmcgen = Form("%s",cutmcgen.Data());
 	}
 	else
 	{
 		seldata = Form("%s&&%s&&hiBin>%f&&hiBin<%f",trgselection.Data(),cut.Data(),hiBinMin,hiBinMax);
-		selmceff = Form("%s&&hiBin>%f&&hiBin<%f",cut.Data(),hiBinMin,hiBinMax);
+		selmceff = Form("%s&&%s&&hiBin>%f&&hiBin<%f",trgselection.Data(),cut.Data(),hiBinMin,hiBinMax);
 		selmcgen = Form("%s&&hiBin>%f&&hiBin<%f",cutmcgen.Data(),hiBinMin,hiBinMax);
 	}
 
-	selmc = Form("%s",cut.Data());
+	selmc = Form("%s&&%s&&hiBin>=%f&&hiBin<=%f",trgselection.Data(),cut.Data(),hiBinMin,hiBinMax);
 
 	gStyle->SetTextSize(0.05);
 	gStyle->SetTextFont(42);
@@ -68,10 +68,15 @@ void fitNP(int usePbPb=0, TString inputdata="/data/HeavyFlavourRun2/MC2015/Bntup
 
 	TFile* inf = new TFile(inputdata.Data());
 
-	TTree* nt = (TTree*)inf->Get("ntKp");
-	nt->AddFriend("ntHlt");
-	nt->AddFriend("ntHi");
-	nt->AddFriend("ntSkim");
+	TTree* nt = (TTree*)inf->Get("Bfinder/ntKp");
+	nt->AddFriend("hltanalysis/HltTree");
+	nt->AddFriend("hiEvtAnalyzer/HiTree");
+	nt->AddFriend("skimanalysis/HltTree");
+
+	TTree* ntMC = (TTree*)infMC->Get("Bfinder/ntKp");
+	ntMC->AddFriend("hltanalysis/HltTree");
+	ntMC->AddFriend("hiEvtAnalyzer/HiTree");
+	ntMC->AddFreind("skimanalysis/HltTree");
 
 	TF1 *totalmass;
 

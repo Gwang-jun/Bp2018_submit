@@ -62,18 +62,20 @@ void MCefficiency(int isPbPb=0,TString inputmc="", TString selmcgen="",TString s
   TTree* ntMC = (TTree*)infMC->Get("Bfinder/ntKp");
   ntMC->AddFriend("hltanalysis/HltTree");
   ntMC->AddFriend("hiEvtAnalyzer/HiTree");
-  ntMC->AddFriend("skimanalysis/HltTree");
   ntMC->AddFriend("Bfinder/ntGen");
+  //ntMC->AddFriend("skimanalysis/HltTree");
   TTree* ntGen = (TTree*)infMC->Get("Bfinder/ntGen");
   ntGen->AddFriend("hltanalysis/HltTree");
   ntGen->AddFriend("hiEvtAnalyzer/HiTree");
-  TTree* ntSkim = (TTree*)infMC->Get("skimanalysis/HltTree");
-  TTree* ntHlt = (TTree*)infMC->Get("hltanalysis/HltTree");
-  TTree* nthi = (TTree*)infMC->Get("hiEvtAnalyzer/HiTree");
-  nthi->AddFriend(ntMC);
+  ntGen->AddFriend("Bfinder/ntKp");
+  //ntGen->AddFriend("skimanalysis/HltTree");
 
   //For 2015 PbPb, pp MC
   //TFile* infMC = new TFile(inputmc.Data());
+  //TTree* ntSkim = (TTree*)infMC->Get("skimanalysis/HltTree");
+  //TTree* ntHlt = (TTree*)infMC->Get("hltanalysis/HltTree");
+  //TTree* nthi = (TTree*)infMC->Get("hiEvtAnalyzer/HiTree");
+  //nthi->AddFriend(ntMC);
   //TTree* ntMC = (TTree*)infMC->Get("ntKp");
   //TTree* ntGen = (TTree*)infMC->Get("ntGen");
   //TTree* ntSkim = (TTree*)infMC->Get("ntSkim");
@@ -90,28 +92,28 @@ void MCefficiency(int isPbPb=0,TString inputmc="", TString selmcgen="",TString s
   //nthi->AddFriend(ntMC);
   //ntMC->AddFriend(nthi);
 
-  // optimal weigths
+  // optimal weights
   TCut weighpthat = "1";
   TCut weightGpt = "1";
   TCut weightBgenpt = "1";
   TCut weightHiBin = "1";
   TCut weightPVz = "1";
   if(useweight==0) {
-    weightPVz="1.055564*TMath::Exp(-0.001720*(PVz+2.375584)*(PVz+2.375584))";
     weighpthat = "pthatweight";
+    weightPVz = "1.055564*TMath::Exp(-0.001720*(PVz+2.375584)*(PVz+2.375584))";
     weightGpt = "0.599212+-0.020703*Gpt+0.003143*Gpt*Gpt+-0.000034*Gpt*Gpt*Gpt";
     weightBgenpt = "0.599212+-0.020703*Bgenpt+0.003143*Bgenpt*Bgenpt+-0.000034*Bgenpt*Bgenpt*Bgenpt";
     }
   
   if(useweight==1) {
-    weightPVz="1";
-    //    weightPVz="1.055564*TMath::Exp(-0.001720*(PVz+2.375584)*(PVz+2.375584))";
     weighpthat = "pthatweight";
-    weightGpt = "1";
-    //weightGpt = "0.599212+-0.020703*Gpt+0.003143*Gpt*Gpt+-0.000034*Gpt*Gpt*Gpt";
-    weightBgenpt = "1";
-    //weightBgenpt = "0.599212+-0.020703*Bgenpt+0.003143*Bgenpt*Bgenpt+-0.000034*Bgenpt*Bgenpt*Bgenpt";
     weightHiBin = "Ncoll";
+    //weightPVz="1";
+    weightPVz = "1.032231*TMath::Exp(-0.000763*(PVz+3.728292)*(PVz+3.728292))";
+    //weightGpt = "1";
+    weightGpt = "0.000001+0.128279*Gpt-0.003814*Gpt*Gpt+0.000071*Gpt*Gpt*Gpt";
+    //weightBgenpt = "1";
+    weightBgenpt = "0.000001+0.128279*Bgenpt-0.003814*Bgenpt*Bgenpt+0.000071*Bgenpt*Bgenpt*Bgenpt";
     }
   
   TH1D* hPtMC = new TH1D("hPtMC","",_nBins,_ptBins);
@@ -422,7 +424,3 @@ int main(int argc, char *argv[])
     MCefficiency(atoi(argv[1]),argv[2],argv[3],argv[4],argv[5],argv[6],argv[7],argv[8],atoi(argv[9]),atof(argv[10]),atof(argv[11]));
   return 0;
 }
-
-
-
-
