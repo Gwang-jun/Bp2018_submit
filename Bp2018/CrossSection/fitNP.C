@@ -3,7 +3,7 @@
 #include "TF1.h"
 
 const int nBins=1;
-double ptBins[nBins+1] = {5.,100};
+double ptBins[nBins+1] = {5.,100.};
 
 Double_t minhisto=5.0;
 Double_t maxhisto=6.0;
@@ -18,6 +18,9 @@ TString selmceff;
 TString selmcgen;
 TString collisionsystem;
 Float_t hiBinMin,hiBinMax,centMin,centMax;
+
+Double_t npyield;
+Double_t npyieldErr;
 
 void fitNP(int usePbPb=1, TString inputdata="" , TString inputmc="", TString trgselection="1",  TString cut="", TString cutmcgen="", int isMC=1, Double_t luminosity=1., int doweight=0, TString collsyst="", TString outputfile="ROOTfiles/NPFitPbPb.root", Float_t centmin=0., Float_t centmax=0.)
 {
@@ -58,6 +61,8 @@ void fitNP(int usePbPb=1, TString inputdata="" , TString inputmc="", TString trg
 	void clean0 (TH1D* h);
 	TF1* fit (TTree* nt, TTree* ntMC, double ptmin, double ptmax, int isMC,bool, TF1* &total,Float_t centmin, Float_t centmax);
 
+	doweight=0;
+
 	if(doweight==0) {
 		weightgen="1";
 		weight="1";
@@ -71,12 +76,14 @@ void fitNP(int usePbPb=1, TString inputdata="" , TString inputmc="", TString trg
 	TTree* nt = (TTree*)inf->Get("Bfinder/ntKp");
 	nt->AddFriend("hltanalysis/HltTree");
 	nt->AddFriend("hiEvtAnalyzer/HiTree");
-	nt->AddFriend("skimanalysis/HltTree");
+	//nt->AddFriend("skimanalysis/HltTree");
+	nt->AddFriend("Bfinder/ntGen");
 
-	TTree* ntMC = (TTree*)infMC->Get("Bfinder/ntKp");
+	TTree* ntMC = (TTree*)inf->Get("Bfinder/ntKp");
 	ntMC->AddFriend("hltanalysis/HltTree");
 	ntMC->AddFriend("hiEvtAnalyzer/HiTree");
-	ntMC->AddFreind("skimanalysis/HltTree");
+	//ntMC->AddFreind("skimanalysis/HltTree");
+	ntMC->AddFriend("Bfinder/ntGen");
 
 	TF1 *totalmass;
 
@@ -84,8 +91,8 @@ void fitNP(int usePbPb=1, TString inputdata="" , TString inputmc="", TString trg
 	for(int i=0;i<nBins;i++)
 	{
 		TF1* f = fit(nt,nt,ptBins[i],ptBins[i+1],isMC,isPbPb, totalmass,centmin, centmax);
-		double yield = f->Integral(minhisto,maxhisto)/binwidthmass;
-		double yieldErr = f->Integral(minhisto,maxhisto)/binwidthmass*f->GetParError(0)/f->GetParameter(0);
+		//double yield = f->Integral(minhisto,maxhisto)/binwidthmass;
+		//double yieldErr = f->Integral(minhisto,maxhisto)/binwidthmass*f->GetParError(0)/f->GetParameter(0);
 	}  
 }
 
@@ -105,65 +112,49 @@ TF1 *fit(TTree *nt, TTree *ntMC, Double_t ptmin, Double_t ptmax, int isMC,bool i
 	TCanvas* c= new TCanvas(Form("c%d",count),"",600,600);
 	TH1D* h = new TH1D(Form("h%d",count),"",nbinsmasshisto,minhisto,maxhisto);
 
-	//   TF1* f = new TF1(Form("f%d",count),"[0]*Gaus(x,[1],[2])/(sqrt(2*3.14159)*[2]) + [3]*Gaus(x,[4],[5])/(sqrt(2*3.14159)*[5]) + [6]*Gaus(x,[7],[8])/(sqrt(2*3.14159)*[8]) + [9]+[10]*x ");
-	//   TF1* f = new TF1(Form("f%d",count),"[0]*Gaus(x,[1],[2])/(sqrt(2*3.14159)*[2]) + [3]*Gaus(x,[4],[5])/(sqrt(2*3.14159)*[5]) + [9]+[10]*x ");
-	TF1* f = new TF1(Form("f%d",count),"[0]*TMath::Erf((x-[1])/[2]) + [0] + [9]+[10]*x ");
-
+	//TF1* f = new TF1(Form("f%d",count),"[0]*Gaus(x,[1],[2])/(sqrt(2*3.14159)*[2]) + [3]*Gaus(x,[4],[5])/(sqrt(2*3.14159)*[5]) + [6]*Gaus(x,[7],[8])/(sqrt(2*3.14159)*[8]) + [9]+[10]*x ");
+	//TF1* f = new TF1(Form("f%d",count),"[0]*Gaus(x,[1],[2])/(sqrt(2*3.14159)*[2]) + [3]*Gaus(x,[4],[5])/(sqrt(2*3.14159)*[5]) + [9]+[10]*x ");
+	//TF1* f = new TF1(Form("f%d",count),"[0]*TMath::Erf((x-[1])/[2])+[0]+[9]+[10]*x");
+	TF1* f = new TF1(Form("f%d",count),"[0]*TMath::Erf((x-[1])/[2])+[0]+[6]*TMath::Gaus(x,[7],[8])/(sqrt(2*3.14159)*[8])+[9]+[10]*x");
+	
 	if(isMC==1) nt->Project(Form("h%d",count),"Bmass",Form("%s*(%s&&Bpt>%f&&Bpt<%f)","1",seldata.Data(),ptmin,ptmax));   
 	else nt->Project(Form("h%d",count),"Bmass",Form("(%s&&Bpt>%f&&Bpt<%f)",seldata.Data(),ptmin,ptmax));   
 
 	clean0(h);
 
 	h->Draw();
-	f->SetParLimits(0, 1e-2, 1e4);
-	f->SetParLimits(1, 5.02, 5.06);
-	f->SetParLimits(2, 0.001, 0.1);
 
+	//error fn
+	f->SetParLimits(0, 1, 1e3);
+	f->SetParLimits(1, 5.0, 5.3);
+	f->SetParLimits(2, -1, 0);
+	f->SetParameter(0,10);
+	f->SetParameter(1,5.1);
+	f->SetParameter(2,-0.1);
+	
 	f->SetParLimits(3, 1e-2, 1e4);
 	f->SetParLimits(4, 5.06, 5.10);
 	f->SetParLimits(5, 0.001, 0.1);
-
-	f->SetParLimits(6, 0, 1e4);
-	f->SetParLimits(7, 5.3, 5.4);
-	f->SetParLimits(8, 0.001, 0.5);
-
-	f->SetParLimits(9, 0, 1e5);
-	f->SetParLimits(10, -500,  100);
-
-	f->SetParameter(0,1e2);
-	f->SetParameter(1,5.03);
-	f->SetParameter(2,0.05);
-
-	f->SetParameter(0,1e2);
-	f->SetParameter(1,5.03);
-	f->SetParameter(2,0.05);
-
 	f->SetParameter(3,1e2);
 	f->SetParameter(4,5.07);
 	f->SetParameter(5,0.05);
 
-	f->SetParameter(6,1e2);
+	f->SetParLimits(6, 1e-1, 1e2);
+	f->SetParLimits(7, 5.3, 5.4);
+	f->SetParLimits(8, 0.03, 0.10);
+	f->SetParameter(6,10);
 	f->SetParameter(7,5.35);
 	f->SetParameter(8,0.05);
 
+	f->SetParLimits(9, 0, 1e5);
+	f->SetParLimits(10, -500,  100);
 	f->SetParameter(9,1e3);
 	f->SetParameter(10,-1);
 
-	//error fn
-	f->SetParLimits(0, 1e1, 1e3);
-	f->SetParLimits(1, 5., 5.3);
-	f->SetParLimits(2, -10, 0);
-	f->SetParameter(0,100);
-	f->SetParameter(1,5.1);
-	f->SetParameter(2,0);
-
 	h->GetEntries();
 
-	h->Fit(Form("f%d",count),"q","",minhisto,maxhisto);
-	h->Fit(Form("f%d",count),"q","",minhisto,maxhisto);
-	h->Fit(Form("f%d",count),"L q","",minhisto,maxhisto);
-	h->Fit(Form("f%d",count),"L q","",minhisto,maxhisto);
-	h->Fit(Form("f%d",count),"L q","",minhisto,maxhisto);
+	//h->Fit(Form("f%d",count),"q","",minhisto,maxhisto);
+	//h->Fit(Form("f%d",count),"L q","",minhisto,maxhisto);
 	h->Fit(Form("f%d",count),"L m","",minhisto,maxhisto);
 	h->SetMarkerSize(0.8);
 	h->SetMarkerStyle(20);
@@ -175,19 +166,25 @@ TF1 *fit(TTree *nt, TTree *ntMC, Double_t ptmin, Double_t ptmax, int isMC,bool i
 	background->SetRange(minhisto,maxhisto);
 	background->SetLineStyle(2);
 
-	//   TF1 *mass = new TF1(Form("fmass%d",count),"[0]*Gaus(x,[1],[2])/(sqrt(2*3.14159)*[2]) + [3]*Gaus(x,[4],[5])/(sqrt(2*3.14159)*[5]) + [6]*Gaus(x,[7],[8])/(sqrt(2*3.14159)*[8])");
-	//   mass->SetParameters(f->GetParameter(0),f->GetParameter(1),f->GetParameter(2),f->GetParameter(3),f->GetParameter(4),f->GetParameter(5),f->GetParameter(6),f->GetParameter(7),f->GetParameter(8));
+	//TF1 *mass = new TF1(Form("fmass%d",count),"[0]*Gaus(x,[1],[2])/(sqrt(2*3.14159)*[2]) + [3]*Gaus(x,[4],[5])/(sqrt(2*3.14159)*[5]) + [6]*Gaus(x,[7],[8])/(sqrt(2*3.14159)*[8])");
+	//mass->SetParameters(f->GetParameter(0),f->GetParameter(1),f->GetParameter(2),f->GetParameter(3),f->GetParameter(4),f->GetParameter(5),f->GetParameter(6),f->GetParameter(7),f->GetParameter(8));
 	//TF1 *mass = new TF1(Form("fmass%d",count),"[0]*Gaus(x,[1],[2])/(sqrt(2*3.14159)*[2]) + [3]*Gaus(x,[4],[5])/(sqrt(2*3.14159)*[5])");
 	//mass->SetParameters(f->GetParameter(0),f->GetParameter(1),f->GetParameter(2),f->GetParameter(3),f->GetParameter(4),f->GetParameter(5));
-	TF1 *mass = new TF1(Form("fmass%d",count),"[0]*TMath::Erf((x-[1])/[2]) + [0]");
-	mass->SetParameters(f->GetParameter(0),f->GetParameter(1),f->GetParameter(2));
-	//mass->SetParError(0,f->GetParError(0));
-	//mass->SetParError(1,f->GetParError(1));
-	//mass->SetParError(2,f->GetParError(2));
+	//TF1 *mass = new TF1(Form("fmass%d",count),"[0]*TMath::Erf((x-[1])/[2]) + [0]");
+	//mass->SetParameters(f->GetParameter(0),f->GetParameter(1),f->GetParameter(2));
+	TF1 *mass = new TF1(Form("fmass%d",count),"[0]*TMath::Erf((x-[1])/[2])+[0]+[3]*TMath::Gaus(x,[4],[5])/(sqrt(2*3.14159)*[5])");
+	mass->SetParameters(f->GetParameter(0),f->GetParameter(1),f->GetParameter(2),f->GetParameter(6),f->GetParameter(7),f->GetParameter(8));
+	mass->SetParError(0,f->GetParError(0));
+	mass->SetParError(1,f->GetParError(1));
+	mass->SetParError(2,f->GetParError(2));
+	mass->SetParError(3,f->GetParError(6));
+	mass->SetParError(4,f->GetParError(7));
+	mass->SetParError(5,f->GetParError(8));
 	mass->SetLineColor(2);
 
 	h->SetXTitle("m_{#mu#muK} (GeV/c^{2})");
-	h->SetYTitle("Entries / (5 MeV/c^{2})");
+	double yunit = 1000./nbinsmasshisto;
+	h->SetYTitle(Form("Events / (%.0f MeV/c^{2})",yunit));//basically, the unit is equivalent to binwidthmass in MeV
 	h->GetXaxis()->CenterTitle();
 	h->GetYaxis()->CenterTitle();
 	h->SetAxisRange(0,h->GetMaximum()*1.4*1.2,"Y");
@@ -214,9 +211,9 @@ TF1 *fit(TTree *nt, TTree *ntMC, Double_t ptmin, Double_t ptmax, int isMC,bool i
 	mass->SetFillStyle(3004);
 	mass->SetFillColor(2);
 	f->Draw("same");
-
-	Double_t yield = mass->Integral(minhisto,maxhisto)/binwidthmass;
-	Double_t yieldErr = mass->Integral(minhisto,maxhisto)/binwidthmass*mass->GetParError(0)/mass->GetParameter(0);
+	
+	npyield = mass->Integral(minhisto,maxhisto)/binwidthmass;
+	//npyieldErr = mass->Integral(minhisto,maxhisto)/binwidthmass*mass->GetParError(0)/mass->GetParameter(0);
 
 	TLegend* leg = new TLegend(0.65,0.58,0.82,0.88,NULL,"brNDC");
 	leg->SetBorderSize(0);
@@ -224,10 +221,25 @@ TF1 *fit(TTree *nt, TTree *ntMC, Double_t ptmin, Double_t ptmax, int isMC,bool i
 	leg->SetTextFont(42);
 	leg->SetFillStyle(0);
 	leg->AddEntry(h,"Data","pl");
+	//leg->AddEntry(h,"Bs #rightarrow J/#psi + X","pl");
 	leg->AddEntry(f,"Fit","l");
-	leg->AddEntry(mass,"Peaking BG","f");
+        leg->AddEntry(mass,"Peaking BG","f");
 	leg->AddEntry(background,"Combinatorial","l");
 	leg->Draw("same");
+
+	TLatex* texYield = new TLatex(0.55,0.51,Form("Yield:%.2f", npyield));
+	texYield->SetNDC();
+	texYield->SetTextAlign(12);
+	texYield->SetTextSize(0.035);
+	texYield->SetTextFont(42);
+	//texYield->Draw();
+
+	TLatex* texChi = new TLatex(0.55,0.475,Form("#chi^{2}/nDOF:%.2f/%d=%.2f", f->GetChisquare(), f->GetNDF(), f->GetChisquare()/f->GetNDF()));
+	texChi->SetNDC();
+	texChi->SetTextAlign(12);
+	texChi->SetTextSize(0.035);
+	texChi->SetTextFont(42);
+        texChi->Draw();
 
 	TLatex* texCms = new TLatex(0.18,0.93, "#scale[1.25]{CMS} Preliminary");
 	texCms->SetNDC();
@@ -256,7 +268,7 @@ TF1 *fit(TTree *nt, TTree *ntMC, Double_t ptmin, Double_t ptmax, int isMC,bool i
 
 	if(centMax>0){
 		TString texper="%";
-		tex = new TLatex(0.22,0.71,Form("Centrality %.0f-%.0f%s",centMin,centMax,texper.Data()));//0.2612903,0.8425793
+		tex = new TLatex(0.22,0.71,Form("Cent. %.0f-%.0f%s",centMin,centMax,texper.Data()));
 		tex->SetNDC();
 		tex->SetTextColor(1);
 		tex->SetTextFont(42);
@@ -276,8 +288,8 @@ TF1 *fit(TTree *nt, TTree *ntMC, Double_t ptmin, Double_t ptmax, int isMC,bool i
 
 	h->Write();
 	f->Write();
-	if(!isPbPb) c->SaveAs(Form("plotNP/BMass%s_%d.pdf",collisionsystem.Data(),count));
-	else c->SaveAs(Form("plotNP/BMass%s_%.0f_%.0f_%d.pdf",collisionsystem.Data(),centMin,centMax,count));
+	if(!isPbPb) c->SaveAs(Form("plotNP/BMass%s.png",collisionsystem.Data()));
+	else c->SaveAs(Form("plotNP/BMass%s_%.0f_%.0f.png",collisionsystem.Data(),centMin,centMax));
 	return mass;
 }
 

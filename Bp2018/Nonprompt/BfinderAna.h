@@ -13,9 +13,9 @@ void setHltBranch(TTree* hltroot)
 unsigned int       Bf_HiTree_Run;
 unsigned long long Bf_HiTree_Evt;
 unsigned int       Bf_HiTree_Lumi;
-void setHiTreeBranch(TTree* hitreeroot)
+void setHiTreeBranch(TTree* hiroot)
 {
-  hitreeroot->SetBranchAddress("run",&Bf_HiTree_Run);
-  hitreeroot->SetBranchAddress("evt",&Bf_HiTree_Evt);
-  hitreeroot->SetBranchAddress("lumi",&Bf_HiTree_Lumi);
+  hiroot->SetBranchAddress("run",&Bf_HiTree_Run);
+  hiroot->SetBranchAddress("evt",&Bf_HiTree_Evt);
+  hiroot->SetBranchAddress("lumi",&Bf_HiTree_Lumi);
 }

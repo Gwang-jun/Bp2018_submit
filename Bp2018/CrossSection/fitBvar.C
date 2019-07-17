@@ -15,6 +15,8 @@ bool isPbPb = true;
 
 float yield=0;
 float yieldErr=0;
+float yieldref;
+int stage;
 float NPpar[2];
 
 const int nbkg=4;
@@ -23,16 +25,16 @@ const int nsig=2;
 TString bkgerf = "[3]*(TMath::Erf((x-[4])/[5])+1)";
 TString bkgerf_new = "[0]*(TMath::Erf((x-[1])/[2])+1)";
 
-TString sig[nsig] =     {"[0]*([7]*Gaus(x,[1],[2]*(1+[6]))/(sqrt(2*3.14159)*[2]*(1+[6]))+(1-[7])*Gaus(x,[1],[8]*(1+[6]))/(sqrt(2*3.14159)*[8]*(1+[6])))",
-		         "[0]*([7]*Gaus(x,[1],[2])/(sqrt(2*3.14159)*[2])+(1-[7])*Gaus(x,[1],[8])/(sqrt(2*3.14159)*[8])+[6]*Gaus(x,[1],[9])/(sqrt(2*3.14159)*[9]))",
-		         //"[0]*([7]*Gaus(x,[1],[2])/(sqrt(2*3.14159)*[2])+[6]*ROOT::Math::crystalball_cdf(x,[9],[10],[8],[1]))",
-		         //"[0]*([7]*Gaus(x,[1],[2])/(sqrt(2*3.14159)*[2])+[6]*TMath::BreitWigner(x,[1],[8]))"
+TString sig[nsig] =     {"[0]*([7]*TMath::Gaus(x,[1],[2]*(1+[6]))/(sqrt(2*3.14159)*[2]*(1+[6]))+(1-[7])*TMath::Gaus(x,[1],[8]*(1+[6]))/(sqrt(2*3.14159)*[8]*(1+[6])))",
+		         "[0]*([7]*TMath::Gaus(x,[1],[2])/(sqrt(2*3.14159)*[2])+(1-[7])*TMath::Gaus(x,[1],[8])/(sqrt(2*3.14159)*[8])+[6]*TMath::Gaus(x,[1],[9])/(sqrt(2*3.14159)*[9]))",
+		         //"[0]*([7]*TMath::Gaus(x,[1],[2])/(sqrt(2*3.14159)*[2])+[6]*ROOT::Math::crystalball_cdf(x,[9],[10],[8],[1]))",
+		         //"[0]*([7]*TMath::Gaus(x,[1],[2])/(sqrt(2*3.14159)*[2])+[6]*TMath::BreitWigner(x,[1],[8]))"
 			 };
 		    
-TString sig_new[nsig] = {"[0]*([3]*Gaus(x,[1],[2]*(1+[5]))/(sqrt(2*3.14159)*[2]*(1+[5]))+(1-[3])*Gaus(x,[1],[4]*(1+[5]))/(sqrt(2*3.14159)*[4]*(1+[5])))",
-		         "[0]*([3]*Gaus(x,[1],[2])/(sqrt(2*3.14159)*[2])+(1-[3])*Gaus(x,[1],[4])/(sqrt(2*3.14159)*[4])+[5]*Gaus(x,[1],[6])/(sqrt(2*3.14159)*[6]))",
-		         //"[0]*([3]*Gaus(x,[1],[2])/(sqrt(2*3.14159)*[2])+[5]*ROOT::Math::crystalball_cdf(x,[6],[7],[4],[1]))",
-		         //"[0]*([3]*Gaus(x,[1],[2])/(sqrt(2*3.14159)*[2])+[5]*TMath::BreitWigner(x,[1],[4]))"
+TString sig_new[nsig] = {"[0]*([3]*TMath::Gaus(x,[1],[2]*(1+[5]))/(sqrt(2*3.14159)*[2]*(1+[5]))+(1-[3])*TMath::Gaus(x,[1],[4]*(1+[5]))/(sqrt(2*3.14159)*[4]*(1+[5])))",
+		         "[0]*([3]*TMath::Gaus(x,[1],[2])/(sqrt(2*3.14159)*[2])+(1-[3])*TMath::Gaus(x,[1],[4])/(sqrt(2*3.14159)*[4])+[5]*TMath::Gaus(x,[1],[6])/(sqrt(2*3.14159)*[6]))",
+		         //"[0]*([3]*TMath::Gaus(x,[1],[2])/(sqrt(2*3.14159)*[2])+[5]*ROOT::Math::crystalball_cdf(x,[6],[7],[4],[1]))",
+		         //"[0]*([3]*TMath::Gaus(x,[1],[2])/(sqrt(2*3.14159)*[2])+[5]*TMath::BreitWigner(x,[1],[4]))"
 			 };
 
 TString sig_bkg[nsig] = {"[9]+[10]*(x-6)",
@@ -73,7 +75,7 @@ void getNPFnPar(TString npfname, float par[]){
 	par[1] = f->GetParameter(2);
 }
 
-void fitBvar(TString collsyst="PbPb", TString inputfile ="", TString npfile="ROOTfiles/NPFitPbPb.root", float centMin=0, float centMax=100, TString outputfile="outHisto")
+void fitBvar(TString collsyst="", TString inputfile ="", TString npfile="", float centMin=0, float centMax=100, TString outputfile="outHisto")
 {
   collisionsystem = collsyst;
   infname = outputfile;
@@ -93,14 +95,14 @@ void fitBvar(TString collsyst="PbPb", TString inputfile ="", TString npfile="ROO
 
   TCanvas* c = new TCanvas("c","",600,600);
 
-  TF1* bmass = new TF1("bmass","[0]",7,50);
+  TF1* bmass = new TF1("bmass","[0]",5,100);
   bmass->SetTitle(";B^{+} p_{T} (GeV/c);fraction of default yield");
-  bmass->SetMinimum(0.9);
-  bmass->SetMaximum(1.1);
+  bmass->SetMinimum(0.5);
+  bmass->SetMaximum(1.5);
   if(isPbPb)
     {
-    bmass->SetMinimum(0.9);
-    bmass->SetMaximum(1.1);
+    bmass->SetMinimum(0.5);
+    bmass->SetMaximum(1.5);
     }
   bmass->SetParameter(0,1);
   bmass->SetLineWidth(1);
@@ -161,17 +163,19 @@ void fitBvar(TString collsyst="PbPb", TString inputfile ="", TString npfile="ROO
 	      for(int i=0;i<nBins;i++)
 		{
 
-		  double def_y = h_def->GetBinContent(i+1);
+		  //double def_y = h_def->GetBinContent(i+1);
+		  double def_y = yieldref;
 		  double def_err = h_def->GetBinError(i+1);
 		 
 		  TF1* f = fit(ptBins[i],ptBins[i+1],s,b,0);
 		  cout<<"YIELD / YIELDERR:  "<< yield <<" "<< yieldErr << endl;
-		  cout << "DEF YIELD:  "<< def_y*(ptBins[i+1]-ptBins[i]) <<endl;
+		  //cout << "DEF YIELD:  "<< def_y*(ptBins[i+1]-ptBins[i]) <<endl;
+		  cout << "DEF YIELD:  "<< yieldref <<endl;
 		  double y = yield/(ptBins[i+1]-ptBins[i]);
 		  double err = yieldErr/(ptBins[i+1]-ptBins[i]);
 
-		  double y_fr = y/def_y;
-		  cout << "YIELD FRACTION: " << y_fr << endl;
+		  double y_fr = yield/def_y;
+		  cout << "YIELD FRACTION: " << 100*(y_fr-1.0) << "%" << endl;
 		  double err_fr = sqrt(pow(err/def_y,2)+pow(def_err*y/(def_y*def_y),2));
 
 		  hvar->SetBinContent(i+1,y_fr);
@@ -179,17 +183,20 @@ void fitBvar(TString collsyst="PbPb", TString inputfile ="", TString npfile="ROO
 		  hvar->SetMarkerStyle(8);
 		  hvar->SetMarkerColor(4+cnt);
 		  cnt++;
+		  stage=cnt;
 
 		  if(s==0 && b==0)
-		  {    		     
+		  {   
+		      def_y = yieldref;
 		      f = fit(ptBins[i],ptBins[i+1],0,0,1);
 		      cout<<"YIELD / YIELDERR:  "<< yield <<" "<< yieldErr << endl;
-		      cout << "DEF YIELD:  "<< def_y*(ptBins[i+1]-ptBins[i]) <<endl;
+		      //cout << "DEF YIELD:  "<< def_y*(ptBins[i+1]-ptBins[i]) <<endl;
+		      cout << "DEF YIELD:  "<< yieldref <<endl;
 		      y = yield/(ptBins[i+1]-ptBins[i]);
 		      err = yieldErr/(ptBins[i+1]-ptBins[i]);
 
-		      y_fr = y/def_y;
-		      cout << "YIELD FRACTION: " << y_fr << endl;
+		      y_fr = yield/def_y;
+		      cout << "YIELD FRACTION: " << 100*(y_fr-1.0) << "%" << endl;
 		      err_fr = sqrt(pow(err/def_y,2)+pow(def_err*y/(def_y*def_y),2));
 
 		      hwidvar->SetBinContent(i+1,y_fr);
@@ -219,14 +226,16 @@ void fitBvar(TString collsyst="PbPb", TString inputfile ="", TString npfile="ROO
 
 TF1* fit(float ptmin, float ptmax, int s, int b, int widVar)
 {
-
-    static int count=0;
-    count++;
-
+  
+  static int count=0;
+  count++;
+  
   TCanvas* c = new TCanvas(Form("c_%.0f_%.0f",ptmin,ptmax),"",400,400);
   TFile* infile = new TFile(Form("%s/%s_%.0f_%.0f.root",infname.Data(),collisionsystem.Data(),ptmin,ptmax));
-  TH1D* h = (TH1D*)infile->Get("h");                    h->SetName(Form("h_%.0f_%.0f",ptmin,ptmax));
-  TH1D* hMCSignal = (TH1D*)infile->Get("hMCSignal");    hMCSignal->SetName(Form("hMCSignal_%.0f_%.0f",ptmin,ptmax));
+  TH1D* h = (TH1D*)infile->Get("h");
+  h->SetName(Form("h_%.0f_%.0f",ptmin,ptmax));
+  TH1D* hMCSignal = (TH1D*)infile->Get("hMCSignal");
+  hMCSignal->SetName(Form("hMCSignal_%.0f_%.0f",ptmin,ptmax));
     
   TF1* f;  
   TF1* background;
@@ -378,8 +387,8 @@ TF1* fit(float ptmin, float ptmax, int s, int b, int widVar)
    mass->SetFillColor(kOrange-3);
    mass->SetFillStyle(3002);
 
-  h->SetXTitle("m_{#mu#muK} (GeV/c^{2})");
-  h->SetYTitle("Entries / (5 MeV/c^{2})");
+  h->SetXTitle("m_{B} (GeV/c^{2})");
+  h->SetYTitle("Entries / (20 MeV/c^{2})");
   h->GetXaxis()->CenterTitle();
   h->GetYaxis()->CenterTitle();
   h->SetAxisRange(0,h->GetMaximum()*1.4*1.2,"Y");
@@ -417,6 +426,8 @@ TF1* fit(float ptmin, float ptmax, int s, int b, int widVar)
    yield = mass->Integral(minhisto,maxhisto)/binwidthmass;
    yieldErr = mass->Integral(minhisto,maxhisto)/binwidthmass*mass->GetParError(0)/mass->GetParameter(0);
 
+   if(s==0 && b==0 && stage==0) yieldref=yield;
+
   TLegend* leg = new TLegend(0.55,0.45,0.875,0.76,NULL,"brNDC");
   leg->SetBorderSize(0);
   leg->SetTextSize(0.05);
@@ -438,7 +449,7 @@ TF1* fit(float ptmin, float ptmax, int s, int b, int widVar)
 
   TLatex* texCol;
   if(collisionsystem=="pp"||collisionsystem=="PP") texCol= new TLatex(0.39,0.94, Form("25.8 pb^{-1} (%s #sqrt{s_{NN}} = 5.02 TeV)","pp"));
-  else texCol= new TLatex(0.35,0.94, Form("345 #mub^{-1} (%s #sqrt{s_{NN}} = 5.02 TeV)","PbPb"));
+  else texCol= new TLatex(0.35,0.94, Form("1.5 nb^{-1} (%s #sqrt{s_{NN}} = 5.02 TeV)","PbPb"));
   texCol->SetNDC();
   texCol->SetTextSize(0.05);
   texCol->SetLineWidth(2);
@@ -447,7 +458,7 @@ TF1* fit(float ptmin, float ptmax, int s, int b, int widVar)
 
   TLatex* tex;
   
-  tex = new TLatex(0.53,0.85,Form("%.1f < p_{T} < %.1f GeV/c",ptmin,ptmax));
+  tex = new TLatex(0.53,0.85,Form("%.0f < p_{T} < %.0f GeV/c",ptmin,ptmax));
   tex->SetNDC();
   tex->SetTextFont(42);
   tex->SetTextSize(0.05);
@@ -456,7 +467,7 @@ TF1* fit(float ptmin, float ptmax, int s, int b, int widVar)
   
   if(centmax>0){
   TString texper="%";
-  tex = new TLatex(0.225,0.78,Form("Centrality %.0f-%.0f%s",centmin,centmax,texper.Data()));//0.2612903,0.8425793
+  tex = new TLatex(0.225,0.78,Form("Cent. %.0f-%.0f%s",centmin,centmax,texper.Data()));//0.2612903,0.8425793
   tex->SetNDC();
   tex->SetTextColor(1);
   tex->SetTextFont(42);
@@ -465,7 +476,7 @@ TF1* fit(float ptmin, float ptmax, int s, int b, int widVar)
   tex->Draw();
   }
 
-  tex = new TLatex(0.77,0.78,"|y_{lab}| < 2.4");
+  tex = new TLatex(0.77,0.78,"|y| < 2.4");
   tex->SetNDC();
   tex->SetTextFont(42);
   tex->SetTextSize(0.05);

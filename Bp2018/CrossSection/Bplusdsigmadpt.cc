@@ -16,14 +16,14 @@
 
 using namespace std;
 
-void Bplusdsigmadpt(TString inputFONLLdat = "fonll_0to120", TString outputFONLL = "pp_fonll_Bplus_dsigmadpt.root", TString label = "pp")
+void Bplusdsigmadpt(TString inputFONLLdat = "fonll_0to120.txt", TString outputFONLL = "fonll_Bplus_dsigmadpt.root", TString label = "pp")
 {
-  double norm=0.405;           //FF of B->B+, i.e., B fraction
+  double norm=0.405; //Fragmentation Fraction of B->B+ in pp. http://pdg.lbl.gov/2019/listings/rpp2019-list-B-plus-minus-B0-Bs0-admixture.pdf
   gROOT->SetStyle("Plain");
   gStyle->SetOptTitle(0);
   gStyle->SetOptStat(0);
 
-  ifstream getdata(Form("%s.txt",inputFONLLdat.Data()));
+  ifstream getdata(inputFONLLdat.Data());
 
   if(!getdata.is_open())
     {
@@ -44,8 +44,8 @@ void Bplusdsigmadpt(TString inputFONLLdat = "fonll_0to120", TString outputFONLL 
       getdata>>max_sc[i];
       getdata>>min_mass[i];
       getdata>>max_mass[i];
-      //getdata>>min_pdf[i];
-      //getdata>>max_pdf[i];
+      getdata>>min_pdf[i];
+      getdata>>max_pdf[i];
     }
   
   TH1F* hpt = new TH1F("hpt","",BIN_NUM,HMIN,HMAX);
@@ -55,8 +55,8 @@ void Bplusdsigmadpt(TString inputFONLLdat = "fonll_0to120", TString outputFONLL 
   TH1F* hmaxsc = new TH1F("hmaxsc","",BIN_NUM,HMIN,HMAX);
   TH1F* hminmass = new TH1F("hminmass","",BIN_NUM,HMIN,HMAX);
   TH1F* hmaxmass = new TH1F("hmaxmass","",BIN_NUM,HMIN,HMAX);
-  //TH1F* hminpdf = new TH1F("hminpdf","",BIN_NUM,HMIN,HMAX);
-  //TH1F* hmaxpdf = new TH1F("hmaxpdf","",BIN_NUM,HMIN,HMAX);
+  TH1F* hminpdf = new TH1F("hminpdf","",BIN_NUM,HMIN,HMAX);
+  TH1F* hmaxpdf = new TH1F("hmaxpdf","",BIN_NUM,HMIN,HMAX);
 
   for(i=0;i<BIN_NUM;i++)
     {
@@ -67,8 +67,8 @@ void Bplusdsigmadpt(TString inputFONLLdat = "fonll_0to120", TString outputFONLL 
       hmaxsc->SetBinContent(i+1,max_sc[i]);
       hminmass->SetBinContent(i+1,min_mass[i]);
       hmaxmass->SetBinContent(i+1,max_mass[i]);
-      //hminpdf->SetBinContent(i+1,min_pdf[i]);
-      //hmaxpdf->SetBinContent(i+1,max_pdf[i]);
+      hminpdf->SetBinContent(i+1,min_pdf[i]);
+      hmaxpdf->SetBinContent(i+1,max_pdf[i]);
     }
   //Rebin Edge
   
@@ -79,8 +79,8 @@ void Bplusdsigmadpt(TString inputFONLLdat = "fonll_0to120", TString outputFONLL 
   TH1F* hmaxsc_rebin = (TH1F*)hmaxsc->Rebin(nBins,"hmaxsc_rebin",ptBins);
   TH1F* hminmass_rebin = (TH1F*)hminmass->Rebin(nBins,"hminmass_rebin",ptBins);
   TH1F* hmaxmass_rebin = (TH1F*)hmaxmass->Rebin(nBins,"hmaxmass_rebin",ptBins);
-  //TH1F* hminpdf_rebin = (TH1F*)hminpdf->Rebin(nBins,"hminpdf_rebin",ptBins);
-  //TH1F* hmaxpdf_rebin = (TH1F*)hmaxpdf->Rebin(nBins,"hmaxpdf_rebin",ptBins);
+  TH1F* hminpdf_rebin = (TH1F*)hminpdf->Rebin(nBins,"hminpdf_rebin",ptBins);
+  TH1F* hmaxpdf_rebin = (TH1F*)hmaxpdf->Rebin(nBins,"hmaxpdf_rebin",ptBins);
 
   double asigma[nBins],aminall[nBins],amaxall[nBins],aminsc[nBins],amaxsc[nBins],aminmass[nBins],amaxmass[nBins],aminpdf[nBins],amaxpdf[nBins],aerrorl[nBins],aerrorh[nBins]; 
 
@@ -124,11 +124,11 @@ void Bplusdsigmadpt(TString inputFONLLdat = "fonll_0to120", TString outputFONLL 
       tem = hmaxmass_rebin->GetBinContent(j+1);
       amaxmass[j] = tem/bin_num[j];
 
-      //tem = hminpdf_rebin->GetBinContent(j+1);
-      //aminpdf[j] = tem/bin_num[j];
+      tem = hminpdf_rebin->GetBinContent(j+1);
+      aminpdf[j] = tem/bin_num[j];
 
-      //tem = hmaxpdf_rebin->GetBinContent(j+1);
-      //amaxpdf[j] = tem/bin_num[j];
+      tem = hmaxpdf_rebin->GetBinContent(j+1);
+      amaxpdf[j] = tem/bin_num[j];
 
       aerrorl[j] = asigma[j]-aminall[j];//all,sc,mass,pdf
       aerrorh[j] = amaxall[j]-asigma[j];//all,sc,mass,pdf
@@ -212,7 +212,7 @@ void Bplusdsigmadpt(TString inputFONLLdat = "fonll_0to120", TString outputFONLL 
   leg->SetFillColor(0);
   TLegendEntry* ent_gaeSigma=leg->AddEntry(gaeSigma,"Frag.Fraction=1.0 (pure FONLL)","PL");
   ent_gaeSigma->SetTextColor(gaeSigma->GetMarkerColor());
-  TLegendEntry* ent_gaeSigmaBplus=leg->AddEntry(gaeSigmaBplus,"Multiplied by Frag. Fraction=0.405","PL");
+  TLegendEntry* ent_gaeSigmaBplus=leg->AddEntry(gaeSigmaBplus,Form("Multiplied by Frag. Fraction=%.3f",norm),"PL");
   ent_gaeSigmaBplus->SetTextColor(gaeSigmaBplus->GetMarkerColor());
   leg->Draw();
 

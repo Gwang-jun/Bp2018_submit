@@ -30,7 +30,7 @@ double *_ptBins = ptBins;
 Double_t yield;
 Double_t yieldErr;
 
-void fitB(int usePbPb=0, TString inputdata="" , TString inputmc="", TString trgselection="1",  TString cut="", TString cutmcgen="", int isMC=0, Double_t luminosity=1., int doweight=0, TString collsyst="PbPb", TString outputfile="", TString npfit="0", int doDataCor = 0, Float_t centmin=0., Float_t centmax=100.)
+void fitB(int usePbPb=0, TString inputdata="" , TString inputmc="", TString trgselection="1",  TString cut="", TString cutmcgen="", int isMC=0, Double_t luminosity=1., int doweight=0, TString collsyst="PbPb", TString outputfile="", TString npfit="0", int doDataCor = 0, Float_t centmin=0., Float_t centmax=90.)
 {
   collisionsystem=collsyst;
   if(collisionsystem=="ppInc"||collisionsystem=="PbPbInc"){
@@ -53,15 +53,15 @@ void fitB(int usePbPb=0, TString inputdata="" , TString inputmc="", TString trgs
       seldata = Form("%s&&%s",trgselection.Data(),cut.Data());
       selmceff = Form("%s&&%s",trgselection.Data(),cut.Data());
       selmcgen = Form("%s",cutmcgen.Data());
+      selmc = Form("%s&&%s",trgselection.Data(),cut.Data());
     }
   else
     {
       seldata = Form("%s&&%s&&hiBin>=%f&&hiBin<=%f",trgselection.Data(),cut.Data(),hiBinMin,hiBinMax);
       selmceff = Form("%s&&%s&&hiBin>=%f&&hiBin<=%f",trgselection.Data(),cut.Data(),hiBinMin,hiBinMax);
       selmcgen = Form("%s&&hiBin>=%f&&hiBin<=%f",cutmcgen.Data(),hiBinMin,hiBinMax);
+      selmc = Form("%s&&%s&&hiBin>=%f&&hiBin<=%f",trgselection.Data(),cut.Data(),hiBinMin,hiBinMax);
     }
-
-  selmc = Form("%s&&%s&&hiBin>=%f&&hiBin<=%f",trgselection.Data(),cut.Data(),hiBinMin,hiBinMax);
 
 gStyle->SetTextSize(0.05);
 gStyle->SetTextFont(42);
@@ -83,15 +83,19 @@ TF1* fit (TTree* nt, TTree* ntMC, double ptmin, double ptmax, int isMC,bool, TF1
  weightdata="1";
  if(!isPbPb)
    {
-     weightgen="pthatweight*(0.599212+-0.020703*Gpt+0.003143*Gpt*Gpt+-0.000034*Gpt*Gpt*Gpt)*((1.055564*TMath::Exp(-0.001720*(PVz+2.375584)*(PVz+2.375584))))";
-     weight="pthatweight*(0.599212+-0.020703*Bpt+0.003143*Bpt*Bpt+-0.000034*Bpt*Bpt*Bpt)*(1.055564*TMath::Exp(-0.001720*(PVz+2.375584)*(PVz+2.375584)))";
+     weightgen="pthatweight*(0.599212+-0.020703*Gpt+0.003143*Gpt*Gpt+-0.000034*Gpt*Gpt*Gpt)";
+     weight="pthatweight*(0.599212+-0.020703*Bgenpt+0.003143*Bgenpt*Bgenpt+-0.000034*Bgenpt*Bgenpt*Bgenpt)";
    }
  else
    {
      //weightgen="pthatweight*Ncoll";
      //weight="pthatweight*Ncoll";
-     weightgen="pthatweight*Ncoll*(1.032231*TMath::Exp(-0.000763*(PVz+3.728292)*(PVz+3.728292)))*(0.000001+0.128279*Gpt-0.003814*Gpt*Gpt+0.000071*Gpt*Gpt*Gpt)";
-     weight="pthatweight*Ncoll*(1.032231*TMath::Exp(-0.000763*(PVz+3.728292)*(PVz+3.728292)))*(0.000001+0.128279*Bpt-0.003814*Bpt*Bpt+0.000071*Bpt*Bpt*Bpt)";
+     //weightgen="pthatweight*Ncoll*(1.032231*TMath::Exp(-0.000763*(PVz+3.728292)*(PVz+3.728292)))*(0.000001+0.128279*Gpt-0.003814*Gpt*Gpt+0.000071*Gpt*Gpt*Gpt)";
+     //weight="pthatweight*Ncoll*(1.032231*TMath::Exp(-0.000763*(PVz+3.728292)*(PVz+3.728292)))*(0.000001+0.128279*Bgenpt-0.003814*Bgenpt*Bgenpt+0.000071*Bgenpt*Bgenpt*Bgenpt)";
+     weightgen="pthatweight*Ncoll*(1.034350*TMath::Exp(-0.000844*(PVz+3.502992)*(PVz+3.502992)))*(0.715021+0.039896*Gpt-0.000834*Gpt*Gpt+0.000006*Gpt*Gpt*Gpt)"; // MC Gpt
+     weight="pthatweight*Ncoll*(1.034350*TMath::Exp(-0.000844*(PVz+3.502992)*(PVz+3.502992)))*(0.715021+0.039896*Bgenpt-0.000834*Bgenpt*Bgenpt+0.000006*Bgenpt*Bgenpt*Bgenpt)"; // MC Gpt
+     //weightgen="pthatweight*Ncoll*(1.034350*TMath::Exp(-0.000844*(PVz+3.502992)*(PVz+3.502992)))*(1.095759-0.028827*Gpt+0.000414*Gpt*Gpt-0.000002*Gpt*Gpt*Gpt)"; // pythia ref
+     //weight="pthatweight*Ncoll*(1.034350*TMath::Exp(-0.000844*(PVz+3.502992)*(PVz+3.502992)))*(1.095759-0.028827*Bgenpt+0.000414*Bgenpt*Bgenpt-0.000002*Bgenpt*Bgenpt*Bgenpt)"; // pythia ref
    }
 
 //if(doDataCor == 1){
@@ -111,19 +115,19 @@ TFile* infMC = new TFile(inputmc.Data());
 TTree* nt = (TTree*)inf->Get("Bfinder/ntKp");
 nt->AddFriend("hltanalysis/HltTree");
 nt->AddFriend("hiEvtAnalyzer/HiTree");
-//nt->AddFriend("skimanalysis/HltTree");
+nt->AddFriend("skimanalysis/HltTree");
 
 //For 2018 PbPb MC
 TTree* ntGen = (TTree*)infMC->Get("Bfinder/ntGen");
 ntGen->AddFriend("hltanalysis/HltTree");
 ntGen->AddFriend("hiEvtAnalyzer/HiTree");
 ntGen->AddFriend("Bfinder/ntKp"); //call PVz
-//ntGen->AddFriend("skimanalysis/HltTree");
+ntGen->AddFriend("skimanalysis/HltTree");
 TTree* ntMC = (TTree*)infMC->Get("Bfinder/ntKp");
 ntMC->AddFriend("hltanalysis/HltTree");
 ntMC->AddFriend("hiEvtAnalyzer/HiTree");
 ntMC->AddFriend("Bfinder/ntGen"); //call Bgen
-//ntMC->AddFriend("skimanalysis/HltTree");
+ntMC->AddFriend("skimanalysis/HltTree");
 
 //For 2015 PbPb, pp data
 //TTree* nt = (TTree*)inf->Get("ntKp");
@@ -140,13 +144,13 @@ ntMC->AddFriend("Bfinder/ntGen"); //call Bgen
 //ntMC->AddFriend("ntHlt");
 //ntMC->AddFriend("ntHi");
 //ntMC->AddFriend("ntSkim");
-//ntMC->AddFriend("mvaTree");
 //ntMC->AddFriend("ntGen");
+//ntMC->AddFriend("mvaTree");
 
 TH1D* hMean = new TH1D("hMean","",_nBins,_ptBins);                       
 TH1D* hSigmaGaus1 = new TH1D("hSigmaGaus1","",_nBins,_ptBins); 
 TH1D* hSigmaGaus2 = new TH1D("hSigmaGaus2","",_nBins,_ptBins); 
-TF1 *totalmass;
+TF1 * totalmass;
 
 TString outputf;
 outputf = Form("%s",outputfile.Data());
@@ -160,8 +164,7 @@ TH1D* hPtGen = new TH1D("hPtGen","",_nBins,_ptBins);
 
  for(int i=0;i<_nBins;i++)
    {
-     //TF1* f = fit(nt,ntMC,_ptBins[i],_ptBins[i+1],isMC,isPbPb, totalmass,centmin, centmax, NPpar);
-     
+     //TF1* f = fit(nt,ntMC,_ptBins[i],_ptBins[i+1],isMC,isPbPb, totalmass,centmin, centmax, NPpar);     
      //if(i==(_nBins-1)){nbinsmasshisto=25;binwidthmass=(maxhisto-minhisto)/nbinsmasshisto;}
      
      TF1* f = fit(nt,ntMC,_ptBins[i],_ptBins[i+1],isMC,isPbPb,totalmass,centmin,centmax,npfit);
@@ -172,24 +175,12 @@ TH1D* hPtGen = new TH1D("hPtGen","",_nBins,_ptBins);
      hPt->SetBinError(i+1,yieldErr/(_ptBins[i+1]-_ptBins[i]));
    }  
  
- if(!isPbPb)
-   {
-     ntMC->Project("hPtMC","Bpt",TCut(weight)*(TCut(selmceff.Data())&&"(Bgen==23333)"));
-     divideBinWidth(hPtMC);
-     ntMC->Project("hPtRecoTruth","Bpt",TCut(selmceff.Data())&&"(Bgen==23333)");
-     divideBinWidth(hPtRecoTruth);
-     ntGen->Project("hPtGen","Gpt",TCut(weightgen)*(TCut(selmcgen.Data())));
-     divideBinWidth(hPtGen);
-   }
- else
-   {
-     ntMC->Project("hPtMC","Bpt",TCut(weight)*(TCut(selmceff.Data())&&"(Bgen==23333)"));
-     divideBinWidth(hPtMC);
-     ntMC->Project("hPtRecoTruth","Bpt",TCut(selmceff.Data())&&"(Bgen==23333)");
-     divideBinWidth(hPtRecoTruth);
-     ntGen->Project("hPtGen","Gpt",TCut(weightgen)*(TCut(selmcgen.Data())));
-     divideBinWidth(hPtGen);
-   }
+ ntMC->Project("hPtMC","Bpt",TCut(weight)*(TCut(selmceff.Data())&&"(Bgen==23333)"));
+ divideBinWidth(hPtMC);
+ ntMC->Project("hPtRecoTruth","Bpt",TCut(selmceff.Data())&&"(Bgen==23333)");
+ divideBinWidth(hPtRecoTruth);
+ ntGen->Project("hPtGen","Gpt",TCut(weightgen)*(TCut(selmcgen.Data())));
+ divideBinWidth(hPtGen);
 
  TCanvas* cPt =  new TCanvas("cPt","",600,600);
  cPt->SetLogy();
@@ -206,7 +197,7 @@ TH1D* hPtGen = new TH1D("hPtGen","",_nBins,_ptBins);
      legPt->Draw("same");  
    }
  hPtMC->Sumw2();
-  
+ 
  TH1D* hEff = (TH1D*)hPtMC->Clone("hEff");
  hEff->SetTitle(";B^{+} p_{T} (GeV/c);Efficiency");
  hEff->Sumw2();
@@ -227,7 +218,12 @@ TH1D* hPtGen = new TH1D("hPtGen","",_nBins,_ptBins);
      TLegend* legPtCor = myLegend(0.55,0.80,0.90,0.94);
      legPtCor->AddEntry(hPtCor,"Corrected signal","pl");
      legPtCor->AddEntry(hPtGen,"Generated B^{+}","lf");
-     legPtCor->Draw("same");  
+     legPtCor->Draw("same");
+     hPtCor->SetLineColor(kRed);
+     hPtGen->SetLineColor(kBlue);
+     hPtCor->Draw("same");
+     hPtGen->Draw("same");
+     cPtCor->SaveAs("a.png");
    }
  
  TH1D* hPtSigma= (TH1D*)hPtCor->Clone("hPtSigma");
@@ -280,17 +276,18 @@ void getNPFnPar(TString npfname, float par[]){
   f->SetNpx(5000);
   f->SetLineWidth(5);
   
-  if(isMC==1) nt->Project(Form("h-%d",count),"Bmass",Form("%s*(%s&&Bpt>%f&&Bpt<%f)*(1/%s)","1",seldata.Data(),ptmin,ptmax,weightdata.Data()));
+  if(isMC==1) ntMC->Project(Form("h-%d",count),"Bmass",Form("%s*(%s&&Bpt>%f&&Bpt<%f)*(1/%s)","1",seldata.Data(),ptmin,ptmax,weightdata.Data()));
   else nt->Project(Form("h-%d",count),"Bmass",Form("(%s&&Bpt>%f&&Bpt<%f)*(1/%s)",seldata.Data(),ptmin,ptmax,weightdata.Data()));   
   ntMC->Project(Form("hMCSignal-%d",count),"Bmass",Form("%s&&Bpt>%f&&Bpt<%f",Form("%s&&Bgen==23333",selmc.Data()),ptmin,ptmax));
   clean0(h);
   
   f->SetParLimits(4,-1e5,1e5);
+  //f->SetParLimits(2,0.01,0.10);
+  //f->SetParLimits(8,0.01,0.10);
   f->SetParLimits(2,0.01,0.05);
   f->SetParLimits(8,0.01,0.05);
   f->SetParLimits(7,0,1);
-  f->SetParLimits(5,0,1e4);
-  f->SetParLimits(0,0,1e5);
+  f->SetParLimits(0,0,1e6);
   
   //Do the signal fit first
   
@@ -299,6 +296,8 @@ void getNPFnPar(TString npfname, float par[]){
   f->SetParameter(2,setparam2);
   f->SetParameter(8,setparam3);
   f->FixParameter(1,fixparam1);
+  //f->FixParameter(3,0);
+  //f->FixParameter(4,0);
   f->FixParameter(5,0);
   if(weightdata != "1"){
     int maxb = h->GetMaximumBin();
@@ -313,7 +312,7 @@ void getNPFnPar(TString npfname, float par[]){
   
   hMCSignal->Fit(Form("f%d",count),"q","",minhisto,maxhisto);
   hMCSignal->Fit(Form("f%d",count),"q","",minhisto,maxhisto);
-  f->ReleaseParameter(1);
+  //f->ReleaseParameter(1);
   hMCSignal->Fit(Form("f%d",count),"L q","",minhisto,maxhisto);
   hMCSignal->Fit(Form("f%d",count),"L q","",minhisto,maxhisto);
   hMCSignal->Fit(Form("f%d",count),"L q","",minhisto,maxhisto);
@@ -326,6 +325,8 @@ void getNPFnPar(TString npfname, float par[]){
   f->FixParameter(7,f->GetParameter(7));
   f->FixParameter(8,f->GetParameter(8));
   
+  //f->ReleaseParameter(3);
+  //f->ReleaseParameter(4);
   f->ReleaseParameter(5);
   f->SetParLimits(5,0,1000);
   
@@ -441,7 +442,7 @@ void getNPFnPar(TString npfname, float par[]){
   leg->AddEntry(Bkpi,"B #rightarrow J/#psi X","f");
   leg->Draw("same");
   
-  TLatex* texYield = new TLatex(0.55,0.51,Form("Yield:%.2f", yield));
+  TLatex* texYield = new TLatex(0.55,0.51,Form("Yield:%.2f#pm%.2f", yield, yieldErr));
   texYield->SetNDC();
   texYield->SetTextAlign(12);
   texYield->SetTextSize(0.035);
@@ -489,14 +490,16 @@ void getNPFnPar(TString npfname, float par[]){
   tex->Draw();
   
   TString texper="%";
-  tex = new TLatex(0.488,0.80,Form("Centrality %.0f-%.0f%s  |y|<2.4",centmin,centmax,texper.Data()));
+  if(isPbPb){
+  tex = new TLatex(0.488,0.80,Form("Cent. %.0f-%.0f%s  |y|<2.4",centmin,centmax,texper.Data()));
   tex->SetNDC();
   tex->SetTextColor(1);
   tex->SetTextFont(42);
   tex->SetTextSize(0.045);
   tex->SetLineWidth(2);
   tex->Draw();
-  
+  }  
+
   total=f;
   
   TF1* t = (TF1*)h->GetFunction(Form("f%d",count))->Clone();
@@ -506,16 +509,16 @@ void getNPFnPar(TString npfname, float par[]){
   h->Write();
   hMCSignal->Write();
   
-  TString _postfix = "";
+  TString _postfix = "%";
   if(weightdata!="1") _postfix = "_EFFCOR";
   if(isPbPb && isMC==0) 
     c->SaveAs(Form("plotFits/test_data_PbPb_pt%.0f-%.0f_cent%.0f-%.0f%s.png",ptmin,ptmax,centmin,centmax,_postfix.Data()));
   else if(isPbPb && isMC==1) 
-    c->SaveAs(Form("plotFits/mc_PbPb_pt%.0f-%.0f_cent%.0f-%.0f%s.pdf",ptmin,ptmax,centmin,centmax,_postfix.Data()));
+    c->SaveAs(Form("plotFits/test_mc_PbPb_pt%.0f-%.0f_cent%.0f-%.0f%s.pdf",ptmin,ptmax,centmin,centmax,_postfix.Data()));
   else if(!isPbPb && isMC==0) 
-    c->SaveAs(Form("plotFits/data_pp_pt%.0f-%.0f_cent%.0f-%.0f%s.pdf",ptmin,ptmax,centmin,centmax,_postfix.Data()));
+    c->SaveAs(Form("plotFits/test_data_pp_pt%.0f-%.0f.pdf",ptmin,ptmax));
   else 
-    c->SaveAs(Form("plotFits/mc_pp_pt%.0f-%.0f_cent%.0f-%.0f%s.pdf",ptmin,ptmax,centmin,centmax,_postfix.Data()));
+    c->SaveAs(Form("plotFits/test_mc_pp_pt%.0f-%.0f.pdf",ptmin,ptmax));
   
   return mass;
 }

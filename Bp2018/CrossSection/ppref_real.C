@@ -1,56 +1,69 @@
 #include "uti.h"
 
-const int nBins=10;
-const float FF=0.405; //Fragmentation Fration of b -> B+, to be multiplied for FONLL
+const int nBins = 10;
+const float FF = 0.340; //Fragmentation Fration of b -> B+, to be multiplied for FONLL
 double ptBins[nBins+1] = {5., 10., 13., 17., 24., 30., 40., 50., 60., 70., 100.};
-TString inputname_ref = "ppref_real.txt";
-TString outputname_ref = "ppref_real_5p02TeV.root";
+double yrange[nBins+1];
+TString inputname_ref_13 = "ppref_real_13.txt";
+TString inputname_ref_7 = "ppref_real_7.txt";
+TString outputname_ref = "ppref_extrapolation.root";
 TString inputmcname = "/mnt/T2_US_MIT/submit-hi2/scratch/gwangjun/crab_Bfinder_20190520_Hydjet_Pythia8_BuToJpsiK_1033p1_pt3tkpt0p7dls2_v2_addSamplePthat_pthatweight.root";
 
 using namespace std;
 
 void ppref_real()
 {
-  ifstream getdata(inputname_ref.Data());
-  
-  if(!getdata.is_open())
-    {
-      cout<<"Failure while opening the input file"<<endl;
-    }
-  
-  // dsigmadpt units in [microbarn/GeV] 
-  float ptmin[nBins], ptmax[nBins], yrange[nBins], dsigmadpt_real[nBins], e1[nBins], e2[nBins], e3[nBins], dsigmadpt_FONLL[nBins], e4[nBins], e5[nBins], dsigmadpt_FONLL_5p02[nBins], e6[nBins], e7[nBins], dsigmadpt_pythia[nBins], e_real[nBins], e_FONLL[nBins], e_FONLL_5p02[nBins], e_pythia[nBins], dsigmadpt_real_5p02[nBins];
+  gStyle->SetOptStat(0);
+
+  ifstream getdata(inputname_ref_13.Data());
+  // dsigmadpt units in [micr/obarn/GeV] 
+  double ptmin[9], ptmax[9], dsigmadpt_real_13[9], e1[9], e2[9], e3[9], dsigmadpt_FONLL_13[9], e4[9], e5[9], dsigmadpt_FONLL_5[9], e6[9], e7[9], e_real_13[9];
   int i;
   
-  for(i=0;i<nBins;i++)
+  for(i=1;i<10;i++)
     {
       getdata>>ptmin[i];
       getdata>>ptmax[i];
       getdata>>yrange[i];
-      getdata>>dsigmadpt_real[i];
+      getdata>>dsigmadpt_real_13[i];
       getdata>>e1[i];
       getdata>>e2[i];
       getdata>>e3[i];
-      getdata>>dsigmadpt_FONLL[i];
+      getdata>>dsigmadpt_FONLL_13[i];
       getdata>>e4[i];
       getdata>>e5[i];
-      getdata>>dsigmadpt_FONLL_5p02[i];
+      getdata>>dsigmadpt_FONLL_5[i];
       getdata>>e6[i];
       getdata>>e7[i];
-      getdata>>dsigmadpt_pythia[i];
 
-      e_real[i] = sqrt(e1[i]*e1[i]+e2[i]*e2[i]+e3[i]*e3[i]);
-      e_FONLL[i] = (e5[i]-e4[i])*0.5;
-      e_FONLL_5p02[i] = (e7[i]-e6[i])*0.5;
-      e_pythia[i] = 0.0;
-      
-      //dsigmadpt_real_5p02[i]=dsigmadpt_real[i]*dsigmadpt_FONLL_5p02[i]/dsigmadpt_FONLL[i];
+      e_real_13[i] = sqrt(e1[i]*e1[i]+e2[i]*e2[i]+e3[i]*e3[i]);
+    }
+
+  ifstream getdata(inputname_ref_7.Data());
+  // dsigmadpt units in [microbarn/GeV] 
+  double dsigmadpt_real_7[5], e8[5], e9[5], dsigmadpt_FONLL_7[5], e10[5], e11[5], e_real_7[5];
+  
+  for(i=0;i<5;i++)
+    {
+      getdata>>ptmin[i];
+      getdata>>ptmax[i];
+      getdata>>yrange[i];
+      getdata>>dsigmadpt_real_7[i];
+      getdata>>e8[i];
+      getdata>>e9[i];
+      getdata>>dsigmadpt_FONLL_7[i];
+      getdata>>e10[i];
+      getdata>>e11[i];
+      getdata>>dsigmadpt_FONLL_5[i];
+      getdata>>e6[i];
+      getdata>>e7[i];
+
+      e_real_7[i] = sqrt(e8[i]*e8[i]+e9[i]*e9[i]);
     }
   
   TH1F* d_r = new TH1F("d_r","",nBins,ptBins);
   TH1F* d_f = new TH1F("d_f","",nBins,ptBins);
   TH1F* d_f5 = new TH1F("d_f5","",nBins,ptBins);
-  TH1F* pythia_ref = new TH1F("pythia_ref","",nBins,ptBins);
 
   for(i=0;i<nBins;i++)
     {
@@ -102,18 +115,18 @@ void ppref_real()
   Ratiopt->Sumw2();
   Ratiopt->Divide(Genpt);
   
-  TF1 *f = new TF1("f","[0]+[1]*x+[2]*x*x+[3]*x*x*x",5,100);
+  TF1 *f = new TF1("f1","[0]+[1]*x+[2]*x*x+[3]*x*x*x",5,100);
   f->SetParameters(1,0.1,0.1,0.1);
   f->SetParLimits(0,0,10);
   f->SetParLimits(1,-10,10);
   f->SetParLimits(2,-10,10);
   f->SetParLimits(3,-10,10);
   
-  Ratiopt->Fit("f");
+  Ratiopt->Fit(f,"R");
   
-  printf("Bpt weight function: %f+%f*Bpt+%f*Bpt*Bpt+%f*Bpt*Bpt*Bpt\n",f->GetParameter(0),f->GetParameter(1),f->GetParameter(2),f->GetParameter(3));
+  printf("Bpt weight function(MC Gpt): %f+%f*Bpt+%f*Bpt*Bpt+%f*Bpt*Bpt*Bpt\n",f->GetParameter(0),f->GetParameter(1),f->GetParameter(2),f->GetParameter(3));
   
-  Ratiopt->SetTitle("Ratio between Real data and Genpt");
+  Ratiopt->SetTitle("Real_reference/Genpt");
   Ratiopt->GetXaxis()->SetTitle("p_{t} (GeV/c)");
   Ratiopt->GetYaxis()->SetTitle("Real/Gen");
   Ratiopt->GetYaxis()->SetTitleOffset(1.0);
@@ -158,13 +171,28 @@ void ppref_real()
 
   c2->SaveAs("Bpt_weight.png");  
 
-  TH1F* Ratio_pythia = (TH1F*) pythia_ref->Clone("Ratio_pythia");
+  TH1F* Ratio_pythia = (TH1F*) real_ref->Clone("Ratio_pythia");
   Ratio_pythia->Sumw2();
-  Ratio_pythia->Divide(Genpt);
+  Ratio_pythia->Divide(pythia_ref);
+  
+  Ratio_pythia->Fit(f,"R");
+  
+  printf("Bpt weight function(pythia ref): %f+%f*Bpt+%f*Bpt*Bpt+%f*Bpt*Bpt*Bpt\n",f->GetParameter(0),f->GetParameter(1),f->GetParameter(2),f->GetParameter(3));
+
+  Ratio_pythia->SetTitle("Real_reference/pythia_reference");
+  Ratio_pythia->SetLineColor(kBlue);
   
   TCanvas* c3 = new TCanvas("","",600,600);
   c3->cd();
   Ratio_pythia->Draw("");
+
+  TLatex* fitftn2 = new TLatex(0.15,0.8,Form("Bpt weight: %f+%f*Bpt+%f*Bpt^2+%f*Bpt^3",f->GetParameter(0),f->GetParameter(1),f->GetParameter(2),f->GetParameter(3)));
+  fitftn2->SetNDC();
+  fitftn2->SetTextFont(42);
+  fitftn2->SetTextSize(0.020);
+  fitftn2->SetLineWidth(1);
+  fitftn2->Draw("same");
+
   c3->SaveAs("Bpt_pythia.png");
   
   TFile* output_ref = new TFile(outputname_ref.Data(),"recreate");

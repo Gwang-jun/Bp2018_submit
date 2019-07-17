@@ -1,7 +1,7 @@
 void canvasSigmaBplusRatioPbPb_cent0-90()
 {
 //=========Macro generated from canvas: cSigma/
-//=========  (Wed May 22 17:49:51 2019) by ROOT version 6.12/07
+//=========  (Mon Jul 15 08:34:01 2019) by ROOT version 6.12/07
    TCanvas *cSigma = new TCanvas("cSigma", "",0,0,600,600);
    gStyle->SetOptStat(0);
    gStyle->SetOptTitle(0);
@@ -56,13 +56,13 @@ void canvasSigmaBplusRatioPbPb_cent0-90()
    40,
    75};
    Double_t gaeSigmaBplus_fy3001[7] = {
-   4405494,
-   2052997,
-   652850.7,
-   179221.3,
-   42701.85,
-   5133.226,
-   244.7777};
+   4634232,
+   2167553,
+   685281.8,
+   186414.7,
+   44056.79,
+   5247.477,
+   248.2524};
    Double_t gaeSigmaBplus_felx3001[7] = {
    1,
    1.5,
@@ -72,13 +72,13 @@ void canvasSigmaBplusRatioPbPb_cent0-90()
    10,
    25};
    Double_t gaeSigmaBplus_fely3001[7] = {
-   1195828,
-   502245.6,
-   149751.2,
-   37027.43,
-   7813.787,
-   786.1306,
-   30.29715};
+   1279894,
+   531575.1,
+   157767.3,
+   38660.19,
+   8088.552,
+   805.5551,
+   30.76349};
    Double_t gaeSigmaBplus_fehx3001[7] = {
    1,
    1.5,
@@ -88,13 +88,13 @@ void canvasSigmaBplusRatioPbPb_cent0-90()
    10,
    25};
    Double_t gaeSigmaBplus_fehy3001[7] = {
-   1812953,
-   814792.5,
-   233301.5,
-   54366.09,
-   10752.1,
-   984.792,
-   34.06047};
+   1908619,
+   863802.8,
+   246333.8,
+   56879.75,
+   11149.93,
+   1010.418,
+   34.60447};
    TGraphAsymmErrors *grae = new TGraphAsymmErrors(7,gaeSigmaBplus_fx3001,gaeSigmaBplus_fy3001,gaeSigmaBplus_felx3001,gaeSigmaBplus_fehx3001,gaeSigmaBplus_fely3001,gaeSigmaBplus_fehy3001);
    grae->SetName("gaeSigmaBplus");
    grae->SetTitle(";p_{T}(GeV/c);d#sigma/dp_{T} (B^{+}) (pb GeV-1c)");
@@ -107,8 +107,8 @@ void canvasSigmaBplusRatioPbPb_cent0-90()
    grae->SetLineWidth(3);
    
    TH1F *Graph_gaeSigmaBplus3001 = new TH1F("Graph_gaeSigmaBplus3001","",100,0,109.5);
-   Graph_gaeSigmaBplus3001->SetMinimum(193.0325);
-   Graph_gaeSigmaBplus3001->SetMaximum(6840269);
+   Graph_gaeSigmaBplus3001->SetMinimum(195.74);
+   Graph_gaeSigmaBplus3001->SetMaximum(7197114);
    Graph_gaeSigmaBplus3001->SetDirectory(0);
    Graph_gaeSigmaBplus3001->SetStats(0);
    Graph_gaeSigmaBplus3001->GetXaxis()->SetTitle("p_{T}(GeV/c)");
@@ -119,21 +119,21 @@ void canvasSigmaBplusRatioPbPb_cent0-90()
    Double_t xAxis1[8] = {5, 7, 10, 15, 20, 30, 50, 100}; 
    
    TH1D *hPtSigma__2 = new TH1D("hPtSigma__2","",7, xAxis1);
-   hPtSigma__2->SetBinContent(1,574354.4);
-   hPtSigma__2->SetBinContent(2,463850.4);
-   hPtSigma__2->SetBinContent(3,163666.6);
-   hPtSigma__2->SetBinContent(4,56700.36);
-   hPtSigma__2->SetBinContent(5,15330.63);
-   hPtSigma__2->SetBinContent(6,2784.278);
-   hPtSigma__2->SetBinContent(7,128.1992);
-   hPtSigma__2->SetBinError(1,356059.3);
-   hPtSigma__2->SetBinError(2,97366.79);
-   hPtSigma__2->SetBinError(3,16535.96);
-   hPtSigma__2->SetBinError(4,5026.543);
-   hPtSigma__2->SetBinError(5,1282.156);
-   hPtSigma__2->SetBinError(6,302.9944);
-   hPtSigma__2->SetBinError(7,38.10976);
-   hPtSigma__2->SetEntries(11.93811);
+   hPtSigma__2->SetBinContent(1,1614102);
+   hPtSigma__2->SetBinContent(2,658554.9);
+   hPtSigma__2->SetBinContent(3,207785.8);
+   hPtSigma__2->SetBinContent(4,56013.62);
+   hPtSigma__2->SetBinContent(5,13697.14);
+   hPtSigma__2->SetBinContent(6,1935.492);
+   hPtSigma__2->SetBinContent(7,139.7821);
+   hPtSigma__2->SetBinError(1,957765.1);
+   hPtSigma__2->SetBinError(2,151964.6);
+   hPtSigma__2->SetBinError(3,23155.91);
+   hPtSigma__2->SetBinError(4,5715.05);
+   hPtSigma__2->SetBinError(5,1281.92);
+   hPtSigma__2->SetBinError(6,265.8947);
+   hPtSigma__2->SetBinError(7,37.30896);
+   hPtSigma__2->SetEntries(6.922451);
    hPtSigma__2->SetLineWidth(2);
    hPtSigma__2->SetMarkerStyle(20);
    hPtSigma__2->SetMarkerSize(0.84);
@@ -163,13 +163,13 @@ void canvasSigmaBplusRatioPbPb_cent0-90()
    40,
    75};
    Double_t gaeCrossSyst_fy3002[7] = {
-   574354.4,
-   463850.4,
-   163666.6,
-   56700.36,
-   15330.63,
-   2784.278,
-   128.1992};
+   1614102,
+   658554.9,
+   207785.8,
+   56013.62,
+   13697.14,
+   1935.492,
+   139.7821};
    Double_t gaeCrossSyst_felx3002[7] = {
    1,
    1.5,
@@ -179,13 +179,13 @@ void canvasSigmaBplusRatioPbPb_cent0-90()
    10,
    25};
    Double_t gaeCrossSyst_fely3002[7] = {
-   255901.4,
-   95979.16,
-   26093.79,
-   8608.947,
-   2275.458,
-   412.4327,
-   19.29716};
+   806784.7,
+   134008.6,
+   33794.39,
+   8532.071,
+   2031.572,
+   286.8527,
+   21.40135};
    Double_t gaeCrossSyst_fehx3002[7] = {
    1,
    1.5,
@@ -195,13 +195,13 @@ void canvasSigmaBplusRatioPbPb_cent0-90()
    10,
    25};
    Double_t gaeCrossSyst_fehy3002[7] = {
-   255901.4,
-   95979.16,
-   26093.79,
-   8608.947,
-   2275.458,
-   412.4327,
-   19.29716};
+   806784.7,
+   134008.6,
+   33794.39,
+   8532.071,
+   2031.572,
+   286.8527,
+   21.40135};
    grae = new TGraphAsymmErrors(7,gaeCrossSyst_fx3002,gaeCrossSyst_fy3002,gaeCrossSyst_felx3002,gaeCrossSyst_fehx3002,gaeCrossSyst_fely3002,gaeCrossSyst_fehy3002);
    grae->SetName("gaeCrossSyst");
    grae->SetTitle("Graph");
@@ -212,8 +212,8 @@ void canvasSigmaBplusRatioPbPb_cent0-90()
    grae->SetMarkerSize(0.8);
    
    TH1F *Graph_gaeCrossSyst3002 = new TH1F("Graph_gaeCrossSyst3002","Graph",100,0,109.5);
-   Graph_gaeCrossSyst3002->SetMinimum(98.01187);
-   Graph_gaeCrossSyst3002->SetMaximum(913270.5);
+   Graph_gaeCrossSyst3002->SetMinimum(106.5427);
+   Graph_gaeCrossSyst3002->SetMaximum(2662964);
    Graph_gaeCrossSyst3002->SetDirectory(0);
    Graph_gaeCrossSyst3002->SetStats(0);
 
@@ -247,6 +247,19 @@ tex->SetNDC();
    tex->SetTextAlign(31);
    tex->SetTextFont(42);
    tex->SetTextSize(0.035);
+   tex->SetLineWidth(2);
+   tex->Draw();
+      tex = new TLatex(0.94,0.95,"PbPb #sqrt{s_{NN}} = 5.02 TeV");
+tex->SetNDC();
+   tex->SetTextAlign(32);
+   tex->SetTextFont(42);
+   tex->SetTextSize(0.028);
+   tex->SetLineWidth(2);
+   tex->Draw();
+      tex = new TLatex(0.53,0.815,"Cent. 0-90%");
+tex->SetNDC();
+   tex->SetTextFont(42);
+   tex->SetTextSize(0.04);
    tex->SetLineWidth(2);
    tex->Draw();
       tex = new TLatex(0.53,0.755,"|y| < 2.4");

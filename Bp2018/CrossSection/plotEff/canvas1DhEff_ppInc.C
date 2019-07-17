@@ -1,19 +1,19 @@
 void canvas1DhEff_ppInc()
 {
 //=========Macro generated from canvas: canvas1D/
-//=========  (Wed Feb 13 19:02:33 2019) by ROOT version 6.14/04
+//=========  (Wed Jul 10 14:08:51 2019) by ROOT version 6.12/07
    TCanvas *canvas1D = new TCanvas("canvas1D", "",0,0,600,600);
    gStyle->SetOptStat(0);
    gStyle->SetOptTitle(0);
    canvas1D->SetHighLightColor(2);
-   canvas1D->Range(-10.875,-0.07500001,117.875,0.675);
+   canvas1D->Range(-13.125,-0.125,118.125,1.125);
    canvas1D->SetFillColor(0);
    canvas1D->SetBorderMode(0);
    canvas1D->SetBorderSize(2);
    canvas1D->SetFrameBorderMode(0);
    canvas1D->SetFrameBorderMode(0);
    
-   TH2F *hemptyEff__1 = new TH2F("hemptyEff__1","",50,2,105,10,0,0.6);
+   TH2F *hemptyEff__1 = new TH2F("hemptyEff__1","",50,0,105,10,0,1);
    hemptyEff__1->SetMinimum(0);
    hemptyEff__1->SetMaximum(0.6);
    hemptyEff__1->SetStats(0);
@@ -23,7 +23,7 @@ void canvas1DhEff_ppInc()
    ci = TColor::GetColor("#000099");
    hemptyEff__1->SetLineColor(ci);
    hemptyEff__1->SetMarkerStyle(20);
-   hemptyEff__1->GetXaxis()->SetTitle("p_{T} GeV^{-1}c)");
+   hemptyEff__1->GetXaxis()->SetTitle("p_{T} (GeV/c)");
    hemptyEff__1->GetXaxis()->CenterTitle(true);
    hemptyEff__1->GetXaxis()->SetLabelFont(42);
    hemptyEff__1->GetXaxis()->SetLabelSize(0.035);
@@ -42,12 +42,12 @@ void canvas1DhEff_ppInc()
    hemptyEff__1->GetZaxis()->SetTitleSize(0.035);
    hemptyEff__1->GetZaxis()->SetTitleFont(42);
    hemptyEff__1->Draw("");
-   Double_t xAxis1[2] = {7, 100}; 
+   Double_t xAxis1[2] = {5, 100}; 
    
    TH1D *hEff__2 = new TH1D("hEff__2","",1, xAxis1);
-   hEff__2->SetBinContent(1,0.05819259);
-   hEff__2->SetBinError(1,0.0003917692);
-   hEff__2->SetEntries(22063.52);
+   hEff__2->SetBinContent(1,0.04144416);
+   hEff__2->SetBinError(1,0.0002577756);
+   hEff__2->SetEntries(25848.96);
    hEff__2->SetStats(0);
    hEff__2->SetLineColor(2);
    hEff__2->SetMarkerColor(2);
@@ -79,7 +79,7 @@ tex->SetNDC();
    tex->SetTextSize(0.038);
    tex->SetLineWidth(2);
    tex->Draw();
-      tex = new TLatex(0.9,0.92,"25.8 pb^{-1} (5.02 TeV pp)");
+      tex = new TLatex(0.9,0.92,"28.0 pb^{-1} (5.02 TeV pp)");
 tex->SetNDC();
    tex->SetTextAlign(31);
    tex->SetTextFont(42);

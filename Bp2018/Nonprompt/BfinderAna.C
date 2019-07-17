@@ -2,37 +2,26 @@
 #include "format.h"
 #include "BfinderAna.h"
 
+using namespace std;
+
 Bool_t istest = true;
 void printDa(GenInfoBranches *GenInfo, int idx, int space);
 int getBAncestor(GenInfoBranches *GenInfo, int idx, int BancestorId);
 int matcher(BInfoBranches *BInfo, TrackInfoBranches *TrackInfo, MuonInfoBranches *MuonInfo, GenInfoBranches *GenInfo, int j, float BId, float MId, float tk1Id, float tk2Id, bool twoTks);
 int BfinderAna(
-	       TString infile="",
-		TString outfile="test.root", 
+	        TString infile="/mnt/T2_US_MIT/submit-hi2/scratch/gwangjun/NP/crab_Bfinder_20190520_Hydjet_Pythia8_BuToJpsiK_nonprompt_1033p1_pt3tkpt0p7dls2_allpthat_pthatweight.root",
+		TString outfile="test2.root", 
 		Bool_t REAL=false, 
-		Bool_t isPbPb=false, 
+		Bool_t isPbPb=true, 
 		Int_t startEntries=0, 
 		Int_t endEntries=-1,  
 		//Int_t endEntries=200000,  
 		Bool_t skim=true, 
 		Bool_t gskim=true, 
-		Bool_t checkMatching=true, 
+		Bool_t checkMatching=false, 
 		Bool_t iseos=false, 
 		Bool_t SkimHLTtree=true)
 {
-	if(istest)
-	{
-//		infile="/data/HeavyFlavourRun2/BfinderRun2/MC/crab_BfinderMC_pp_BJpsiMM_5p02TeV_TuneCUETP8M1_20160613_bPt0jpsiPt0tkPt0p5_Bp.root";
-		infile="/data/HeavyFlavourRun2/BfinderRun2/MC/crab_BfinderMC_pp_BJpsiMM_5p02TeV_TuneCUETP8M1_20170123_bPt0jpsiPt0tkPt0p5_Bp.root";
-//		infile="/data/HeavyFlavourRun2/BfinderRun2/MC/crab_BfinderMC_PbPb_Pythia8_BJpsiMM_ptJpsi_0_inf_Hydjet_MB_20160613_bPt5jpsiPt0tkPt0p8_Bp.root";
-		outfile="test.root";
-		REAL=false;
-		isPbPb=false;
-		skim=false;
-		checkMatching=true;
-		iseos=false;
-	}
-
 	cout<<endl;
 	if(REAL) cout<<"--- Processing - REAL DATA";
 	else cout<<"--- Processing - MC";
@@ -58,6 +47,13 @@ int BfinderAna(
 
 	setHltBranch(hltroot);
 	setHiTreeBranch(hiroot);
+
+	//EvtInfo->regTree(root);
+	//VtxInfo->regTree(root);
+	//MuonInfo->regTree(root);
+	//TrackInfo->regTree(root);
+	//BInfo->regTree(root);
+	//GenInfo->regTree(root);
 
 	EvtInfo->setbranchadd(root);
 	VtxInfo->setbranchadd(root);
@@ -110,7 +106,7 @@ int BfinderAna(
 	std::map<int,int> BtypeCountB0K;
 	std::map<int,int> BtypeCountLambdaB;
 	const int _gType = 4;
-	int genTypeCount[_gType] = {0, 0, 0 , 0};
+	int genTypeCount[_gType] = {0, 0, 0, 0};
 
 	cout<<"--- Processing events"<<endl;
 	for(Int_t i=startEntries;i<endEntries;i++)
@@ -120,20 +116,20 @@ int BfinderAna(
 		skimroot->GetEntry(i);
 		hiroot->GetEntry(i);
 
-		if(i%100000==0) cout<<setw(7)<<i<<" / "<<endEntries<<endl;
+		if(i%10000==0) cout<<setw(7)<<i<<" / "<<endEntries<<endl;
 		if(checkMatching)
 		{
-			if(((int)Bf_HLT_Event!=EvtInfo->EvtNo||(int)Bf_HLT_Run!=EvtInfo->RunNo||(int)Bf_HLT_LumiBlock!=EvtInfo->LumiNo) || 
-					((int)Bf_HiTree_Evt!=EvtInfo->EvtNo||(int)Bf_HiTree_Run!=EvtInfo->RunNo||(int)Bf_HiTree_Lumi!=EvtInfo->LumiNo))
-			{
-				cout<<"Error: not matched "<<i<<" | (Hlt,Bfr,Hi) | ";
-				cout<<"EvtNo("<<Bf_HLT_Event<<","<<EvtInfo->EvtNo<<","<<Bf_HiTree_Evt<<") ";
-				cout<<"RunNo("<<Bf_HLT_Run<<","<<EvtInfo->RunNo<<","<<Bf_HiTree_Run<<") ";
-				cout<<"LumiNo("<<Bf_HLT_LumiBlock<<","<<EvtInfo->LumiNo<<","<<Bf_HiTree_Lumi<<")"<<endl;
-				continue;
-			}
+		  		  if(((int)Bf_HLT_Event!=EvtInfo->EvtNo||(int)Bf_HLT_Run!=EvtInfo->RunNo||(int)Bf_HLT_LumiBlock!=EvtInfo->LumiNo) || 
+		  					((int)Bf_HiTree_Evt!=EvtInfo->EvtNo||(int)Bf_HiTree_Run!=EvtInfo->RunNo||(int)Bf_HiTree_Lumi!=EvtInfo->LumiNo))
+		  	{
+		  		cout<<"Error: not matched "<<i<<" | (Hlt,Bfr,Hi) | ";
+		  		cout<<"EvtNo("<<Bf_HLT_Event<<","<<EvtInfo->EvtNo<<","<<Bf_HiTree_Evt<<") ";
+		  		cout<<"RunNo("<<Bf_HLT_Run<<","<<EvtInfo->RunNo<<","<<Bf_HiTree_Run<<") ";
+		  		cout<<"LumiNo("<<Bf_HLT_LumiBlock<<","<<EvtInfo->LumiNo<<","<<Bf_HiTree_Lumi<<")"<<endl;
+		  		continue;
+		  	}
 		}
-		//Do oyur analysis here
+		//Do your analysis here
 		//example: checking GenInfo
 	    for(int j=0;j<GenInfo->size;j++){
 			if(1){
@@ -589,12 +585,13 @@ int main(int argc, char *argv[])
 {
 	if(argc==3)
 	{
-		BfinderAna(argv[1], argv[2]);
+	  BfinderAna(argv[1], argv[2]);
 	}
 	else
 	{
-		std::cout << "Usage: mergeForest <input_collection> <output_file>" << std::endl;
-		return 0;
+	  //std::cout << "Usage: mergeForest <input_collection> <output_file>" << std::endl;
+	  BfinderAna();
+	  return 0;
 	}
 	return 1;
 }

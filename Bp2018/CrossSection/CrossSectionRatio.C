@@ -5,7 +5,7 @@
 float tpadr = 0.7;
 bool addpbpb = 0;
 
-void CrossSectionRatio(TString inputFONLL="ROOTfiles/output_inclusiveDd0meson_5TeV_y1.root", TString input="ROOTfiles/hPtSpectrumBplusPP.root", TString efficiency="test.root",TString outputplot="myplot.root",int usePbPb=1,TString label="PbPb",int doDataCor = 0,double lumi=1.,Float_t centMin=0.,Float_t centMax=100.)
+void CrossSectionRatio(TString inputFONLL="", TString input="", TString efficiency="",TString outputplot="",int usePbPb=1,TString label="PbPb",int doDataCor = 0,double lumi=1.,Float_t centMin=0.,Float_t centMax=90.)
 {
 	gStyle->SetOptTitle(0);
 	gStyle->SetOptStat(0);
@@ -193,14 +193,14 @@ void CrossSectionRatio(TString inputFONLL="ROOTfiles/output_inclusiveDd0meson_5T
 	texCol->SetTextAlign(32);
 	texCol->SetTextSize(0.04*tpadr);
 	texCol->SetTextFont(42);
-	//texCol->Draw();
+	texCol->Draw();
 
 	TString texper="%";
-	TLatex* texCent = new TLatex(0.53,0.815,Form("Centrality %.0f-%.0f%s",centMin,centMax,texper.Data()));
+	TLatex* texCent = new TLatex(0.53,0.815,Form("Cent. %.0f-%.0f%s",centMin,centMax,texper.Data()));
 	texCent->SetNDC();
 	texCent->SetTextFont(42);
 	texCent->SetTextSize(0.04);
-	//if(isPbPb) texCent->Draw();
+	if(isPbPb) texCent->Draw();
 
 	TLatex* texY = new TLatex(0.53,1-(1-0.65)*tpadr,"|y| < 2.4");
 	texY->SetNDC();

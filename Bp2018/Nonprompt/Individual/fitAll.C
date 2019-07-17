@@ -14,10 +14,14 @@
 double minhisto = 5.0;
 double maxhisto = 6.0;
 
+double ptmin = 5.0;
+double ptmax = 100.0;
+double centMin = 0.0;
+double centMax = 90.0;
+
 TString infilepp = "test_pp.root";
-TString infilePbPb = "test_PbPb.root";
-bool ispp = true;
-//bool ispp = false;
+TString infilePbPb = "test2_PbPb.root";
+bool ispp = false;
 
 void fitAll(){
 	TFile* outf;
@@ -41,8 +45,8 @@ void fitAll(){
 	TCanvas* c = new TCanvas("c", "", 600, 600);
 	c->cd();
 	
-    //TF1* f = new TF1(Form("f"),"[0]*TMath::Erf((x-[1])/[2]) + [0] + [3]*([4]*Gaus(x,[5],[6])/(sqrt(2*3.14159)*[6])+(1-[4])*Gaus(x,[5],[7])/(sqrt(2*3.14159)*[7])) + [9]+[10]*x ");
-    TF1* f = new TF1(Form("f"),"[0]*TMath::Erf((x-[1])/[2]) + [0] + [3]*([4]*Gaus(x,[5],[6])/(sqrt(2*3.14159)*[6])+(1-[4])*Gaus(x,[5],[7])/(sqrt(2*3.14159)*[7]))");
+    //TF1* f = new TF1(Form("f"),"[0]*TMath::Erf((x-[1])/[2]) + [0] + [3]*([4]*TMath::Gaus(x,[5],[6])/(sqrt(2*3.14159)*[6])+(1-[4])*TMath::Gaus(x,[5],[7])/(sqrt(2*3.14159)*[7])) + [9]+[10]*x ");
+    TF1* f = new TF1(Form("f"),"[0]*TMath::Erf((x-[1])/[2])+[0]+[3]*([4]*TMath::Gaus(x,[5],[6])/(sqrt(2*3.14159)*[6])+(1-[4])*TMath::Gaus(x,[5],[7])/(sqrt(2*3.14159)*[7]))");
 
     //error fn
     f->SetParLimits(0, 1e0, 1e3);
@@ -78,7 +82,7 @@ void fitAll(){
     h->SetMarkerStyle(20);
 
 	//print out the fitted function
-	printf(Form("%.6f*TMath::Erf((x-%.6f)/%.6f) + %.6f + %.6f*(%.6f*Gaus(x,%.6f,%.6f)/(sqrt(2*3.14159)*%.6f)+(1-%.6f)*Gaus(x,%.6f,%.6f)/(sqrt(2*3.14159)*%.6f)) \n", 
+	printf(Form("%.6f*TMath::Erf((x-%.6f)/%.6f)+%.6f+%.6f*(%.6f*TMath::Gaus(x,%.6f,%.6f)/(sqrt(2*3.14159)*%.6f)+(1-%.6f)*TMath::Gaus(x,%.6f,%.6f)/(sqrt(2*3.14159)*%.6f)) \n", 
 		f->GetParameter(0),
 		f->GetParameter(1),
 		f->GetParameter(2),
@@ -95,12 +99,12 @@ void fitAll(){
 		));
 
     hempty->SetXTitle("m_{#mu#muK} (GeV/c^{2})");
-    hempty->SetYTitle("Entries / (5 MeV/c^{2})");
+    hempty->SetYTitle("Entries / (20 MeV/c^{2})");
     hempty->GetXaxis()->CenterTitle();
     hempty->GetYaxis()->CenterTitle();
     hempty->SetAxisRange(0,h->GetMaximum()*1.4*1.2,"Y");
-    hempty->GetXaxis()->SetTitleOffset(1.3);
-    hempty->GetYaxis()->SetTitleOffset(1.3);
+    hempty->GetXaxis()->SetTitleOffset(1.0);
+    hempty->GetYaxis()->SetTitleOffset(1.1);
     hempty->GetXaxis()->SetLabelOffset(0.007);
     hempty->GetYaxis()->SetLabelOffset(0.007);
     hempty->GetXaxis()->SetTitleSize(0.045);
@@ -122,29 +126,74 @@ void fitAll(){
 	h->Draw("same e");
 	f->Draw("same");
 
-	TLegend* leg = new TLegend(0.42,0.56,0.65,0.86,NULL,"brNDC");
-	leg->SetBorderSize(0);
-	leg->SetTextSize(0.04);
-	leg->SetTextFont(42);
-	leg->SetFillStyle(0);
-	leg->AddEntry(h,"Peaking background stack:","p");
-    leg->AddEntry(hempty,"B^{+} to Jpsi Pi","p");
-    leg->AddEntry(hempty,"B^{+} to Jpsi and various K","p");
-    leg->AddEntry(hempty,"B^{0} to Jpsi and various K","p");
-	TLatex * tlatex;
-	if(ispp) tlatex=new TLatex(0.48,0.89,"pp MC");
-	else tlatex=new TLatex(0.48,0.89,"PbPb MC");
-	tlatex->SetNDC();
-	tlatex->SetTextColor(1);
-	tlatex->SetTextFont(42);
-	tlatex->SetTextSize(0.04);
-	tlatex->Draw();
-	leg->AddEntry(f,"Fit","l");
-	leg->Draw("same");
+        TLegend* leg = new TLegend(0.65,0.58,0.82,0.88,NULL,"brNDC");
+        leg->SetBorderSize(0);
+        leg->SetTextSize(0.02);
+        leg->SetTextFont(42);
+        leg->SetFillStyle(0);
+        leg->AddEntry(h,"Non-prompt contribution","pl");
+        //leg->AddEntry(h,"Bs #rightarrow J/#psi + X","pl");                                                                                   
+        //leg->AddEntry(hempty,"B^{+} #rightarrow J/#psi + #pi","pl");
+        //leg->AddEntry(hempty,"B^{+} #rightarrow J/#psi + various K","pl");
+        //leg->AddEntry(hempty,"B^{0} #rightarrow J/#psi + various K","pl");
+        leg->Draw("same");
+	
+        TLatex* texChi = new TLatex(0.55,0.475,Form("#chi^{2}/nDOF:%.2f/%d=%.2f", f->GetChisquare(), f->GetNDF(), f->GetChisquare()/f->GetNDF()));
+        texChi->SetNDC();
+        texChi->SetTextAlign(12);
+        texChi->SetTextSize(0.035);
+        texChi->SetTextFont(42);
+        texChi->Draw();
+
+        TLatex* texCms = new TLatex(0.18,0.93, "#scale[1.25]{CMS} Preliminary");
+        texCms->SetNDC();
+        texCms->SetTextAlign(12);
+        texCms->SetTextSize(0.04);
+        texCms->SetTextFont(42);
+        texCms->Draw();
+
+        TLatex* texCol;
+        if(ispp) texCol= new TLatex(0.96,0.93, Form("%s #sqrt{s_{NN}} = 5.02 TeV","pp"));
+        else texCol= new TLatex(0.96,0.93, Form("%s #sqrt{s_{NN}} = 5.02 TeV","PbPb"));
+        texCol->SetNDC();
+        texCol->SetTextAlign(32);
+        texCol->SetTextSize(0.04);
+        texCol->SetTextFont(42);
+        texCol->Draw();
+
+        TLatex* tex;
+        tex = new TLatex(0.22,0.78,Form("%.1f < p_{T} < %.1f GeV/c",ptmin,ptmax));
+        tex->SetNDC();
+        tex->SetTextFont(42);
+        tex->SetTextSize(0.04);
+        tex->SetLineWidth(2);
+        tex->Draw();
+
+        TString texper="%";
+	tex = new TLatex(0.22,0.71,Form("Centrality %.0f-%.0f%s",centMin,centMax,texper.Data()));//0.2612903,0.8425793                  
+	tex->SetNDC();
+	tex->SetTextColor(1);
+	tex->SetTextFont(42);
+	tex->SetTextSize(0.045);
+	tex->SetLineWidth(2);
+	tex->Draw();
+
+        tex = new TLatex(0.22,0.83,"|y| < 2.4");
+        tex->SetNDC();
+        tex->SetTextFont(42);
+        tex->SetTextSize(0.04);
+        tex->SetLineWidth(2);
+        tex->Draw();
 
 	outf->cd();
 	h->Write();
 	f->Write();
 	if(ispp) c->SaveAs(Form("plotspp/fitNP_pp.png"));
 	else c->SaveAs(Form("plotsPbPb/fitNP_PbPb.png"));
+}
+
+int main()
+{
+  fitAll();
+  return 0;
 }

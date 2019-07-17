@@ -1,7 +1,7 @@
 const int nBins=1;
 double ptBins[nBins+1] = {5.,100};
 
-const int BIN_NUM= 960;
+const int BIN_NUM= 480;
 const int HMIN=0;
 const int HMAX=120;
 

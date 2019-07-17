@@ -66,10 +66,6 @@
 	TF1* fDataPre;
 	TF1* fMCPre;
 
-
-
-
-
 	TString weightfunctionreco;
 	TString cutalpha;
 	TString cutalphaMC;

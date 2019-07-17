@@ -8,20 +8,16 @@ int     HLT_HIL1DoubleMu0ForPPRef_v1;
 //pbpb
 int     pclusterCompatibilityFilter;
 int     pprimaryVertexFilter;
-int     phfCoincFilter3;
-double  BDT[MAX_XB]; 
-int     HLT_HIL1DoubleMu0_v1;
-int     HLT_HIL1DoubleMu0_part1_v1;
-int     HLT_HIL1DoubleMu0_part2_v1;
-int     HLT_HIL1DoubleMu0_part3_v1;
-int     hiBin;
+int     phfCoincFilter2Th4;
+int     HLT_HIL3Mu0NHitQ10_L2Mu0_MAXdR3p5_M1to5_v1;
+float     Ncoll;
 //common
 float   pthatweight;
 int     Gsize;
 float   Gpt[MAX_GEN];
 float   Gy[MAX_GEN];
-float   GpdgId[MAX_GEN];   
-float   GisSignal[MAX_GEN];
+int   GpdgId[MAX_GEN];   
+int   GisSignal[MAX_GEN];
 int     Bsize;
 float   Bgen[MAX_XB];
 float   Bgenpt[MAX_XB];
@@ -54,12 +50,28 @@ bool    Btrk1highPurity[MAX_XB];
 bool    Btrk2highPurity[MAX_XB];
 float   Btrk1Eta[MAX_XB];
 float   Btrk1Pt[MAX_XB];
+float   Btrk1PtErr[MAX_XB];
 float   Bchi2cl[MAX_XB];
 float   BsvpvDistance[MAX_XB];
 float   BsvpvDisErr[MAX_XB];
 float   Bdtheta[MAX_XB];
+bool   Bmu1SoftMuID[MAX_XB];
+bool   Bmu2SoftMuID[MAX_XB];
+bool   Bmu1isAcc[MAX_XB];
+bool   Bmu2isAcc[MAX_XB];
+bool   Bmu1isTriggered[MAX_XB];
+bool   Bmu2isTriggered[MAX_XB];
+float   Btrk1PixelHit[MAX_XB];
+float   Btrk1StripHit[MAX_XB];
+float   Btrk1Chi2ndf[MAX_XB];
+float   Btrk1nStripLayer[MAX_XB];
+float   Btrk1nPixelLayer[MAX_XB];
+float   Btrk1Dxy1[MAX_XB];
+float   Btrk1DxyError1[MAX_XB];
+float   Btrk1Dz1[MAX_XB];
+float   Btrk1DzError1[MAX_XB];
 
-void setAddressTree(TTree* ntKp, TTree* ntHlt, TTree* ntSkim, TTree* ntHi, TTree* mvaTree, TTree* ntGen, bool ispp){
+void setAddressTree(TTree* ntKp, TTree* ntHlt, TTree* ntSkim, TTree* ntHi, TTree* ntGen, bool ispp){
 	if(ispp){
 		ntSkim->SetBranchAddress("pBeamScrapingFilter",&pBeamScrapingFilter);
 		ntSkim->SetBranchAddress("pPAprimaryVertexFilter",&pPAprimaryVertexFilter);
@@ -68,20 +80,16 @@ void setAddressTree(TTree* ntKp, TTree* ntHlt, TTree* ntSkim, TTree* ntHi, TTree
 	else{
 		ntSkim->SetBranchAddress("pclusterCompatibilityFilter",&pclusterCompatibilityFilter);
 		ntSkim->SetBranchAddress("pprimaryVertexFilter",&pprimaryVertexFilter);
-		ntSkim->SetBranchAddress("phfCoincFilter3",&phfCoincFilter3);
-		mvaTree->SetBranchAddress("BDT",BDT);
-		ntHlt->SetBranchAddress("HLT_HIL1DoubleMu0_v1",&HLT_HIL1DoubleMu0_v1);
-		ntHlt->SetBranchAddress("HLT_HIL1DoubleMu0_part1_v1",&HLT_HIL1DoubleMu0_part1_v1);
-		ntHlt->SetBranchAddress("HLT_HIL1DoubleMu0_part2_v1",&HLT_HIL1DoubleMu0_part2_v1);
-		ntHlt->SetBranchAddress("HLT_HIL1DoubleMu0_part3_v1",&HLT_HIL1DoubleMu0_part3_v1);
-		ntHi->SetBranchAddress("hiBin",&hiBin);
+		ntSkim->SetBranchAddress("phfCoincFilter2Th4",&phfCoincFilter2Th4);
+		ntHlt->SetBranchAddress("HLT_HIL3Mu0NHitQ10_L2Mu0_MAXdR3p5_M1to5_v1",&HLT_HIL3Mu0NHitQ10_L2Mu0_MAXdR3p5_M1to5_v1);
+		ntHi->SetBranchAddress("Ncoll",&Ncoll);
 	}
 	ntHi->SetBranchAddress("pthatweight",&pthatweight);
 	ntGen->SetBranchAddress("Gsize",&Gsize);
-    ntGen->SetBranchAddress("Gpt",Gpt);
-    ntGen->SetBranchAddress("Gy",Gy);
-    ntGen->SetBranchAddress("GpdgId",GpdgId);
-    ntGen->SetBranchAddress("GisSignal",GisSignal);
+	ntGen->SetBranchAddress("Gpt",Gpt);
+	ntGen->SetBranchAddress("Gy",Gy);
+	ntGen->SetBranchAddress("GpdgId",GpdgId);
+	ntGen->SetBranchAddress("GisSignal",GisSignal);
 	ntKp->SetBranchAddress("Bsize",&Bsize);
 	ntKp->SetBranchAddress("Bgen",Bgen);
 	ntKp->SetBranchAddress("Bgenpt",Bgenpt);
@@ -114,8 +122,25 @@ void setAddressTree(TTree* ntKp, TTree* ntHlt, TTree* ntSkim, TTree* ntHi, TTree
 	ntKp->SetBranchAddress("Btrk2highPurity",Btrk2highPurity);
 	ntKp->SetBranchAddress("Btrk1Eta",Btrk1Eta);
 	ntKp->SetBranchAddress("Btrk1Pt",Btrk1Pt);
+	ntKp->SetBranchAddress("Btrk1PtErr",Btrk1Pt);
 	ntKp->SetBranchAddress("Bchi2cl",Bchi2cl);
 	ntKp->SetBranchAddress("BsvpvDistance",BsvpvDistance);
 	ntKp->SetBranchAddress("BsvpvDisErr",BsvpvDisErr);
 	ntKp->SetBranchAddress("Bdtheta",Bdtheta);
+	ntKp->SetBranchAddress("Bmu1SoftMuID",Bmu1SoftMuID);
+	ntKp->SetBranchAddress("Bmu2SoftMuID",Bmu2SoftMuID);
+	ntKp->SetBranchAddress("Bmu1isAcc",Bmu1isAcc);
+	ntKp->SetBranchAddress("Bmu2isAcc",Bmu2isAcc);
+	ntKp->SetBranchAddress("Bmu1isTriggered",Bmu1isTriggered);
+	ntKp->SetBranchAddress("Bmu2isTriggered",Bmu2isTriggered);
+	ntKp->SetBranchAddress("Btrk1PixelHit",Btrk1PixelHit);
+	ntKp->SetBranchAddress("Btrk1StripHit",Btrk1StripHit);
+	ntKp->SetBranchAddress("Btrk1Chi2ndf",Btrk1Chi2ndf);
+	ntKp->SetBranchAddress("Btrk1nStripLayer",Btrk1nStripLayer);
+	ntKp->SetBranchAddress("Btrk1nPixelLayer",Btrk1nPixelLayer);
+	ntKp->SetBranchAddress("Btrk1Dxy1",Btrk1Dxy1);
+	ntKp->SetBranchAddress("Btrk1DxyError1",Btrk1DxyError1);
+	ntKp->SetBranchAddress("Btrk1Dz1",Btrk1Dz1);
+	ntKp->SetBranchAddress("Btrk1DzError1",Btrk1DzError1);
+
 }

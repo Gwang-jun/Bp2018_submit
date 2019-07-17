@@ -2,10 +2,8 @@
 #include "TLegendEntry.h"
 #include "parameters.h"
 
-
-void ClosureTest(TString inputfile="ROOTfiles/hPtSpectrumDzeroPbPbMBMCClosure.root",TString label="PbPbMBClosure"){
-
-
+void ClosureTest(TString inputfile="",TString label="")
+{
   gStyle->SetOptTitle(0);
   gStyle->SetOptStat(0);
   gStyle->SetEndErrorSize(0);
@@ -13,13 +11,16 @@ void ClosureTest(TString inputfile="ROOTfiles/hPtSpectrumDzeroPbPbMBMCClosure.ro
 
   TFile *f=new TFile(inputfile.Data());
 
-  TH1D *hPtCor=(TH1D*)f->Get("hPtCor");
+  TH1D *hPtEff=(TH1D*)f->Get("hPtEff");
+  TH1D *hPtCor=(TH1D*)f->Get("hPt");
   TH1D *hPtGen=(TH1D*)f->Get("hPtGen");
 
+  hPtCor->Sumw2();
+  hPtCor->Divide(hPtEff);
   hPtCor->Divide(hPtGen);
   TCanvas*canvas=new TCanvas("canvas","canvas",550,500);
   canvas->cd();
-  TH2F* hemptyClosure=new TH2F("hemptyClosure","",50,ptBins[0]-2,ptBins[nBins]+2,10,0.0,1.5);  
+  TH2F* hemptyClosure=new TH2F("hemptyClosure","",50,ptBins[0]-5,ptBins[nBins]+10,10,0.5,1.5);  
   hemptyClosure->GetXaxis()->CenterTitle();
   hemptyClosure->GetYaxis()->CenterTitle();
   hemptyClosure->GetYaxis()->SetTitle("Corrected Yield/Generated Yield");

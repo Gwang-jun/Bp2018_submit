@@ -4,13 +4,12 @@
 #include "../Systematics/systematics.C"
 #include "Dmeson/Draw_DRAA.h"
 
-//bool drawDRAA = true;
 bool drawDRAA = false;
 
 int _nBins = nBinsCent;
 double *_ptBins = ptBinsCent;
 
-void NuclearModificationFactorCent(TString inputPP="ROOTfiles/CrossSectionPP.root", TString inputPbPb="ROOTfiles/CrossSectionPbPb.root", TString inputEffPP = "ROOTfiles/MCstudiesPP_INC.root", TString inputEffPbPb = "ROOTfiles/MCstudiesPbPb_CENT.root", TString label="PbPb", TString outputfile="RAAfile.root", int doDataCor = 0, double PPlumi=1., double nMBEvt=1., Float_t centMin=0., Float_t centMax=100.)
+void NuclearModificationFactorCent(TString inputPP="", TString inputPbPb="", TString inputEffPP = "", TString inputEffPbPb = "", TString label="", TString outputfile="", int doDataCor = 0, double PPlumi=1., double nMBEvt=1., Float_t centMin=0., Float_t centMax=100.)
 {
   float pti = _ptBins[0];
   float pte = _ptBins[_nBins];
@@ -133,7 +132,7 @@ void NuclearModificationFactorCent(TString inputPP="ROOTfiles/CrossSectionPP.roo
   canvasRAA->cd();
   //canvasRAA->SetLogx();
 
-  TH2F* hemptyEff=new TH2F("hemptyEff","",50,pti,pte,10.,0,1.55);  
+  TH2F* hemptyEff=new TH2F("hemptyEff","",50,pti,pte,10.,0,1.5);  
   hemptyEff->GetXaxis()->CenterTitle();
   hemptyEff->GetYaxis()->CenterTitle();
   hemptyEff->GetYaxis()->SetTitle("B^{+} R_{AA}");
@@ -184,7 +183,7 @@ void NuclearModificationFactorCent(TString inputPP="ROOTfiles/CrossSectionPP.roo
   bSystnorm->SetFillColor(16);
   bSystnorm->Draw();
 
-  TLatex * tlatexeff2=new TLatex(0.41,0.58,Form("p_{T} %.0f-%.0f (GeV/c)",ptBinsInc[0], ptBinsInc[1]));
+  TLatex * tlatexeff2=new TLatex(0.60,0.70,Form("%.0f<p_{T}<%.0f (GeV/c)",ptBinsInc[0], ptBinsInc[1]));
   tlatexeff2->SetNDC();
   tlatexeff2->SetTextColor(1);
   tlatexeff2->SetTextFont(42);
@@ -248,16 +247,16 @@ void NuclearModificationFactorCent(TString inputPP="ROOTfiles/CrossSectionPP.roo
   ent_B->SetMarkerColor(4);
   ent_B->SetTextSize(0.043);//0.03
 
-  TLatex* texSystnorm = new TLatex(0.23,0.70,"T_{AA} and lumi.");
-  if(drawDRAA) texSystnorm = new TLatex(0.17,0.70,"T_{AA} and lumi.");
+  TLatex* texSystnorm = new TLatex(0.23,0.73,"T_{AA} and lumi.");
+  if(drawDRAA) texSystnorm = new TLatex(0.17,0.73,"T_{AA} and lumi.");
   texSystnorm->SetNDC();
   texSystnorm->SetTextColor(1);
   texSystnorm->SetTextFont(42);
   texSystnorm->SetTextSize(0.04);
   texSystnorm->SetLineWidth(2);
   texSystnorm->Draw();
-  texSystnorm = new TLatex(0.23,0.65,"uncertainty");
-  if(drawDRAA) texSystnorm = new TLatex(0.17,0.65,"uncertainty");
+  texSystnorm = new TLatex(0.23,0.68,"uncertainty");
+  if(drawDRAA) texSystnorm = new TLatex(0.17,0.68,"uncertainty");
   texSystnorm->SetNDC();
   texSystnorm->SetTextColor(1);
   texSystnorm->SetTextFont(42);
