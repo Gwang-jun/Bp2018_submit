@@ -120,11 +120,11 @@ void MCefficiency(int isPbPb=0,TString inputmc="", TString selmcgen="",TString s
   TH1D* hPthat = new TH1D("hPthat","",100,0,500);
   TH1D* hPthatweight = new TH1D("hPthatweight","",100,0,500);
 
-  ntMC->Project("hPtMC","Bpt",TCut(weightPVz)*TCut(weighpthat)*TCut(weightBgenpt)*TCut(weightHiBin)*(TCut(cut.Data())&&"(Bgen==23333)"));
-  ntMC->Project("hPtMCrecoonly","Bpt",TCut(weightPVz)*TCut(weighpthat)*TCut(weightBgenpt)*TCut(weightHiBin)*(TCut(cut_recoonly.Data())&&"(Bgen==23333)"));
-  ntGen->Project("hPtGen","Gpt",TCut(weightPVz)*TCut(weighpthat)*TCut(weightGpt)*(TCut(selmcgen.Data())));
-  ntGen->Project("hPtGenAcc","Gpt",TCut(weightPVz)*TCut(weighpthat)*TCut(weightGpt)*(TCut(selmcgenacceptance.Data())));
-  ntGen->Project("hPtGenAccWeighted","Gpt",TCut(weightPVz)*TCut(weighpthat)*TCut(weightGpt)*TCut(weightHiBin)*(TCut(selmcgenacceptance.Data())));
+  ntMC->Project("hPtMC","Bpt",TCut(weighpthat)*TCut(weightBgenpt)*TCut(weightHiBin)*TCut(weightPVz)*(TCut(cut.Data())&&"(Bgen==23333)"));
+  ntMC->Project("hPtMCrecoonly","Bpt",TCut(weighpthat)*TCut(weightBgenpt)*TCut(weightHiBin)*TCut(weightPVz)*(TCut(cut_recoonly.Data())&&"(Bgen==23333)"));
+  ntGen->Project("hPtGen","Gpt",TCut(weighpthat)*TCut(weightGpt)*(TCut(selmcgen.Data())));
+  ntGen->Project("hPtGenAcc","Gpt",TCut(weighpthat)*TCut(weightGpt)*(TCut(selmcgenacceptance.Data())));
+  ntGen->Project("hPtGenAccWeighted","Gpt",TCut(weighpthat)*TCut(weightGpt)*TCut(weightHiBin)*TCut(weightPVz)*(TCut(selmcgenacceptance.Data())));
   
   ////// tag & probe scaling factor
   for(int i = 0; i < _nBins; i++){printf("%.2f, ", hPtMC->GetBinContent(i+1));}printf("\n");

@@ -4,20 +4,17 @@
 
 void ClosureTest(TString inputfile="",TString label="")
 {
-  gStyle->SetOptTitle(0);
   gStyle->SetOptStat(0);
-  gStyle->SetEndErrorSize(0);
-  gStyle->SetMarkerStyle(20);
-
+  
   TFile *f=new TFile(inputfile.Data());
 
-  TH1D *hPtEff=(TH1D*)f->Get("hPtEff");
-  TH1D *hPtCor=(TH1D*)f->Get("hPt");
+  TH1D *hPtCor=(TH1D*)f->Get("hPtCor");
   TH1D *hPtGen=(TH1D*)f->Get("hPtGen");
 
   hPtCor->Sumw2();
-  hPtCor->Divide(hPtEff);
+  hPtGen->Sumw2();
   hPtCor->Divide(hPtGen);
+
   TCanvas*canvas=new TCanvas("canvas","canvas",550,500);
   canvas->cd();
   TH2F* hemptyClosure=new TH2F("hemptyClosure","",50,ptBins[0]-5,ptBins[nBins]+10,10,0.5,1.5);  

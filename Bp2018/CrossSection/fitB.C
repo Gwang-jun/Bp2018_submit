@@ -92,7 +92,8 @@ TF1* fit (TTree* nt, TTree* ntMC, double ptmin, double ptmax, int isMC,bool, TF1
      //weight="pthatweight*Ncoll";
      //weightgen="pthatweight*Ncoll*(1.032231*TMath::Exp(-0.000763*(PVz+3.728292)*(PVz+3.728292)))*(0.000001+0.128279*Gpt-0.003814*Gpt*Gpt+0.000071*Gpt*Gpt*Gpt)";
      //weight="pthatweight*Ncoll*(1.032231*TMath::Exp(-0.000763*(PVz+3.728292)*(PVz+3.728292)))*(0.000001+0.128279*Bgenpt-0.003814*Bgenpt*Bgenpt+0.000071*Bgenpt*Bgenpt*Bgenpt)";
-     weightgen="pthatweight*Ncoll*(1.034350*TMath::Exp(-0.000844*(PVz+3.502992)*(PVz+3.502992)))*(0.715021+0.039896*Gpt-0.000834*Gpt*Gpt+0.000006*Gpt*Gpt*Gpt)"; // MC Gpt
+     //weightgen="pthatweight*Ncoll*(1.034350*TMath::Exp(-0.000844*(PVz+3.502992)*(PVz+3.502992)))*(0.715021+0.039896*Gpt-0.000834*Gpt*Gpt+0.000006*Gpt*Gpt*Gpt)"; // MC Gpt
+     weightgen="pthatweight*(0.715021+0.039896*Gpt-0.000834*Gpt*Gpt+0.000006*Gpt*Gpt*Gpt)"; // MC Gpt
      weight="pthatweight*Ncoll*(1.034350*TMath::Exp(-0.000844*(PVz+3.502992)*(PVz+3.502992)))*(0.715021+0.039896*Bgenpt-0.000834*Bgenpt*Bgenpt+0.000006*Bgenpt*Bgenpt*Bgenpt)"; // MC Gpt
      //weightgen="pthatweight*Ncoll*(1.034350*TMath::Exp(-0.000844*(PVz+3.502992)*(PVz+3.502992)))*(1.095759-0.028827*Gpt+0.000414*Gpt*Gpt-0.000002*Gpt*Gpt*Gpt)"; // pythia ref
      //weight="pthatweight*Ncoll*(1.034350*TMath::Exp(-0.000844*(PVz+3.502992)*(PVz+3.502992)))*(1.095759-0.028827*Bgenpt+0.000414*Bgenpt*Bgenpt-0.000002*Bgenpt*Bgenpt*Bgenpt)"; // pythia ref
@@ -129,23 +130,25 @@ ntMC->AddFriend("hiEvtAnalyzer/HiTree");
 ntMC->AddFriend("Bfinder/ntGen"); //call Bgen
 ntMC->AddFriend("skimanalysis/HltTree");
 
+/*
 //For 2015 PbPb, pp data
-//TTree* nt = (TTree*)inf->Get("ntKp");
-//nt->AddFriend("ntHlt");
-//nt->AddFriend("ntHi");
-//nt->AddFriend("ntSkim");
-//nt->AddFriend("mvaTree");
+TTree* nt = (TTree*)inf->Get("ntKp");
+nt->AddFriend("ntHlt");
+nt->AddFriend("ntHi");
+nt->AddFriend("ntSkim");
+nt->AddFriend("mvaTree");
 
 //For 2015 PbPb, pp MC
-//TTree* ntGen = (TTree*)infMC->Get("ntGen");
-//ntGen->AddFriend("ntHlt");
-//ntGen->AddFriend("ntHi");
-//TTree* ntMC = (TTree*)infMC->Get("ntKp");
-//ntMC->AddFriend("ntHlt");
-//ntMC->AddFriend("ntHi");
-//ntMC->AddFriend("ntSkim");
-//ntMC->AddFriend("ntGen");
-//ntMC->AddFriend("mvaTree");
+TTree* ntGen = (TTree*)infMC->Get("ntGen");
+ntGen->AddFriend("ntHlt");
+ntGen->AddFriend("ntHi");
+TTree* ntMC = (TTree*)infMC->Get("ntKp");
+ntMC->AddFriend("ntHlt");
+ntMC->AddFriend("ntHi");
+ntMC->AddFriend("ntSkim");
+ntMC->AddFriend("ntGen");
+ntMC->AddFriend("mvaTree");
+*/
 
 TH1D* hMean = new TH1D("hMean","",_nBins,_ptBins);                       
 TH1D* hSigmaGaus1 = new TH1D("hSigmaGaus1","",_nBins,_ptBins); 
@@ -276,9 +279,10 @@ void getNPFnPar(TString npfname, float par[]){
   f->SetNpx(5000);
   f->SetLineWidth(5);
   
-  if(isMC==1) ntMC->Project(Form("h-%d",count),"Bmass",Form("%s*(%s&&Bpt>%f&&Bpt<%f)*(1/%s)","1",seldata.Data(),ptmin,ptmax,weightdata.Data()));
+  if(isMC==1) ntMC->Project(Form("h-%d",count),"Bmass",Form("%s*(%s&&Bpt>%f&&Bpt<%f)*(1/%s)",weight.Data(),seldata.Data(),ptmin,ptmax,weightdata.Data()));
   else nt->Project(Form("h-%d",count),"Bmass",Form("(%s&&Bpt>%f&&Bpt<%f)*(1/%s)",seldata.Data(),ptmin,ptmax,weightdata.Data()));   
-  ntMC->Project(Form("hMCSignal-%d",count),"Bmass",Form("%s&&Bpt>%f&&Bpt<%f",Form("%s&&Bgen==23333",selmc.Data()),ptmin,ptmax));
+  ntMC->Project(Form("hMCSignal-%d",count),"Bmass",Form("%s*(%s&&Bgen==23333&&Bpt>%f&&Bpt<%f)*(1/%s)",weight.Data(),selmc.Data(),ptmin,ptmax,weightdata.Data()));
+
   clean0(h);
   
   f->SetParLimits(4,-1e5,1e5);

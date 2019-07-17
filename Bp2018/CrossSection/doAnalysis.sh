@@ -31,8 +31,8 @@ DORAA_Y=0
 DOANALYSISPP_FIT_INC=0
 DOANALYSISPP_MCSTUDY_INC=0
 DOANALYSISPbPb_FIT_CENT=0
-DOANALYSISPbPb_MCSTUDY_CENT=1
-DORAA_CENT=1
+DOANALYSISPbPb_MCSTUDY_CENT=0
+DORAA_CENT=0
 
 DOANALYSISPP_MCSTUDY_FINE=0
 DOANALYSISPP_EFFFIT=0
@@ -492,7 +492,8 @@ LABELPbPbMCClosure="PbPbMCClosure"
 
 g++ fitB.C $(root-config --cflags --libs) -g -o fitB.exe 
 ./fitB.exe 1 "$INPUTMCPbPb"  "$INPUTMCPbPb"  "$TRGPbPbMCClosure" "$CUTPbPb"   "$SELGENPbPb"   "$ISMCPbPbMCClosure"   "$LUMIPbPbMCClosure"   "$ISDOWEIGHTPbPbMCClosure"   "$LABELPbPbMCClosure"  "$OUTPUTFILEPbPbMCClosure" "$NPFIT_PbPb" 0 "$CENTPbPbMIN" "$CENTPbPbMAX"
+rm fitB.exe
 g++ ClosureTest.C $(root-config --cflags --libs) -g -o ClosureTest.exe 
 ./ClosureTest.exe "$OUTPUTFILEPbPbMCClosure" "$LABELPbPb"
-
+rm ClosureTest.exe
 fi

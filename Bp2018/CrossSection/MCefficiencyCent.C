@@ -97,11 +97,11 @@ void MCefficiencyCent(int isPbPb=0,TString inputmc="", TString selmcgen="",TStri
   TH1D* hPthat = new TH1D("hPthat","",100,0,500);
   TH1D* hPthatweight = new TH1D("hPthatweight","",100,0,500);
 
-  ntMC->Project("hPtMC","hiBin",TCut(weightPVz)*TCut(weighpthat)*TCut(weightBgenpt)*TCut(weightHiBin)*(TCut(cut.Data())&&"(Bgen==23333)"));
-  ntMC->Project("hPtMCrecoonly","hiBin",TCut(weightPVz)*TCut(weighpthat)*TCut(weightBgenpt)*TCut(weightHiBin)*(TCut(cut_recoonly.Data())&&"(Bgen==23333)"));
-  ntGen->Project("hPtGen","hiBin",TCut(weightPVz)*TCut(weighpthat)*TCut(weightGpt)*(TCut(selmcgen.Data())));
-  ntGen->Project("hPtGenAcc","hiBin",TCut(weightPVz)*TCut(weighpthat)*TCut(weightGpt)*(TCut(selmcgenacceptance.Data())));
-  ntGen->Project("hPtGenAccWeighted","hiBin",TCut(weightPVz)*TCut(weighpthat)*TCut(weightGpt)*TCut(weightHiBin)*(TCut(selmcgenacceptance.Data())));
+  ntMC->Project("hPtMC","hiBin",TCut(weighpthat)*TCut(weightBgenpt)*TCut(weightHiBin)*TCut(weightPVz)*(TCut(cut.Data())&&"(Bgen==23333)"));
+  ntMC->Project("hPtMCrecoonly","hiBin",TCut(weighpthat)*TCut(weightBgenpt)*TCut(weightHiBin)*TCut(weightPVz)*(TCut(cut_recoonly.Data())&&"(Bgen==23333)"));
+  ntGen->Project("hPtGen","hiBin",TCut(weighpthat)*TCut(weightGpt)*(TCut(selmcgen.Data())));
+  ntGen->Project("hPtGenAcc","hiBin",TCut(weighpthat)*TCut(weightGpt)*(TCut(selmcgenacceptance.Data())));
+  ntGen->Project("hPtGenAccWeighted","hiBin",TCut(weighpthat)*TCut(weightGpt)*TCut(weightHiBin)*TCut(weightPVz)*(TCut(selmcgenacceptance.Data())));
 
   divideBinWidth(hPtMC);
   divideBinWidth(hPtMCrecoonly);
