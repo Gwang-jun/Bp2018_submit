@@ -84,14 +84,10 @@ void fitB(int usePbPb=0, TString inputdata="" , TString inputmc="", TString trgs
     }
   else
     {
-      //weightgen="pthatweight*Ncoll";
-      //weight="pthatweight*Ncoll";
-      //weightgen="pthatweight*Ncoll*(1.032231*TMath::Exp(-0.000763*(PVz+3.728292)*(PVz+3.728292)))*(0.000001+0.128279*Gpt-0.003814*Gpt*Gpt+0.000071*Gpt*Gpt*Gpt)";
-      //weight="pthatweight*Ncoll*(1.032231*TMath::Exp(-0.000763*(PVz+3.728292)*(PVz+3.728292)))*(0.000001+0.128279*Bgenpt-0.003814*Bgenpt*Bgenpt+0.000071*Bgenpt*Bgenpt*Bgenpt)";
-      weightgen="pthatweight*Ncoll*(1.034350*TMath::Exp(-0.000844*(PVz+3.502992)*(PVz+3.502992)))*(0.715021+0.039896*Gpt-0.000834*Gpt*Gpt+0.000006*Gpt*Gpt*Gpt)"; // MC Gpt
-      weight="pthatweight*Ncoll*(1.034350*TMath::Exp(-0.000844*(PVz+3.502992)*(PVz+3.502992)))*(0.715021+0.039896*Bgenpt-0.000834*Bgenpt*Bgenpt+0.000006*Bgenpt*Bgenpt*Bgenpt)"; // MC Gpt
-      //weightgen="pthatweight*Ncoll*(1.034350*TMath::Exp(-0.000844*(PVz+3.502992)*(PVz+3.502992)))*(1.095759-0.028827*Gpt+0.000414*Gpt*Gpt-0.000002*Gpt*Gpt*Gpt)"; // pythia ref
-      //weight="pthatweight*Ncoll*(1.034350*TMath::Exp(-0.000844*(PVz+3.502992)*(PVz+3.502992)))*(1.095759-0.028827*Bgenpt+0.000414*Bgenpt*Bgenpt-0.000002*Bgenpt*Bgenpt*Bgenpt)"; // pythia ref
+      //weightgen="pthatweight*Ncoll*(1.034350*TMath::Exp(-0.000844*(PVz+3.502992)*(PVz+3.502992)))*(0.715021+0.039896*Gpt-0.000834*Gpt*Gpt+0.000006*Gpt*Gpt*Gpt)"; // private MC Gpt
+      //weight="pthatweight*Ncoll*(1.034350*TMath::Exp(-0.000844*(PVz+3.502992)*(PVz+3.502992)))*(0.715021+0.039896*Bgenpt-0.000834*Bgenpt*Bgenpt+0.000006*Bgenpt*Bgenpt*Bgenpt)"; // private MC Gpt
+      weightgen="pthatweight*(0.889175+0.000791*Gpt+0.000015*Gpt*Gpt)";
+      weight="pthatweight*Ncoll*(TMath::Gaus(PVz,0.427450,4.873825)/(sqrt(2*3.14159)*4.873825))/(TMath::Gaus(PVz,0.909938,4.970989)/(sqrt(2*3.14159)*4.970989))*(0.889175+0.000791*Bgenpt+0.000015*Bgenpt*Bgenpt)";
     }
 
   std::cout<<"we are using weight="<<weight<<std::endl;
@@ -101,23 +97,21 @@ void fitB(int usePbPb=0, TString inputdata="" , TString inputmc="", TString trgs
   TFile* inf = new TFile(inputdata.Data());
   TFile* infMC = new TFile(inputmc.Data());
 
-  //For 2018 PbPb data
+  //For 2018 PbPb data, MC
   TTree* nt = (TTree*)inf->Get("Bfinder/ntKp");
   nt->AddFriend("hltanalysis/HltTree");
   nt->AddFriend("hiEvtAnalyzer/HiTree");
-  //nt->AddFriend("skimanalysis/HltTree");
-
-  //For 2018 PbPb MC
+  nt->AddFriend("skimanalysis/HltTree");
   TTree* ntGen = (TTree*)infMC->Get("Bfinder/ntGen");
   ntGen->AddFriend("hltanalysis/HltTree");
   ntGen->AddFriend("hiEvtAnalyzer/HiTree");
   ntGen->AddFriend("Bfinder/ntKp"); //call PVz
-  //ntGen->AddFriend("skimanalysis/HltTree");
+  ntGen->AddFriend("skimanalysis/HltTree");
   TTree* ntMC = (TTree*)infMC->Get("Bfinder/ntKp");
   ntMC->AddFriend("hltanalysis/HltTree");
   ntMC->AddFriend("hiEvtAnalyzer/HiTree");
   ntMC->AddFriend("Bfinder/ntGen"); //call Bgen
-  //ntMC->AddFriend("skimanalysis/HltTree");
+  ntMC->AddFriend("skimanalysis/HltTree");
 
   TString cutforothers = "";
   for(int i=0; i<nvar; i++)
@@ -288,6 +282,7 @@ void fitB(int usePbPb=0, TString inputdata="" , TString inputmc="", TString trgs
   tex->SetLineWidth(2);
   tex->Draw();
 
+  c0->SaveAs(Form("plotCutVar/cutvariation_%s_%s_pt%.0f-%.0f.png",cutvarname[varnum].Data(),collsyst.Data(),_ptBins[0],_ptBins[1]));
   c0->SaveAs(Form("plotCutVar/cutvariation_%s_%s_pt%.0f-%.0f.pdf",cutvarname[varnum].Data(),collsyst.Data(),_ptBins[0],_ptBins[1]));
   
   return;
@@ -314,9 +309,10 @@ void clean0(TH1D* h)
   f->SetNpx(5000);
   f->SetLineWidth(5);
   
-  if(isMC==1) nt->Project(Form("h-%d",count),"Bmass",Form("%s*(%s&&Bpt>%f&&Bpt<%f)*(1/%s)","1",seldata.Data(),ptmin,ptmax,weightdata.Data()));
-  else nt->Project(Form("h-%d",count),"Bmass",Form("(%s&&Bpt>%f&&Bpt<%f)*(1/%s)",seldata.Data(),ptmin,ptmax,weightdata.Data()));   
-  ntMC->Project(Form("hMCSignal-%d",count),"Bmass",Form("%s&&Bpt>%f&&Bpt<%f",Form("%s&&Bgen==23333",selmc.Data()),ptmin,ptmax));
+  if(isMC==1) ntMC->Project(Form("h-%d",count),"Bmass",Form("%s*(%s&&Bpt>%f&&Bpt<%f)*(1/%s)",weight.Data(),seldata.Data(),ptmin,ptmax,weightdata.Data()));
+  else nt->Project(Form("h-%d",count),"Bmass",Form("(%s&&Bpt>%f&&Bpt<%f)*(1/%s)",seldata.Data(),ptmin,ptmax,weightdata.Data()));
+  ntMC->Project(Form("hMCSignal-%d",count),"Bmass",Form("%s*(%s&&Bgen==23333&&Bpt>%f&&Bpt<%f)*(1/%s)",weight.Data(),selmc.Data(),ptmin,ptmax,weightdata.Data()));
+
   clean0(h);
   
   f->SetParLimits(4,-1e5,1e5);
@@ -334,6 +330,8 @@ void clean0(TH1D* h)
   f->SetParameter(8,setparam3);
   f->FixParameter(1,fixparam1);
   f->FixParameter(5,0);
+  //f->FixParameter(3,0);
+  //f->FixParameter(4,0);
   if(weightdata != "1"){
     int maxb = h->GetMaximumBin();
     double _max = h->GetBinContent(maxb);
@@ -347,7 +345,7 @@ void clean0(TH1D* h)
   
   hMCSignal->Fit(Form("f%d",count),"q","",minhisto,maxhisto);
   hMCSignal->Fit(Form("f%d",count),"q","",minhisto,maxhisto);
-  f->ReleaseParameter(1);
+  //f->ReleaseParameter(1);
   hMCSignal->Fit(Form("f%d",count),"L q","",minhisto,maxhisto);
   hMCSignal->Fit(Form("f%d",count),"L q","",minhisto,maxhisto);
   hMCSignal->Fit(Form("f%d",count),"L q","",minhisto,maxhisto);
@@ -360,6 +358,8 @@ void clean0(TH1D* h)
   f->FixParameter(7,f->GetParameter(7));
   f->FixParameter(8,f->GetParameter(8));
   
+  //f->ReleaseParameter(3);
+  //f->ReleaseParameter(4);
   f->ReleaseParameter(5);
   f->SetParLimits(5,0,1000);
   
@@ -543,14 +543,25 @@ void clean0(TH1D* h)
   TString _postfix = "";
   if(weightdata!="1") _postfix = "_EFFCOR";
   if(isPbPb && isMC==0) 
+    {
+      c->SaveAs(Form("plotCutVar/Fits/data_PbPb_pt%.0f-%.0f_%s_%d-thcut.png",ptmin,ptmax,cutvarname[VARNUM].Data(),stage));
       c->SaveAs(Form("plotCutVar/Fits/data_PbPb_pt%.0f-%.0f_%s_%d-thcut.pdf",ptmin,ptmax,cutvarname[VARNUM].Data(),stage));
-    else if(isPbPb && isMC==1) 
+    }
+  else if(isPbPb && isMC==1) 
+    {
+      c->SaveAs(Form("plotCutVar/Fits/mc_PbPb_pt%.0f-%.0f_%s_%d-thcut.png",ptmin,ptmax,cutvarname[VARNUM].Data(),stage));
       c->SaveAs(Form("plotCutVar/Fits/mc_PbPb_pt%.0f-%.0f_%s_%d-thcut.pdf",ptmin,ptmax,cutvarname[VARNUM].Data(),stage));
-    else if(!isPbPb && isMC==0) 
+    }
+  else if(!isPbPb && isMC==0) 
+    {
+      c->SaveAs(Form("plotCutVar/Fits/data_pp_pt%.0f-%.0f_%s_%d-thcut.png",ptmin,ptmax,cutvarname[VARNUM].Data(),stage));
       c->SaveAs(Form("plotCutVar/Fits/data_pp_pt%.0f-%.0f_%s_%d-thcut.pdf",ptmin,ptmax,cutvarname[VARNUM].Data(),stage));
-    else 
+    }
+  else 
+    {
+      c->SaveAs(Form("plotCutVar/Fits/mc_pp_pt%.0f-%.0f_%s_%d-thcut.png",ptmin,ptmax,cutvarname[VARNUM].Data(),stage));
       c->SaveAs(Form("plotCutVar/Fits/mc_pp_pt%.0f-%.0f_%s_%d-thcut.pdf",ptmin,ptmax,cutvarname[VARNUM].Data(),stage));
-  
+    }  
   return mass;
 }
 

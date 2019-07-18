@@ -88,22 +88,11 @@ TF1* fit (TTree* nt, TTree* ntMC, double ptmin, double ptmax, int isMC,bool, TF1
    }
  else
    {
-     //weightgen="pthatweight*Ncoll";
-     //weight="pthatweight*Ncoll";
-     //weightgen="pthatweight*Ncoll*(1.032231*TMath::Exp(-0.000763*(PVz+3.728292)*(PVz+3.728292)))*(0.000001+0.128279*Gpt-0.003814*Gpt*Gpt+0.000071*Gpt*Gpt*Gpt)";
-     //weight="pthatweight*Ncoll*(1.032231*TMath::Exp(-0.000763*(PVz+3.728292)*(PVz+3.728292)))*(0.000001+0.128279*Bgenpt-0.003814*Bgenpt*Bgenpt+0.000071*Bgenpt*Bgenpt*Bgenpt)";
-     //weightgen="pthatweight*Ncoll*(1.034350*TMath::Exp(-0.000844*(PVz+3.502992)*(PVz+3.502992)))*(0.715021+0.039896*Gpt-0.000834*Gpt*Gpt+0.000006*Gpt*Gpt*Gpt)"; // MC Gpt
-     weightgen="pthatweight*(0.715021+0.039896*Gpt-0.000834*Gpt*Gpt+0.000006*Gpt*Gpt*Gpt)"; // MC Gpt
-     weight="pthatweight*Ncoll*(1.034350*TMath::Exp(-0.000844*(PVz+3.502992)*(PVz+3.502992)))*(0.715021+0.039896*Bgenpt-0.000834*Bgenpt*Bgenpt+0.000006*Bgenpt*Bgenpt*Bgenpt)"; // MC Gpt
-     //weightgen="pthatweight*Ncoll*(1.034350*TMath::Exp(-0.000844*(PVz+3.502992)*(PVz+3.502992)))*(1.095759-0.028827*Gpt+0.000414*Gpt*Gpt-0.000002*Gpt*Gpt*Gpt)"; // pythia ref
-     //weight="pthatweight*Ncoll*(1.034350*TMath::Exp(-0.000844*(PVz+3.502992)*(PVz+3.502992)))*(1.095759-0.028827*Bgenpt+0.000414*Bgenpt*Bgenpt-0.000002*Bgenpt*Bgenpt*Bgenpt)"; // pythia ref
+     //weightgen="pthatweight*(0.715021+0.039896*Gpt-0.000834*Gpt*Gpt+0.000006*Gpt*Gpt*Gpt)"; // private MC
+     //weight="pthatweight*Ncoll*(1.034350*TMath::Exp(-0.000844*(PVz+3.502992)*(PVz+3.502992)))*(0.715021+0.039896*Bgenpt-0.000834*Bgenpt*Bgenpt+0.000006*Bgenpt*Bgenpt*Bgenpt)"; // private MC
+     weightgen="pthatweight*(0.889175+0.000791*Gpt+0.000015*Gpt*Gpt)";
+     weight="pthatweight*Ncoll*(TMath::Gaus(PVz,0.427450,4.873825)/(sqrt(2*3.14159)*4.873825))/(TMath::Gaus(PVz,0.909938,4.970989)/(sqrt(2*3.14159)*4.970989))*(0.889175+0.000791*Bgenpt+0.000015*Bgenpt*Bgenpt)";
    }
-
-//if(doDataCor == 1){
-//if(collisionsystem=="pp"||collisionsystem=="PP"||collisionsystem=="ppInc"||collisionsystem=="PbPbInc"){
-//weightdata="(-6.098782e-02+4.106526e-04*Bpt+Bpt*Bpt*1.434530e-03+Bpt*Bpt*Bpt*-4.695382e-05+Bpt*Bpt*Bpt*Bpt*4.363289e-07)";}
-//else{
-//weightdata="( (hiBin>=0&& hiBin<20)*(3.117632e-02+-1.159784e-02*Bpt+Bpt*Bpt*1.219370e-03+Bpt*Bpt*Bpt*-2.963314e-05+Bpt*Bpt*Bpt*Bpt*2.301367e-07) + (hiBin>=20&&hiBin<60)*(4.379875e-02+-1.553269e-02*Bpt+Bpt*Bpt*1.603658e-03+Bpt*Bpt*Bpt*-3.987113e-05+Bpt*Bpt*Bpt*Bpt*3.104066e-07) + (hiBin>=60&&hiBin<100)*(6.381744e-02+-2.182311e-02*Bpt+Bpt*Bpt*2.237331e-03+Bpt*Bpt*Bpt*-6.150110e-05+Bpt*Bpt*Bpt*Bpt*5.475154e-07) + (hiBin>=100&&hiBin<=200)*(7.876289e-02+-2.580109e-02*Bpt+Bpt*Bpt*2.555978e-03+Bpt*Bpt*Bpt*-6.953917e-05+Bpt*Bpt*Bpt*Bpt*6.101012e-07) )";}}
 
 std::cout<<"we are using weight="<<weight<<std::endl;
 std::cout<<"we are using weightdata="<<weightdata<<std::endl;
@@ -112,13 +101,11 @@ std::cout<<"we are using centrality="<<centmin<<"-"<<centmax<<"%"<<std::endl;
 TFile* inf = new TFile(inputdata.Data());
 TFile* infMC = new TFile(inputmc.Data());
 
-//For 2018 PbPb data
+//For 2018 PbPb data, MC
 TTree* nt = (TTree*)inf->Get("Bfinder/ntKp");
 nt->AddFriend("hltanalysis/HltTree");
 nt->AddFriend("hiEvtAnalyzer/HiTree");
 nt->AddFriend("skimanalysis/HltTree");
-
-//For 2018 PbPb MC
 TTree* ntGen = (TTree*)infMC->Get("Bfinder/ntGen");
 ntGen->AddFriend("hltanalysis/HltTree");
 ntGen->AddFriend("hiEvtAnalyzer/HiTree");
@@ -131,14 +118,12 @@ ntMC->AddFriend("Bfinder/ntGen"); //call Bgen
 ntMC->AddFriend("skimanalysis/HltTree");
 
 /*
-//For 2015 PbPb, pp data
+//For 2015 PbPb, pp data, MC
 TTree* nt = (TTree*)inf->Get("ntKp");
 nt->AddFriend("ntHlt");
 nt->AddFriend("ntHi");
 nt->AddFriend("ntSkim");
 nt->AddFriend("mvaTree");
-
-//For 2015 PbPb, pp MC
 TTree* ntGen = (TTree*)infMC->Get("ntGen");
 ntGen->AddFriend("ntHlt");
 ntGen->AddFriend("ntHi");
@@ -516,14 +501,25 @@ void getNPFnPar(TString npfname, float par[]){
   TString _postfix = "%";
   if(weightdata!="1") _postfix = "_EFFCOR";
   if(isPbPb && isMC==0) 
-    c->SaveAs(Form("plotFits/test_data_PbPb_pt%.0f-%.0f_cent%.0f-%.0f%s.png",ptmin,ptmax,centmin,centmax,_postfix.Data()));
+    {
+      c->SaveAs(Form("plotFits/test_data_PbPb_pt%.0f-%.0f_cent%.0f-%.0f%s.png",ptmin,ptmax,centmin,centmax,_postfix.Data()));
+      c->SaveAs(Form("plotFits/test_data_PbPb_pt%.0f-%.0f_cent%.0f-%.0f%s.pdf",ptmin,ptmax,centmin,centmax,_postfix.Data()));
+    }
   else if(isPbPb && isMC==1) 
-    c->SaveAs(Form("plotFits/test_mc_PbPb_pt%.0f-%.0f_cent%.0f-%.0f%s.pdf",ptmin,ptmax,centmin,centmax,_postfix.Data()));
+    {
+      c->SaveAs(Form("plotFits/test_mc_PbPb_pt%.0f-%.0f_cent%.0f-%.0f%s.png",ptmin,ptmax,centmin,centmax,_postfix.Data()));
+      c->SaveAs(Form("plotFits/test_mc_PbPb_pt%.0f-%.0f_cent%.0f-%.0f%s.pdf",ptmin,ptmax,centmin,centmax,_postfix.Data()));
+    }
   else if(!isPbPb && isMC==0) 
-    c->SaveAs(Form("plotFits/test_data_pp_pt%.0f-%.0f.pdf",ptmin,ptmax));
+    {
+      c->SaveAs(Form("plotFits/test_data_pp_pt%.0f-%.0f.png",ptmin,ptmax));
+      c->SaveAs(Form("plotFits/test_data_pp_pt%.0f-%.0f.pdf",ptmin,ptmax));
+    }
   else 
-    c->SaveAs(Form("plotFits/test_mc_pp_pt%.0f-%.0f.pdf",ptmin,ptmax));
-  
+    {
+      c->SaveAs(Form("plotFits/test_mc_pp_pt%.0f-%.0f.png",ptmin,ptmax));
+      c->SaveAs(Form("plotFits/test_mc_pp_pt%.0f-%.0f.pdf",ptmin,ptmax));
+    }
   return mass;
 }
 

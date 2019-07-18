@@ -15,7 +15,7 @@ DOANALYSISPP_CROSS=0
 DOANALYSISPbPb_FITNP=0
 DOANALYSISPbPb_FIT=0
 DOANALYSISPbPb_FITONSAVED=0
-DOANALYSISPbPb_MCSTUDY=0
+DOANALYSISPbPb_MCSTUDY=1
 DOANALYSISPbPb_CROSS=0
 DORAA=0
 DORAA_POSTPRL=0
@@ -49,19 +49,19 @@ DOCOMPARE=0
 DOSAVEHISTPP=0
 DOSAVEHISTPbPb=0
 DOVARIATION=0
-DOClosure=1
+DOClosure=0
 SAVEMVAPP=0
 SAVEMVAPbPb=0
 PLOTMVA=0
 
 
 # 2015 PP
-INPUTMCPP="/mnt/T2_US_MIT/submit-hi2/scratch/gwangjun/Bntuple20160816_Bpt7svpv5p5Bpt10svpv3p5_BfinderMC_pp_Pythia8_BuToJpsiK_TuneCUEP8M1_20160816_bPt0jpsiPt0tkPt0p5_Bp_pthatweight_JingBDT.root"
-INPUTDATAPP="/mnt/T2_US_MIT/submit-hi2/scratch/gwangjun/Bntuple20160816_Bpt7svpv5p5Bpt10svpv3p5_BfinderData_pp_20160816_bPt0jpsiPt0tkPt0p5_Bp_JingBDT.root"
+INPUTMCPP="/afs/cern.ch/work/g/gwkim/private/samples/Bntuple20160816_Bpt7svpv5p5Bpt10svpv3p5_BfinderMC_pp_Pythia8_BuToJpsiK_TuneCUEP8M1_20160816_bPt0jpsiPt0tkPt0p5_Bp_pthatweight_JingBDT.root"
+INPUTDATAPP="/afs/cern.ch/work/g/gwkim/private/samples/Bntuple20160816_Bpt7svpv5p5Bpt10svpv3p5_BfinderData_pp_20160816_bPt0jpsiPt0tkPt0p5_Bp_JingBDT.root"
 
 # 2018 PbPb
-INPUTMCPbPb="/mnt/T2_US_MIT/submit-hi2/scratch/gwangjun/crab_Bfinder_20190520_Hydjet_Pythia8_BuToJpsiK_1033p1_pt3tkpt0p7dls2_v2_addSamplePthat_pthatweight.root"
-INPUTDATAPbPb="/mnt/T2_US_MIT/submit-hi2/scratch/gwangjun/crab_Bfinder_20190513_HIDoubleMuonPsiPeri_HIRun2018A_04Apr2019_v1_1033p1_GoldenJSON_327123_327564_skimhltBsize_ntKp.root"
+INPUTMCPbPb="/afs/cern.ch/work/g/gwkim/private/samples/crab_Bfinder_20190624_Hydjet_Pythia8_Official_BuToJpsiK_1033p1_pt3tkpt0p7dls2_allpthat_pthatweight.root"
+INPUTDATAPbPb="/afs/cern.ch/work/g/gwkim/private/samples/crab_Bfinder_20190513_HIDoubleMuon__PsiPeri__HIRun2018A_04Apr2019_v1_1033p1_GoldenJSON_skimhltBsize_ntKp.root"
 
 # 2015 PbPb
 # INPUTMCPbPb="/mnt/hadoop/cms/store/user/gwangjun/Bp2018/MC/Bntuple20160816_Bpt7svpv5p5Bpt10svpv3p5_BfinderMC_PbPb_Pythia8_BuToJpsiK_TuneCUEP8M1_20160816_bPt5jpsiPt0tkPt0p8_Bp_pthatweight_JingBDT.root"
@@ -177,10 +177,8 @@ RECOONLYPbPb="Btrk1Pt>0.7 && Bpt>3.0 && (BsvpvDistance/BsvpvDisErr)>2.0 && Bchi2
 
 #GA
 BASECUTPbPb="pprimaryVertexFilter && phfCoincFilter2Th4 && pclusterCompatibilityFilter && Btrk1Pt>0.9 && Bpt>5.0 && (BsvpvDistance/BsvpvDisErr)>2.0 && Bchi2cl>0.05 && TMath::Abs(Btrk1Eta)<2.4 && TMath::Abs(By)<2.4 && TMath::Abs(PVz)<15 && Bmass>5 && Bmass<6 && TMath::Abs(Bmumumass-3.096900)<0.15 && Bmu1SoftMuID && Bmu2SoftMuID && Bmu1isAcc && Bmu2isAcc && Bmu1isTriggered && Bmu2isTriggered && (Btrk1PixelHit+Btrk1StripHit)>=11 && (Btrk1Chi2ndf/(Btrk1nStripLayer+Btrk1nPixelLayer))<0.18 && TMath::Abs(Btrk1PtErr/Btrk1Pt)<0.1" ## pre-filter
-#CUTPbPb="$BASECUTPbPb"
-#CUTPbPb="$BASECUTPbPb && ((Bpt>5 && Bpt<7 && (BsvpvDistance/BsvpvDisErr)>17.347 && cos(Bdtheta)>0.968 && TMath::Abs(Btrk1Dxy1/Btrk1DxyError1)>0.520 && Btrk1Pt>0.995 && Bchi2cl>0.095) || (Bpt>7 && Bpt<10 && (BsvpvDistance/BsvpvDisErr)>4.785 && cos(Bdtheta)>0.967 && TMath::Abs(Btrk1Dxy1/Btrk1DxyError1)>3.241 && Btrk1Pt>0.853) || (Bpt>10 && Bpt<15 && (BsvpvDistance/BsvpvDisErr)>9.414 && cos(Bdtheta)>0.311 && TMath::Abs(Btrk1Dxy1/Btrk1DxyError1)>1.421 && Btrk1Pt>1.292 && Bchi2cl>0.075) || (Bpt>15 && Bpt<20 && (BsvpvDistance/BsvpvDisErr)>6.472 && cos(Bdtheta)>0.205 && Btrk1Pt>1.688) || (Bpt>20 && Bpt<30 && (BsvpvDistance/BsvpvDisErr)>5.644 && cos(Bdtheta)>0.998 && Btrk1Pt>1.260) || (Bpt>30 && Bpt<50 && (BsvpvDistance/BsvpvDisErr)>3.035 && cos(Bdtheta)>-0.928 && Btrk1Pt>2.167 && Bchi2cl>0.061) || (Bpt>50 && Bpt<100 && (BsvpvDistance/BsvpvDisErr)>2.119 && cos(Bdtheta)>-0.235 && Btrk1Pt>1.959))"
-CUTPbPb="$BASECUTPbPb && ((Bpt>5 && Bpt<7 && (BsvpvDistance/BsvpvDisErr)>13.028 && cos(Bdtheta)>-0.785 && TMath::Abs(Btrk1Dxy1/Btrk1DxyError1)>3.664 && Btrk1Pt>1.104 && Bchi2cl>0.224) || (Bpt>7 && Bpt<10 && (BsvpvDistance/BsvpvDisErr)>6.151 && cos(Bdtheta)>-0.279 && TMath::Abs(Btrk1Dxy1/Btrk1DxyError1)>3.379 && TMath::Abs(Btrk1Dz1/Btrk1DzError1)>0.628 && Btrk1Pt>1.185) || (Bpt>10 && Bpt<15 && (BsvpvDistance/BsvpvDisErr)>9.641 && cos(Bdtheta)>-0.510 && TMath::Abs(Btrk1Dxy1/Btrk1DxyError1)>3.464 && Btrk1Pt>1.287 && Bchi2cl>0.185) || (Bpt>15 && Bpt<20 && (BsvpvDistance/BsvpvDisErr)>6.520 && cos(Bdtheta)>0.971 && Btrk1Pt>1.837 && Bchi2cl>0.089) || (Bpt>20 && Bpt<30 && (BsvpvDistance/BsvpvDisErr)>4.171 && cos(Bdtheta)>0.998 && Btrk1Pt>1.692) || (Bpt>30 && Bpt<50 && (BsvpvDistance/BsvpvDisErr)>3.850 && cos(Bdtheta)>0.571 && Btrk1Pt>1.723) || (Bpt>50 && Bpt<100 && cos(Bdtheta)>0.743 && TMath::Abs(Btrk1Dxy1/Btrk1DxyError1)>0.203 && Btrk1Pt>2.973 && Bchi2cl>0.062))"
-#CUTPbPb="Btrk1Pt>1.0 && Bpt>5.0 && (BsvpvDistance/BsvpvDisErr)>2.0 && Bchi2cl>0.05 && TMath::Abs(Btrk1Eta)<2.4 && TMath::Abs(By)<2.4 && TMath::Abs(PVz)<15 && Bmass>5 && Bmass<6 && Bmu1isGlobalMuon && Bmu2isGlobalMuon && Bmu1dxyPV<0.3 && Bmu2dxyPV<0.3 && Bmu1dzPV<20 && Bmu2dzPV<20 && Bmu1InPixelLayer>0 && (Bmu1InPixelLayer+Bmu1InStripLayer)>5 && Bmu2InPixelLayer>0 && (Bmu2InPixelLayer+Bmu2InStripLayer)>5 && ((TMath::Abs(Bmu1eta)<1.2 && Bmu1pt>3.5) || (TMath::Abs(Bmu1eta)>1.2 && TMath::Abs(Bmu1eta)<2.1 && Bmu1pt>(5.77-1.8*TMath::Abs(Bmu1eta))) || (TMath::Abs(Bmu1eta)>2.1 && TMath::Abs(Bmu1eta)<2.4 && Bmu1pt>1.8)) && ((TMath::Abs(Bmu2eta)<1.2 && Bmu2pt>3.5) || (TMath::Abs(Bmu2eta)>1.2 && TMath::Abs(Bmu2eta)<2.1 && Bmu2pt>(5.77-1.8*TMath::Abs(Bmu2eta))) || (TMath::Abs(Bmu2eta)>2.1 && TMath::Abs(Bmu2eta)<2.4 && Bmu2pt>1.8)) && TMath::Abs(Bmumumass-3.096900)<0.15 && Bmu1TMOneStationTight && Bmu2TMOneStationTight && Btrk1highPurity && (Btrk1PixelHit+Btrk1StripHit)>=11 && (Btrk1Chi2ndf/(Btrk1nStripLayer+Btrk1nPixelLayer))<0.18 && TMath::Abs(Btrk1PtErr/Btrk1Pt)<0.1 && ((Bpt>5 && Bpt<7 && (BsvpvDistance/BsvpvDisErr)>10.338 && cos(Bdtheta)>0.9997 && Btrk1Pt>1.005 && Bchi2cl>0.062) || (Bpt>7 && Bpt<10 && (BsvpvDistance/BsvpvDisErr)>17.028 && cos(Bdtheta)>0.966 && Bchi2cl>0.065) || (Bpt>10 && Bpt<15 && (BsvpvDistance/BsvpvDisErr)>12.375 && cos(Bdtheta)>0.986 && Btrk1Pt>1.158 && Bchi2cl>0.058) || (Bpt>15 && Bpt<20 && (BsvpvDistance/BsvpvDisErr)>5.795 && cos(Bdtheta)>0.837 && Btrk1Pt>1.849) || (Bpt>20 && Bpt<30 && (BsvpvDistance/BsvpvDisErr)>4.847 && cos(Bdtheta)>0.873 && Btrk1Pt>1.999) || (Bpt>30 && Bpt<50 && (BsvpvDistance/BsvpvDisErr)>2.733 && cos(Bdtheta)>0.007 && Btrk1Pt>2.339 && Bchi2cl>0.061) || (Bpt>50 && Bpt<100 && (BsvpvDistance/BsvpvDisErr)>3.116 && cos(Bdtheta)>-0.383 && Btrk1Pt>1.500))"
+CUTPbPb="$BASECUTPbPb"
+#CUTPbPb="$BASECUTPbPb && ((Bpt>5 && Bpt<7 && (BsvpvDistance/BsvpvDisErr)>13.028 && cos(Bdtheta)>-0.785 && TMath::Abs(Btrk1Dxy1/Btrk1DxyError1)>3.664 && Btrk1Pt>1.104 && Bchi2cl>0.224) || (Bpt>7 && Bpt<10 && (BsvpvDistance/BsvpvDisErr)>6.151 && cos(Bdtheta)>-0.279 && TMath::Abs(Btrk1Dxy1/Btrk1DxyError1)>3.379 && TMath::Abs(Btrk1Dz1/Btrk1DzError1)>0.628 && Btrk1Pt>1.185) || (Bpt>10 && Bpt<15 && (BsvpvDistance/BsvpvDisErr)>9.641 && cos(Bdtheta)>-0.510 && TMath::Abs(Btrk1Dxy1/Btrk1DxyError1)>3.464 && Btrk1Pt>1.287 && Bchi2cl>0.185) || (Bpt>15 && Bpt<20 && (BsvpvDistance/BsvpvDisErr)>6.520 && cos(Bdtheta)>0.971 && Btrk1Pt>1.837 && Bchi2cl>0.089) || (Bpt>20 && Bpt<30 && (BsvpvDistance/BsvpvDisErr)>4.171 && cos(Bdtheta)>0.998 && Btrk1Pt>1.692) || (Bpt>30 && Bpt<50 && (BsvpvDistance/BsvpvDisErr)>3.850 && cos(Bdtheta)>0.571 && Btrk1Pt>1.723) || (Bpt>50 && Bpt<100 && cos(Bdtheta)>0.743 && TMath::Abs(Btrk1Dxy1/Btrk1DxyError1)>0.203 && Btrk1Pt>2.973 && Bchi2cl>0.062))" ## private MC
 
 #TRGPbPbMC="(HLT_HIL1DoubleMu0_v1)"
 #TRGPbPbMC="(HLT_HIL1DoubleMu0_v1 || HLT_HIL1DoubleMu0_part1_v1 || HLT_HIL1DoubleMu0_part2_v1 || HLT_HIL1DoubleMu0_part3_v1)"

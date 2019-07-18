@@ -145,11 +145,24 @@ void Bplusdsigmadpt(TString inputFONLLdat = "fonll_0to120.txt", TString outputFO
   gaeSigmaBplus->SetFillColor(2);
   gaeSigmaBplus->SetFillStyle(3001); 
   gaeSigmaBplus->SetTitle(";p_{T}(GeV/c);d#sigma/dp_{T} (B^{+}) (pb GeV-1c)");
+
+  TH1D* gaeSigmaBplus_sym = new TH1D("","",nBins,ptBins);
+  gaeSigmaBplus_sym->SetName("gaeSigmaBplus_sym");
+  gaeSigmaBplus_sym->SetTitle("");
+  gaeSigmaBplus_sym->GetXaxis()->SetTitle("p_{t} (GeV)");
+  gaeSigmaBplus_sym->GetYaxis()->SetTitle("d#sigma/dp_{t} (pb/GeV)");
+  gaeSigmaBplus_sym->GetYaxis()->SetTitleOffset(1.1);
+  gaeSigmaBplus_sym->SetLineColor(kBlue);
   
   for (int i=0;i<gaeSigmaBplus->GetN();i++){
     gaeSigmaBplus->GetY()[i] *= norm;
     gaeSigmaBplus->SetPointEYhigh(i,gaeSigmaBplus->GetErrorYhigh(i)*norm);
     gaeSigmaBplus->SetPointEYlow(i,gaeSigmaBplus->GetErrorYlow(i)*norm); 
+    //cout<<gaeSigmaBplus->GetY()[i]<<endl;
+
+    gaeSigmaBplus_sym->SetBinContent(i+1,gaeSigmaBplus->GetY()[i]);
+    gaeSigmaBplus_sym->SetBinError(i+1,0.5*((gaeSigmaBplus->GetErrorYhigh(i))+(gaeSigmaBplus->GetErrorYlow(i))));
+    //cout<<gaeSigmaBplus_sym->GetBinContent(i+1)<<endl;
   }
      
   TCanvas* cr = new TCanvas("cr","cr",600,500);
@@ -226,6 +239,7 @@ void Bplusdsigmadpt(TString inputFONLLdat = "fonll_0to120.txt", TString outputFO
   foutput->cd();
   gaeSigma->Write();
   gaeSigmaBplus->Write();
+  gaeSigmaBplus_sym->Write();
   hpt->Write();
   hminall->Write();
   hmaxall->Write();

@@ -23,11 +23,11 @@ void converter(){
 	string label = "";
 	if(ispp){
 		label = "pp"; 
-		inputmc = "/mnt/T2_US_MIT/submit-hi2/scratch/gwangjun/Bntuple20160816_Bpt7svpv5p5Bpt10svpv3p5_BfinderMC_pp_Pythia8_BuToJpsiK_TuneCUEP8M1_20160816_bPt0jpsiPt0tkPt0p5_Bp_pthatweight_JingBDT.root";
+		inputmc = "/afs/cern.ch/work/g/gwkim/private/samples/Bntuple20160816_Bpt7svpv5p5Bpt10svpv3p5_BfinderMC_pp_Pythia8_BuToJpsiK_TuneCUEP8M1_20160816_bPt0jpsiPt0tkPt0p5_Bp_pthatweight_JingBDT.root";
     }
 	else{
 		label = "pbpb";
-		inputmc = "/mnt/T2_US_MIT/submit-hi2/scratch/gwangjun/crab_Bfinder_20190520_Hydjet_Pythia8_BuToJpsiK_1033p1_pt3tkpt0p7dls2_v2_addSamplePthat_pthatweight.root";
+		inputmc = "/afs/cern.ch/work/g/gwkim/private/samples/crab_Bfinder_20190624_Hydjet_Pythia8_Official_BuToJpsiK_1033p1_pt3tkpt0p7dls2_allpthat_pthatweight.root";
 	}
     TFile* infMC = new TFile(inputmc.Data());
     TTree* ntKp = (TTree*)infMC->Get("Bfinder/ntKp");

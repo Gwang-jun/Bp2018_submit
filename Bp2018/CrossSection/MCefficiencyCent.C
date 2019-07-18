@@ -66,27 +66,22 @@ void MCefficiencyCent(int isPbPb=0,TString inputmc="", TString selmcgen="",TStri
   TCut weightBgenpt = "1";
   TCut weightHiBin = "1";
   TCut weightPVz = "1";
-  if(useweight==0) {
+  if(useweight==0) { //pp
     weighpthat = "pthatweight";
     weightPVz = "1.055564*TMath::Exp(-0.001720*(PVz+2.375584)*(PVz+2.375584))";
     weightGpt = "0.599212+-0.020703*Gpt+0.003143*Gpt*Gpt+-0.000034*Gpt*Gpt*Gpt";
     weightBgenpt = "0.599212+-0.020703*Bgenpt+0.003143*Bgenpt*Bgenpt+-0.000034*Bgenpt*Bgenpt*Bgenpt";
   }
 
-  if(useweight==1) {
+  if(useweight==1) { //PbPb
     weighpthat = "pthatweight";
     weightHiBin = "Ncoll";
-    //weightPVz="1";
-    //weightPVz = "1.032231*TMath::Exp(-0.000763*(PVz+3.728292)*(PVz+3.728292))";
-    weightPVz = "1.034350*TMath::Exp(-0.000844*(PVz+3.502992)*(PVz+3.502992))";
-    //weightGpt = "1";
-    //weightGpt = "0.000001+0.128279*Gpt-0.003814*Gpt*Gpt+0.000071*Gpt*Gpt*Gpt";
-    weightGpt = "0.715021+0.039896*Gpt-0.000834*Gpt*Gpt+0.000006*Gpt*Gpt*Gpt"; // MC Gpt
-    //weightGpt = "1.095759-0.028827*Gpt+0.000414*Gpt*Gpt-0.000002*Gpt*Gpt*Gpt"; // pythia ref
-    //weightBgenpt = "1";
-    //weightBgenpt = "0.000001+0.128279*Bgenpt-0.003814*Bgenpt*Bgenpt+0.000071*Bgenpt*Bgenpt*Bgenpt";
-    weightBgenpt = "0.715021+0.039896*Bgenpt-0.000834*Bgenpt*Bgenpt+0.000006*Bgenpt*Bgenpt*Bgenpt"; // MC Gpt
-    //weightBgenpt = "1.095759-0.028827*Bgenpt+0.000414*Bgenpt*Bgenpt-0.000002*Bgenpt*Bgenpt*Bgenpt"; // pythia ref
+    weightPVz = "(TMath::Gaus(PVz,0.427450,4.873825)/(sqrt(2*3.14159)*4.873825))/(TMath::Gaus(PVz,0.909938,4.970989)/(sqrt(2*3.14159)*4.970989))";
+    weightGpt = "0.889175+0.000791*Gpt+0.000015*Gpt*Gpt";
+    weightBgenpt = "0.889175+0.000791*Bgenpt+0.000015*Bgenpt*Bgenpt";
+    //weightPVz = "1.034350*TMath::Exp(-0.000844*(PVz+3.502992)*(PVz+3.502992))"; // private MC
+    //weightGpt = "0.715021+0.039896*Gpt-0.000834*Gpt*Gpt+0.000006*Gpt*Gpt*Gpt"; // private MC Gpt
+    //weightBgenpt = "0.715021+0.039896*Bgenpt-0.000834*Bgenpt*Bgenpt+0.000006*Bgenpt*Bgenpt*Bgenpt"; // private MC Gpt
   }
 
   TH1D* hPtMC = new TH1D("hPtMC","",_nBins,_ptBins);
@@ -166,8 +161,7 @@ void MCefficiencyCent(int isPbPb=0,TString inputmc="", TString selmcgen="",TStri
 
   TH2F* hemptyEffAcc=(TH2F*)hemptyEff->Clone("hemptyEffAcc");
   TH2F* hemptyEffReco=(TH2F*)hemptyEff->Clone("hemptyEffReco");
-  TH2F* hemptyEffSelection=(TH2F*)hemptyEff->Clone("hemptyEffSelection");
- 
+  TH2F* hemptyEffSelection=(TH2F*)hemptyEff->Clone("hemptyEffSelection"); 
 
   TCanvas*canvasEff=new TCanvas("canvasEff","canvasEff",1000.,500);
   canvasEff->Divide(2,1);
@@ -181,6 +175,7 @@ void MCefficiencyCent(int isPbPb=0,TString inputmc="", TString selmcgen="",TStri
   //gPad->SetLogy();
   hemptyEff->Draw();
   hEff->Draw("same");
+  canvasEff->SaveAs(Form("plotEffCent/canvasEff_study%s_Cent.png",Form(label.Data())));
   canvasEff->SaveAs(Form("plotEffCent/canvasEff_study%s_Cent.pdf",Form(label.Data())));
   
   TH2F* hemptyPthat=new TH2F("hemptyPthat","",50,0.,200.,10,1e-5,1e9);  
@@ -200,7 +195,6 @@ void MCefficiencyCent(int isPbPb=0,TString inputmc="", TString selmcgen="",TStri
   hemptyPthat->GetYaxis()->SetLabelSize(0.035);  
   hemptyPthat->SetMaximum(2);
   hemptyPthat->SetMinimum(0.);
-
 
   TH2F* hemptySpectra=new TH2F("hemptySpectra","",50,0.,200.,10,1,1e9);  
   hemptySpectra->GetXaxis()->CenterTitle();
@@ -341,7 +335,3 @@ int main(int argc, char *argv[])
     MCefficiencyCent(atoi(argv[1]),argv[2],argv[3],argv[4],argv[5],argv[6],argv[7],argv[8],atoi(argv[9]),atof(argv[10]),atof(argv[11]));
   return 0;
 }
-
-
-
-

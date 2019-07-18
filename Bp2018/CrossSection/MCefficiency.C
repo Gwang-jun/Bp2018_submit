@@ -70,18 +70,20 @@ void MCefficiency(int isPbPb=0,TString inputmc="", TString selmcgen="",TString s
   ntGen->AddFriend("Bfinder/ntKp");
   ntGen->AddFriend("skimanalysis/HltTree");
 
-  //For 2015 PbPb, pp MC
-  //TFile* infMC = new TFile(inputmc.Data());
-  //TTree* ntMC = (TTree*)infMC->Get("ntKp");
-  //ntMC->AddFriend("ntHlt");
-  //ntMC->AddFriend("ntHi");
-  //ntMC->AddFriend("ntGen");
-  //ntMC->AddFriend("ntSkim");
-  //TTree* ntGen = (TTree*)infMC->Get("ntGen");
-  //ntGen->AddFriend("ntHlt");
-  //ntGen->AddFriend("ntHi");
-  //ntGen->AddFriend("ntKp");
-  //ntGen->AddFriend("ntSkim");
+  /*
+  For 2015 PbPb, pp MC
+  TFile* infMC = new TFile(inputmc.Data());
+  TTree* ntMC = (TTree*)infMC->Get("ntKp");
+  ntMC->AddFriend("ntHlt");
+  ntMC->AddFriend("ntHi");
+  ntMC->AddFriend("ntGen");
+  ntMC->AddFriend("ntSkim");
+  TTree* ntGen = (TTree*)infMC->Get("ntGen");
+  ntGen->AddFriend("ntHlt");
+  ntGen->AddFriend("ntHi");
+  ntGen->AddFriend("ntKp");
+  ntGen->AddFriend("ntSkim");
+  */
 
   // optimal weights
   TCut weighpthat = "1";
@@ -89,27 +91,22 @@ void MCefficiency(int isPbPb=0,TString inputmc="", TString selmcgen="",TString s
   TCut weightBgenpt = "1";
   TCut weightHiBin = "1";
   TCut weightPVz = "1";
-  if(useweight==0) {
+  if(useweight==0) { //pp
     weighpthat = "pthatweight";
     weightPVz = "1.055564*TMath::Exp(-0.001720*(PVz+2.375584)*(PVz+2.375584))";
     weightGpt = "0.599212+-0.020703*Gpt+0.003143*Gpt*Gpt+-0.000034*Gpt*Gpt*Gpt";
     weightBgenpt = "0.599212+-0.020703*Bgenpt+0.003143*Bgenpt*Bgenpt+-0.000034*Bgenpt*Bgenpt*Bgenpt";
     }
   
-  if(useweight==1) {
+  if(useweight==1) { //PbPb
     weighpthat = "pthatweight";
     weightHiBin = "Ncoll";
-    //weightPVz="1";
-    //weightPVz = "1.032231*TMath::Exp(-0.000763*(PVz+3.728292)*(PVz+3.728292))";
-    weightPVz = "1.034350*TMath::Exp(-0.000844*(PVz+3.502992)*(PVz+3.502992))";
-    //weightGpt = "1";
-    //weightGpt = "0.000001+0.128279*Gpt-0.003814*Gpt*Gpt+0.000071*Gpt*Gpt*Gpt";
-    weightGpt = "0.715021+0.039896*Gpt-0.000834*Gpt*Gpt+0.000006*Gpt*Gpt*Gpt"; // MC Gpt
-    //weightGpt = "1.095759-0.028827*Gpt+0.000414*Gpt*Gpt-0.000002*Gpt*Gpt*Gpt"; // pythia ref
-    //weightBgenpt = "1";
-    //weightBgenpt = "0.000001+0.128279*Bgenpt-0.003814*Bgenpt*Bgenpt+0.000071*Bgenpt*Bgenpt*Bgenpt";
-    weightBgenpt = "0.715021+0.039896*Bgenpt-0.000834*Bgenpt*Bgenpt+0.000006*Bgenpt*Bgenpt*Bgenpt"; // MC Gpt
-    //weightBgenpt = "1.095759-0.028827*Bgenpt+0.000414*Bgenpt*Bgenpt-0.000002*Bgenpt*Bgenpt*Bgenpt"; // pythia ref
+    weightPVz = "(TMath::Gaus(PVz,0.427450,4.873825)/(sqrt(2*3.14159)*4.873825))/(TMath::Gaus(PVz,0.909938,4.970989)/(sqrt(2*3.14159)*4.970989))";
+    weightGpt = "0.889175+0.000791*Gpt+0.000015*Gpt*Gpt";
+    weightBgenpt = "0.889175+0.000791*Bgenpt+0.000015*Bgenpt*Bgenpt";
+    //weightPVz = "1.034350*TMath::Exp(-0.000844*(PVz+3.502992)*(PVz+3.502992))"; // private MC
+    //weightGpt = "0.715021+0.039896*Gpt-0.000834*Gpt*Gpt+0.000006*Gpt*Gpt*Gpt"; // private MC Gpt
+    //weightBgenpt = "0.715021+0.039896*Bgenpt-0.000834*Bgenpt*Bgenpt+0.000006*Bgenpt*Bgenpt*Bgenpt"; // private MC Gpt
     }
   
   TH1D* hPtMC = new TH1D("hPtMC","",_nBins,_ptBins);
@@ -154,35 +151,30 @@ void MCefficiency(int isPbPb=0,TString inputmc="", TString selmcgen="",TString s
   hPtMC->Sumw2();
   hPtGenAcc->Sumw2();
   hPtMCrecoonly->Sumw2();
-
+  /*
   //hEffAcc = hPtGenAcc / hPtGen
   //hEffReco = hPtMCrecoonly / hPtGenAcc
   //hEffSelection = hPtMC / hPtMCrecoonly
   //hEff = hPtMC / hPtGen
 
   //Acceptance only
-  //TH1D* hEffAcc = (TH1D*)hPtGenAcc->Clone("hEffAcc");
-  //hEffAcc->Sumw2();
-  //hEffAcc->Divide(hEffAcc,hPtGen,1,1,"b");
-
+  TH1D* hEffAcc = (TH1D*)hPtGenAcc->Clone("hEffAcc");
+  hEffAcc->Sumw2();
+  hEffAcc->Divide(hEffAcc,hPtGen,1,1,"b");
   //Eff_reco only
-  //TH1D* hEffReco = (TH1D*)hPtMCrecoonly->Clone("hEffReco");
-  //hEffReco->Sumw2();
-  //hEffReco->Divide(hEffReco,hPtGenAcc,1,1,"b");
-  //hEffReco->Divide(hEffReco,hPtGen,1,1,"b");
-
+  TH1D* hEffReco = (TH1D*)hPtMCrecoonly->Clone("hEffReco");
+  hEffReco->Sumw2();
+  hEffReco->Divide(hEffReco,hPtGenAcc,1,1,"b");
+  hEffReco->Divide(hEffReco,hPtGen,1,1,"b");
   //Eff_selection only
-  //TH1D* hEffSelection = (TH1D*)hPtMC->Clone("hEffSelection");
-  //hEffSelection->Sumw2();
-  //hEffSelection->Divide(hEffSelection,hPtMCrecoonly,1,1,"b");
-
+  TH1D* hEffSelection = (TH1D*)hPtMC->Clone("hEffSelection");
+  hEffSelection->Sumw2();
+  hEffSelection->Divide(hEffSelection,hPtMCrecoonly,1,1,"b");
   //Full efficiency = Acc * Eff_reco * Eff_selection
-  //TH1D* hEff = (TH1D*)hPtMC->Clone("hEff");
-  //hEff->Sumw2();
-  //hEff->Divide(hPtGen);
-  //TH1D* hEff = (TH1D*)hEffSelection->Clone("hEff");
-  ////hEff->Divide(hPtMC,hPtGen,1,1,"");
-  //hEff->Multiply(hEff,hEffAcc,1,1);
+  TH1D* hEff = (TH1D*)hPtMC->Clone("hEff");
+  hEff->Sumw2();
+  hEff->Divide(hPtGen);
+  */
 
   //Acceptance
   TH1D* hEffAcc = (TH1D*)hPtGenAcc->Clone("hEffAcc");
@@ -201,7 +193,6 @@ void MCefficiency(int isPbPb=0,TString inputmc="", TString selmcgen="",TString s
   hEff->Sumw2();
   //hEff->Divide(hPtMC,hPtGen,1,1,"");
   hEff->Multiply(hEff,hEffAcc,1,1);
-
 
   TH2F* hemptyEff=new TH2F("hemptyEff","",50,_ptBins[0]-5.,_ptBins[_nBins]+5.,10,0.,1.);  
   hemptyEff->GetXaxis()->CenterTitle();
@@ -237,6 +228,7 @@ void MCefficiency(int isPbPb=0,TString inputmc="", TString selmcgen="",TString s
   canvasEff->cd(2);
   hemptyEff->Draw();
   hEff->Draw("same");
+  canvasEff->SaveAs(Form("plotEff/canvasEff_study%s.png",Form(label.Data())));
   canvasEff->SaveAs(Form("plotEff/canvasEff_study%s.pdf",Form(label.Data())));
   
   for(int j=0;j<_nBins;j++)

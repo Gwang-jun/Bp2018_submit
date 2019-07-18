@@ -33,8 +33,8 @@ void ReweightBpt(){
 
   gStyle->SetOptStat(0);
 
-  TFile *finData = new TFile("/mnt/T2_US_MIT/submit-hi2/scratch/gwangjun/crab_Bfinder_20190513_HIDoubleMuonPsiPeri_HIRun2018A_04Apr2019_v1_1033p1_GoldenJSON_327123_327564_skimhltBsize_ntKp.root");
-  TFile *finMC = new TFile("/mnt/T2_US_MIT/submit-hi2/scratch/gwangjun/crab_Bfinder_20190520_Hydjet_Pythia8_BuToJpsiK_1033p1_pt3tkpt0p7dls2_v2_addSamplePthat_pthatweight.root");
+  TFile *finData = new TFile("/afs/cern.ch/work/g/gwkim/private/samples/crab_Bfinder_20190513_HIDoubleMuon__PsiPeri__HIRun2018A_04Apr2019_v1_1033p1_GoldenJSON_skimhltBsize_ntKp.root");
+  TFile *finMC = new TFile("/afs/cern.ch/work/g/gwkim/private/samples/crab_Bfinder_20190624_Hydjet_Pythia8_Official_BuToJpsiK_1033p1_pt3tkpt0p7dls2_allpthat_pthatweight.root");
 
   TTree * tData = (TTree*) finData->Get("Bfinder/ntKp");
   tData->AddFriend("hltanalysis/HltTree");
@@ -79,43 +79,43 @@ void ReweightBpt(){
   Ratio->SetMarkerSize(1);
   Ratio->Scale(1.0/Ratio->Integral());
 
-  //TString FuncData;
-  //TString FuncMC;
-  //TString FuncRatio;
+  TString FuncData;
+  TString FuncMC;
+  TString FuncRatio;
 
-  //TF1 * f1 = new TF1("f1","[0]+[1]*x+[2]*x*x+[3]*x*x*x",nBins,ptBins);
-  //f1->SetParLimits(0,0,10);
-  //f1->SetParLimits(1,-10,10);
-  //f1->SetParLimits(2,-10,10);
-  //f1->SetParLimits(3,-10,10);
+  TF1 * f1 = new TF1("f1","[0]+[1]*x+[2]*x*x+[3]*x*x*x",nBins,ptBins);
+  f1->SetParLimits(0,0,10);
+  f1->SetParLimits(1,-10,10);
+  f1->SetParLimits(2,-10,10);
+  f1->SetParLimits(3,-10,10);
 
   TCanvas* c = new TCanvas("c","",600,600);
   c->cd();
 
-  //BptData->Fit(f1,"R");
-  //double p0Data = f1->GetParameter(0);
-  //double p1Data = f1->GetParameter(1);
-  //double p2Data = f1->GetParameter(2);
-  //FuncData = Form("%f*TMath::Exp(-%f*(Bpt-%f)*(Bpt-%f))",f1->GetParameter(0),f1->GetParameter(1),f1->GetParameter(2),f1->GetParameter(2));
-  //cout << "Funct Data = " << FuncData.Data() << endl;
+  BptData->Fit(f1,"R");
+  double p0Data = f1->GetParameter(0);
+  double p1Data = f1->GetParameter(1);
+  double p2Data = f1->GetParameter(2);
+  FuncData = Form("%f*TMath::Exp(-%f*(Bpt-%f)*(Bpt-%f))",f1->GetParameter(0),f1->GetParameter(1),f1->GetParameter(2),f1->GetParameter(2));
+  cout << "Funct Data = " << FuncData.Data() << endl;
   BptData->Draw("ep");
   c->SaveAs("BptDataFit.png");
 
-  //BptMC->Fit(f1,"R");
-  //double p0MC = f1->GetParameter(0);
-  //double p1MC = f1->GetParameter(1);
-  //double p2MC = f1->GetParameter(2);
-  //FuncMC = Form("%f*TMath::Exp(-%f*(Bpt-%f)*(Bpt-%f))",f1->GetParameter(0),f1->GetParameter(1),f1->GetParameter(2),f1->GetParameter(2));
-  //cout << "Funct MC = " << FuncMC.Data() << endl;
+  BptMC->Fit(f1,"R");
+  double p0MC = f1->GetParameter(0);
+  double p1MC = f1->GetParameter(1);
+  double p2MC = f1->GetParameter(2);
+  FuncMC = Form("%f*TMath::Exp(-%f*(Bpt-%f)*(Bpt-%f))",f1->GetParameter(0),f1->GetParameter(1),f1->GetParameter(2),f1->GetParameter(2));
+  cout << "Funct MC = " << FuncMC.Data() << endl;
   BptMC->Draw("ep");
   c->SaveAs("BptMCFit.png");
 
-  //Ratio->Fit(f1,"R");
-  //double p0Ratio = f1->GetParameter(0);
-  //double p1Ratio = f1->GetParameter(1);
-  //double p2Ratio = f1->GetParameter(2);
-  //FuncRatio = Form("%f*TMath::Exp(-%f*(Bpt-%f)*(Bpt-%f))",f1->GetParameter(0),f1->GetParameter(1),f1->GetParameter(2),f1->GetParameter(2));
-  //cout << "Funct Ratio = " << FuncRatio.Data() << endl;
+  Ratio->Fit(f1,"R");
+  double p0Ratio = f1->GetParameter(0);
+  double p1Ratio = f1->GetParameter(1);
+  double p2Ratio = f1->GetParameter(2);
+  FuncRatio = Form("%f*TMath::Exp(-%f*(Bpt-%f)*(Bpt-%f))",f1->GetParameter(0),f1->GetParameter(1),f1->GetParameter(2),f1->GetParameter(2));
+  cout << "Funct Ratio = " << FuncRatio.Data() << endl;
   Ratio->Draw("ep");
   c->SaveAs("BptRatioFit.png");
 }

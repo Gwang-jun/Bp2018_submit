@@ -69,22 +69,12 @@ void fitBCent(int usePbPb=0, TString inputdata="" , TString inputmc="", TString 
     }
   else
     {
-     //weightgen="pthatweight*Ncoll";
-     //weight="pthatweight*Ncoll";
-     //weightgen="pthatweight*Ncoll*(1.032231*TMath::Exp(-0.000763*(PVz+3.728292)*(PVz+3.728292)))*(0.000001+0.128279*Gpt-0.003814*Gpt*Gpt+0.000071*Gpt*Gpt*Gpt)";
-     //weight="pthatweight*Ncoll*(1.032231*TMath::Exp(-0.000763*(PVz+3.728292)*(PVz+3.728292)))*(0.000001+0.128279*Bgenpt-0.003814*Bgenpt*Bgenpt+0.000071*Bgenpt*Bgenpt*Bgenpt)";
-     weightgen="pthatweight*Ncoll*(1.034350*TMath::Exp(-0.000844*(PVz+3.502992)*(PVz+3.502992)))*(0.715021+0.039896*Gpt-0.000834*Gpt*Gpt+0.000006*Gpt*Gpt*Gpt)"; // MC Gpt
-     weight="pthatweight*Ncoll*(1.034350*TMath::Exp(-0.000844*(PVz+3.502992)*(PVz+3.502992)))*(0.715021+0.039896*Bgenpt-0.000834*Bgenpt*Bgenpt+0.000006*Bgenpt*Bgenpt*Bgenpt)"; // MC Gpt
-     //weightgen="pthatweight*Ncoll*(1.034350*TMath::Exp(-0.000844*(PVz+3.502992)*(PVz+3.502992)))*(1.095759-0.028827*Gpt+0.000414*Gpt*Gpt-0.000002*Gpt*Gpt*Gpt)"; // pythia ref
-     //weight="pthatweight*Ncoll*(1.034350*TMath::Exp(-0.000844*(PVz+3.502992)*(PVz+3.502992)))*(1.095759-0.028827*Bgenpt+0.000414*Bgenpt*Bgenpt-0.000002*Bgenpt*Bgenpt*Bgenpt)"; // pythia ref
+      //weightgen="pthatweight*Ncoll*(1.034350*TMath::Exp(-0.000844*(PVz+3.502992)*(PVz+3.502992)))*(0.715021+0.039896*Gpt-0.000834*Gpt*Gpt+0.000006*Gpt*Gpt*Gpt)"; // MC Gpt
+      //weight="pthatweight*Ncoll*(1.034350*TMath::Exp(-0.000844*(PVz+3.502992)*(PVz+3.502992)))*(0.715021+0.039896*Bgenpt-0.000834*Bgenpt*Bgenpt+0.000006*Bgenpt*Bgenpt*Bgenpt)"; // MC Gpt
+      weightgen="pthatweight*(0.889175+0.000791*Gpt+0.000015*Gpt*Gpt)";
+      weight="pthatweight*Ncoll*(TMath::Gaus(PVz,0.427450,4.873825)/(sqrt(2*3.14159)*4.873825))/(TMath::Gaus(PVz,0.909938,4.970989)/(sqrt(2*3.14159)*4.970989))*(0.889175+0.000791*Bgenpt+0.000015*Bgenpt*Bgenpt)";
     }
 
-//if(doDataCor == 1){
-//if(collisionsystem=="pp"||collisionsystem=="PP"){
-//weightdata="(-6.098782e-02+4.106526e-04*Bpt+Bpt*Bpt*1.434530e-03+Bpt*Bpt*Bpt*-4.695382e-05+Bpt*Bpt*Bpt*Bpt*4.363289e-07)";}
-//else{
-//weightdata="( (hiBin>=0&& hiBin<20)*(3.117632e-02+-1.159784e-02*Bpt+Bpt*Bpt*1.219370e-03+Bpt*Bpt*Bpt*-2.963314e-05+Bpt*Bpt*Bpt*Bpt*2.301367e-07) + (hiBin>=20&&hiBin<60)*(4.379875e-02+-1.553269e-02*Bpt+Bpt*Bpt*1.603658e-03+Bpt*Bpt*Bpt*-3.987113e-05+Bpt*Bpt*Bpt*Bpt*3.104066e-07) + (hiBin>=60&&hiBin<100)*(6.381744e-02+-2.182311e-02*Bpt+Bpt*Bpt*2.237331e-03+Bpt*Bpt*Bpt*-6.150110e-05+Bpt*Bpt*Bpt*Bpt*5.475154e-07) + (hiBin>=100&&hiBin<=200)*(7.876289e-02+-2.580109e-02*Bpt+Bpt*Bpt*2.555978e-03+Bpt*Bpt*Bpt*-6.953917e-05+Bpt*Bpt*Bpt*Bpt*6.101012e-07) )";}}
-  
   std::cout<<"we are using weight="<<weight<<std::endl;
   std::cout<<"we are using weightdata="<<weightdata<<std::endl;
   std::cout<<"we are using total centrality="<<centmin<<"-"<<centmax<<"%"<<std::endl;
@@ -92,13 +82,11 @@ void fitBCent(int usePbPb=0, TString inputdata="" , TString inputmc="", TString 
   TFile* inf = new TFile(inputdata.Data());
   TFile* infMC = new TFile(inputmc.Data());
 
-  //For 2018 PbPb data
+  //For 2018 PbPb data, MC
   TTree* nt = (TTree*)inf->Get("Bfinder/ntKp");
   nt->AddFriend("hltanalysis/HltTree");
   nt->AddFriend("hiEvtAnalyzer/HiTree");
   nt->AddFriend("skimanalysis/HltTree");
-
-  //For 2018 PbPb MC
   TTree* ntGen = (TTree*)infMC->Get("Bfinder/ntGen");
   ntGen->AddFriend("hltanalysis/HltTree");
   ntGen->AddFriend("hiEvtAnalyzer/HiTree");
@@ -110,24 +98,24 @@ void fitBCent(int usePbPb=0, TString inputdata="" , TString inputmc="", TString 
   ntMC->AddFriend("Bfinder/ntGen"); //call Bgen
   ntMC->AddFriend("skimanalysis/HltTree");
 
-  //For 2015 PbPb, pp data
-  //TTree* nt = (TTree*)inf->Get("ntKp");
-  //nt->AddFriend("ntHlt");
-  //nt->AddFriend("ntHi");
-  //nt->AddFriend("ntSkim");
-  //nt->AddFriend("mvaTree");
+  /*
+  //For 2015 PbPb, pp data, MC
+  TTree* nt = (TTree*)inf->Get("ntKp");
+  nt->AddFriend("ntHlt");
+  nt->AddFriend("ntHi");
+  nt->AddFriend("ntSkim");
+  nt->AddFriend("mvaTree");
+  TTree* ntGen = (TTree*)infMC->Get("ntGen");
+  ntGen->AddFriend("ntHlt");
+  ntGen->AddFriend("ntHi");
+  TTree* ntMC = (TTree*)infMC->Get("ntKp");
+  ntMC->AddFriend("ntHlt");
+  ntMC->AddFriend("ntHi");
+  ntMC->AddFriend("ntSkim");
+  ntMC->AddFriend("mvaTree");
+  ntMC->AddFriend("ntGen");
+  */
 
-  //For 2015 PbPb, pp MC
-  //TTree* ntGen = (TTree*)infMC->Get("ntGen");
-  //ntGen->AddFriend("ntHlt");
-  //ntGen->AddFriend("ntHi");
-  //TTree* ntMC = (TTree*)infMC->Get("ntKp");
-  //ntMC->AddFriend("ntHlt");
-  //ntMC->AddFriend("ntHi");
-  //ntMC->AddFriend("ntSkim");
-  //ntMC->AddFriend("mvaTree");
-  //ntMC->AddFriend("ntGen");
-  
   TH1D* hMean = new TH1D("hMean","",_nBins,_ptBins);                       
   TH1D* hSigmaGaus1 = new TH1D("hSigmaGaus1","",_nBins,_ptBins); 
   TH1D* hSigmaGaus2 = new TH1D("hSigmaGaus2","",_nBins,_ptBins); 
@@ -270,12 +258,9 @@ void getNPFnPar(TString npfname, float par[]){
    f->SetNpx(5000);
    f->SetLineWidth(5);
    
-   if(isMC==1) nt->Project(Form("h-%d",count),"Bmass",Form("%s*(%s&&Bpt>%f&&Bpt<%f)*(1/%s)","1",seldata.Data(),ptmin,ptmax,weightdata.Data()));
+   if(isMC==1) ntMC->Project(Form("h-%d",count),"Bmass",Form("%s*(%s&&Bpt>%f&&Bpt<%f)*(1/%s)",weight.Data(),seldata.Data(),ptmin,ptmax,weightdata.Data()));
    else nt->Project(Form("h-%d",count),"Bmass",Form("(%s&&Bpt>%f&&Bpt<%f)*(1/%s)",seldata.Data(),ptmin,ptmax,weightdata.Data()));
-   ntMC->Project(Form("hMCSignal-%d",count),"Bmass",Form("%s&&Bpt>%f&&Bpt<%f",Form("%s&&Bgen==23333",selmc.Data()),ptmin,ptmax));
-
-   std::cout<<seldata.Data()<<std::endl;
-   std::cout<<selmc.Data()<<std::endl;
+   ntMC->Project(Form("hMCSignal-%d",count),"Bmass",Form("%s*(%s&&Bgen==23333&&Bpt>%f&&Bpt<%f)*(1/%s)",weight.Data(),selmc.Data(),ptmin,ptmax,weightdata.Data()));
 
    clean0(h);
 
@@ -294,6 +279,8 @@ void getNPFnPar(TString npfname, float par[]){
    f->SetParameter(8,setparam3);
    f->FixParameter(1,fixparam1);
    f->FixParameter(5,0);
+   //f->FixParameter(3,0);
+   //f->FixParameter(4,0);
    if(weightdata != "1"){
      int maxb = h->GetMaximumBin();
      double _max = h->GetBinContent(maxb);
@@ -307,7 +294,7 @@ void getNPFnPar(TString npfname, float par[]){
 
    hMCSignal->Fit(Form("f%d",count),"q","",minhisto,maxhisto);
    hMCSignal->Fit(Form("f%d",count),"q","",minhisto,maxhisto);
-   f->ReleaseParameter(1);
+   //f->ReleaseParameter(1);
    hMCSignal->Fit(Form("f%d",count),"L q","",minhisto,maxhisto);
    hMCSignal->Fit(Form("f%d",count),"L q","",minhisto,maxhisto);
    hMCSignal->Fit(Form("f%d",count),"L q","",minhisto,maxhisto);
@@ -320,6 +307,8 @@ void getNPFnPar(TString npfname, float par[]){
    f->FixParameter(7,f->GetParameter(7));
    f->FixParameter(8,f->GetParameter(8));
 
+   //f->ReleaseParameter(3);
+   //f->ReleaseParameter(4);
    f->ReleaseParameter(5);
    f->SetParLimits(5,0,1000);
 
@@ -401,11 +390,13 @@ void getNPFnPar(TString npfname, float par[]){
   yieldErr = mass->Integral(minhisto,maxhisto)/binwidthmass*mass->GetParError(0)/mass->GetParameter(0);
   printf("centrality bin %.0f-%.0f     yield: %f     yieldErr: %f\n", centMin, centMax, yield, yieldErr);
 
-  //Double_t Signal = mass->Integral(5.19932,5.35932)/binwidthmass; //B+ mass_pdg=5.27932GeV, signal region = pm 0.08GeV
-  //Double_t Bkg_comb = background->Integral(5.19932,5.35932)/binwidthmass;
-  //Double_t Bkg_nonprompt = Bkpi->Integral(5.19932,5.35932)/binwidthmass;
-  //printf("p_t bin %.0f-%.0f S: %f B(comb): %f B(comb+np): %f\n", ptmin, ptmax, Signal, Bkg_comb, Bkg_comb+Bkg_nonprompt);
-  //printf("p_t bin %.0f-%.0f sig(comb): %f sig(comb+np): %f\n", ptmin, ptmax, Signal/sqrt(Signal+Bkg_comb), Signal/sqrt(Signal+Bkg_comb+Bkg_nonprompt));
+  /*
+  Double_t Signal = mass->Integral(5.19932,5.35932)/binwidthmass; //B+ mass_pdg=5.27932GeV, signal region = pm 0.08GeV
+  Double_t Bkg_comb = background->Integral(5.19932,5.35932)/binwidthmass;
+  Double_t Bkg_nonprompt = Bkpi->Integral(5.19932,5.35932)/binwidthmass;
+  printf("p_t bin %.0f-%.0f S: %f B(comb): %f B(comb+np): %f\n", ptmin, ptmax, Signal, Bkg_comb, Bkg_comb+Bkg_nonprompt);
+  printf("p_t bin %.0f-%.0f sig(comb): %f sig(comb+np): %f\n", ptmin, ptmax, Signal/sqrt(Signal+Bkg_comb), Signal/sqrt(Signal+Bkg_comb+Bkg_nonprompt));
+  */
 
   TLegend* leg = new TLegend(0.65,0.58,0.82,0.88,NULL,"brNDC");
   leg->SetBorderSize(0);
@@ -478,15 +469,26 @@ void getNPFnPar(TString npfname, float par[]){
 
   TString _postfix = "%";
   if(weightdata!="1") _postfix = "_EFFCOR";
-  if(isPbPb && isMC==0) 
+  if(isPbPb && isMC==0)
+    { 
+      c->SaveAs(Form("plotFits/Fullcut_Cent_data_PbPb_%.0f-%.0f%s.png",centMin,centMax,_postfix.Data()));
       c->SaveAs(Form("plotFits/Fullcut_Cent_data_PbPb_%.0f-%.0f%s.pdf",centMin,centMax,_postfix.Data()));
+    }
   else if(isPbPb && isMC==1) 
+    {
+      c->SaveAs(Form("plotFits/Fullcut_Cent_mc_PbPb_%.0f%.0f%s.png",centMin,centMax,_postfix.Data()));
       c->SaveAs(Form("plotFits/Fullcut_Cent_mc_PbPb_%.0f%.0f%s.pdf",centMin,centMax,_postfix.Data()));
+    }
   else if(!isPbPb && isMC==0) 
+    {
+      c->SaveAs("plotFits/Cent_data_pp.png");
       c->SaveAs("plotFits/Cent_data_pp.pdf");
+    }
   else 
+    {
+      c->SaveAs("plotFits/Cent_mc_pp.png");
       c->SaveAs("plotFits/Cent_mc_pp.pdf");
-
+    }
   return mass;
 }
 

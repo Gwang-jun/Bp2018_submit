@@ -24,7 +24,7 @@ double ptwidth_new[nBins_new] = {1., 1.5, 2.5, 2.5, 5., 10., 25.};
 TString inputname_ref_13 = "ppref_real_13.txt";
 TString inputname_ref_7 = "ppref_real_7.txt";
 TString outputname_ref = "ppref_extrapolation.root";
-TString inputmcname = "/mnt/T2_US_MIT/submit-hi2/scratch/gwangjun/crab_Bfinder_20190520_Hydjet_Pythia8_BuToJpsiK_1033p1_pt3tkpt0p7dls2_v2_addSamplePthat_pthatweight.root";
+TString inputmcname = "/afs/cern.ch/work/g/gwkim/private/samples/crab_Bfinder_20190624_Hydjet_Pythia8_Official_BuToJpsiK_1033p1_pt3tkpt0p7dls2_allpthat_pthatweight.root";
 
 using namespace std;
 
@@ -269,6 +269,11 @@ void ppref_real2()
   real_ref_new_sym->Sumw2();
   real_ref_new_sym->Scale(1.0/real_ref_new_sym->Integral("width"));
 
+  TFile* inputFONLL = new TFile("fonll_Bplus_dsigmadpt.root");
+  TH1D* FONLL_sym = (TH1D*) inputFONLL->Get("gaeSigmaBplus_sym");
+  FONLL_sym->Sumw2();
+  FONLL_sym->Scale(1.0/FONLL_sym->Integral("width"));
+
   TFile* inputMC = new TFile(inputmcname.Data());
   TTree* Gen = (TTree*) inputMC->Get("Bfinder/ntGen");
   Gen->AddFriend("hiEvtAnalyzer/HiTree");
@@ -281,21 +286,23 @@ void ppref_real2()
   divideBinWidth(Genpt);
   Genpt->Scale(1.0/Genpt->Integral("width"));
 
-  TH1D* Ratiopt = (TH1D*) real_ref_new_sym->Clone("Ratiopt");
+  //TH1D* Ratiopt = (TH1D*) real_ref_new_sym->Clone("Ratiopt");
+  TH1D* Ratiopt = (TH1D*) FONLL_sym->Clone("Ratiopt");
   Ratiopt->Sumw2();
   Ratiopt->Divide(Genpt);
   //Ratiopt->Scale(1.0/Ratiopt->Integral("width"));
 
-  TF1 *f = new TF1("f1","[0]+[1]*x+[2]*x*x+[3]*x*x*x",5,100);
-  f->SetParameters(1,0.1,0.1,0.1);
+  TF1 *f = new TF1("f1","[0]+[1]*x+[2]*x*x",5,100);
+  f->SetParameters(1,0.1,0.1,0.1,0.1);
   f->SetParLimits(0,0,10);
   f->SetParLimits(1,-10,10);
   f->SetParLimits(2,-10,10);
-  f->SetParLimits(3,-10,10);
+  //f->SetParLimits(3,-10,10);
+  //f->SetParLimits(4,-10,10);
 
   Ratiopt->Fit(f,"R");
 
-  printf("Bpt weight function(MC Gpt): %f+%f*Bpt+%f*Bpt*Bpt+%f*Bpt*Bpt*Bpt\n",f->GetParameter(0),f->GetParameter(1),f->GetParameter(2),f->GetParameter(3));
+  printf("Bpt weight function(MC Gpt): %f+%f*Bpt+%f*Bpt*Bpt\n",f->GetParameter(0),f->GetParameter(1),f->GetParameter(2));
 
   Ratiopt->SetTitle("");
   Ratiopt->GetXaxis()->SetTitle("p_{t} (GeV/c)");
@@ -307,6 +314,7 @@ void ppref_real2()
   f->SetLineColor(kRed);
   Ratiopt->Draw();  
   f->Draw("same");
+  //c0->SetLogy();
   c0->SaveAs("Bptweight.png");
 
   // Bpt reweight finished
@@ -400,6 +408,10 @@ void ppref_real2()
   real_ref_new_FONLL->Write();
   pp2015_data->Write();
   pp2015_syst->Write();
+  real_ref_new_sym->Write();
+  Genpt->Write();
+  Ratiopt->Write();
+  FONLL_sym->Write();
   output_ref->Close();
   
   return;
