@@ -20,6 +20,7 @@ TString inputmc;
 int _nBins = nBins;
 double *_ptBins = ptBins;
 
+/*
 int inwhichptbin(float pt)
 {
   if(pt>5 && pt<7) return 1;
@@ -30,6 +31,7 @@ int inwhichptbin(float pt)
   if(pt>30 && pt<50) return 6;
   if(pt>50 && pt<100) return 7;
 }
+*/
 
 void converter2(){
   string label = "";
@@ -51,8 +53,9 @@ void converter2(){
   ntKp->AddFriend("hiEvtAnalyzer/HiTree");
   ntKp->AddFriend("skimanalysis/HltTree");
   setAddressTree(ntKp, ntHlt, ntSkim, ntHi, ntGen, ispp);
-  int nevents_total = ntKp->GetEntries();
-  
+  //int nevents_total = ntKp->GetEntries();
+  int nevents_total = 100000;
+
   TFile *f= new TFile(Form("results_%s.root", label.c_str()), "recreate"); 
   TH1D* hGen = new TH1D("hGen","",_nBins,_ptBins);
   TH1D* hNominal = new TH1D("hNominal","",_nBins,_ptBins);
@@ -145,24 +148,37 @@ void converter2(){
 	if(HLT_HIL3Mu0NHitQ10_L2Mu0_MAXdR3p5_M1to5_v1)
 	  if(pclusterCompatibilityFilter&&pprimaryVertexFilter&&phfCoincFilter2Th4&&abs(PVz)<15&&TMath::Abs(By[b])<2.4&&TMath::Abs(Bmumumass[b]-3.096900)<0.15&&Bmass[b]>5&&Bmass[b]<6 && ((abs(Bmu1eta[b])<1.2 && Bmu1pt[b]>=3.5) || (abs(Bmu1eta[b])>=1.2 && abs(Bmu1eta[b])<2.1 && Bmu1pt[b]>=(5.77-1.89*abs(Bmu1eta[b]))) || (abs(Bmu1eta[b])>=2.1 && Bmu1pt[b]>=1.8)) && ((abs(Bmu2eta[b])<1.2 && Bmu2pt[b]>=3.5) || (abs(Bmu2eta[b])>=1.2 && abs(Bmu2eta[b])<2.1 && Bmu2pt[b]>=(5.77-1.89*abs(Bmu2eta[b]))) || (abs(Bmu2eta[b])>=2.1 && Bmu2pt[b]>=1.8)) && Bmu1SoftMuID[b] && Bmu2SoftMuID[b] && Bmu1isAcc[b] && Bmu2isAcc[b] && Bmu1isTriggered[b] && Bmu2isTriggered[b] && (Btrk1PixelHit[b]+Btrk1StripHit[b])>=11 && (Btrk1Chi2ndf[b]/(Btrk1nStripLayer[b]+Btrk1nPixelLayer[b]))<0.18 && TMath::Abs(Btrk1PtErr[b]/Btrk1Pt[b])<0.1 && (BsvpvDistance[b]/BsvpvDisErr[b])>2.0 && abs(Btrk1Eta[b])<2.4 && Btrk1Pt[b]>0.9 && Bchi2cl[b]>0.005 && ((Bpt[b]>5 && Bpt[b]<7 && (BsvpvDistance[b]/BsvpvDisErr[b])>13.028 && cos(Bdtheta[b])>-0.785 && TMath::Abs(Btrk1Dxy1[b]/Btrk1DxyError1[b])>3.664 && Btrk1Pt[b]>1.104 && Bchi2cl[b]>0.224) || (Bpt[b]>7 && Bpt[b]<10 && (BsvpvDistance[b]/BsvpvDisErr[b])>6.151 && cos(Bdtheta[b])>-0.279 && TMath::Abs(Btrk1Dxy1[b]/Btrk1DxyError1[b])>3.379 && TMath::Abs(Btrk1Dz1[b]/Btrk1DzError1[b])>0.628 && Btrk1Pt[b]>1.185) || (Bpt[b]>10 && Bpt[b]<15 && (BsvpvDistance[b]/BsvpvDisErr[b])>9.641 && cos(Bdtheta[b])>-0.510 && TMath::Abs(Btrk1Dxy1[b]/Btrk1DxyError1[b])>3.464 && Btrk1Pt[b]>1.287 && Bchi2cl[b]>0.185) || (Bpt[b]>15 && Bpt[b]<20 && (BsvpvDistance[b]/BsvpvDisErr[b])>6.520 && cos(Bdtheta[b])>0.971 && Btrk1Pt[b]>1.837 && Bchi2cl[b]>0.089) || (Bpt[b]>20 && Bpt[b]<30 && (BsvpvDistance[b]/BsvpvDisErr[b])>4.171 && cos(Bdtheta[b])>0.998 && Btrk1Pt[b]>1.692) || (Bpt[b]>30 && Bpt[b]<50 && (BsvpvDistance[b]/BsvpvDisErr[b])>3.850 && cos(Bdtheta[b])>0.571 && Btrk1Pt[b]>1.723) || (Bpt[b]>50 && Bpt[b]<100 && cos(Bdtheta[b])>0.743 && TMath::Abs(Btrk1Dxy1[b]/Btrk1DxyError1[b])>0.203 && Btrk1Pt[b]>2.973 && Bchi2cl[b]>0.062)) && Bgen[b]==23333)
 	    {
+	      cout<<b<<"-st passed evt"<<endl;
+
 	      double _weight = pthatweight*Ncoll*(TMath::Gaus(PVz,0.427450,4.873825)/(sqrt(2*3.14159)*4.873825))/(TMath::Gaus(PVz,0.909938,4.970989)/(sqrt(2*3.14159)*4.970989))*(0.889175+0.000791*Bgenpt[b]+0.000015*Bgenpt[b]*Bgenpt[b]);
-	      hNominal->Fill((float) Bpt[b], _weight);
+	      hNominal->Fill(Bpt[b], _weight);
 	      //passed and fill
 	      double scale = tnp_weight_trg_pbpb(Bmu1pt[b], Bmu1eta[b], 1, 0)*tnp_weight_trk_pbpb(Btrk1Eta[b], 0)*tnp_weight_trg_pbpb(Bmu2pt[b], Bmu2eta[b], 1, 0)*tnp_weight_trk_pbpb(Btrk1Eta[b], 0);
-	      hScale->Fill((float) Bpt[b], _weight*scale);	    
+	      hScale->Fill(Bpt[b], _weight*scale);	    
 	      
+	      if(Bpt[b]<5 || Bpt[b]>100) cout<<"Bpt out of range!!!!!!"<<endl;
+	      if(_weight==0) cout<<"_weight zero!!!!!!"<<endl;
+	      if(scale==0) cout<<"scale zero!!!!!!"<<endl;
+
 	      double statHiTrg = tnp_weight_trg_pbpb(Bmu1pt[b], Bmu1eta[b], 1, 1)*tnp_weight_trk_pbpb(Btrk1Eta[b], 0)*tnp_weight_trg_pbpb(Bmu2pt[b], Bmu2eta[b], 1, 1)*tnp_weight_trk_pbpb(Btrk1Eta[b], 0);
 	      double statLoTrg = tnp_weight_trg_pbpb(Bmu1pt[b], Bmu1eta[b], 1, 2)*tnp_weight_trk_pbpb(Btrk1Eta[b], 0)*tnp_weight_trg_pbpb(Bmu2pt[b], Bmu2eta[b], 1, 2)*tnp_weight_trk_pbpb(Btrk1Eta[b], 0);
 	      double statHiTrk = tnp_weight_trg_pbpb(Bmu1pt[b], Bmu1eta[b], 1, 0)*tnp_weight_trk_pbpb(Btrk1Eta[b], 1)*tnp_weight_trg_pbpb(Bmu2pt[b], Bmu2eta[b], 1, 0)*tnp_weight_trk_pbpb(Btrk1Eta[b], 1);
 	      double statLoTrk = tnp_weight_trg_pbpb(Bmu1pt[b], Bmu1eta[b], 1, 0)*tnp_weight_trk_pbpb(Btrk1Eta[b], 2)*tnp_weight_trg_pbpb(Bmu2pt[b], Bmu2eta[b], 1, 0)*tnp_weight_trk_pbpb(Btrk1Eta[b], 2);
 	      double statHiMuid = scale*tnp_weight_muid_pbpb(Bmu1pt[b], Bmu1eta[b], 1)*tnp_weight_muid_pbpb(Bmu2pt[b], Bmu2eta[b], 1);
 	      double statLoMuid = scale*tnp_weight_muid_pbpb(Bmu1pt[b], Bmu1eta[b], 2)*tnp_weight_muid_pbpb(Bmu2pt[b], Bmu2eta[b], 2);
-	      hStatHiTrg ->Fill((float) Bpt[b], _weight*statHiTrg);
-	      hStatHiTrk ->Fill((float) Bpt[b], _weight*statHiTrk);
-	      hStatHiMuid->Fill((float) Bpt[b], _weight*statHiMuid);
-	      hStatLoTrg ->Fill((float) Bpt[b], _weight*statLoTrg);
-	      hStatLoTrk ->Fill((float) Bpt[b], _weight*statLoTrk);
-	      hStatLoMuid->Fill((float) Bpt[b], _weight*statLoMuid);
+	      hStatHiTrg ->Fill(Bpt[b], _weight*statHiTrg);
+	      hStatHiTrk ->Fill(Bpt[b], _weight*statHiTrk);
+	      hStatHiMuid->Fill(Bpt[b], _weight*statHiMuid);
+	      hStatLoTrg ->Fill(Bpt[b], _weight*statLoTrg);
+	      hStatLoTrk ->Fill(Bpt[b], _weight*statLoTrk);
+	      hStatLoMuid->Fill(Bpt[b], _weight*statLoMuid);
+
+	      if(statHiTrg==0) cout<<"statHiTrg problem!!!!!!"<<endl;
+	      if(statHiTrk==0) cout<<"statHiTrk problem!!!!!!"<<endl;
+	      if(statHiMuid==0) cout<<"statHiMuid problem!!!!!!"<<endl;
+	      if(statLoTrg==0) cout<<"statLoTrg problem!!!!!!"<<endl;
+	      if(statLoTrk==0) cout<<"statLoTrk problem!!!!!!"<<endl;
+	      if(statLoMuid==0) cout<<"statLoMuid problem!!!!!!"<<endl;
 	      
 	      double sysHiTrg = tnp_weight_trg_pbpb(Bmu1pt[b], Bmu1eta[b], 1, -1)*tnp_weight_trk_pbpb(Btrk1Eta[b], 0)*tnp_weight_trg_pbpb(Bmu2pt[b], Bmu2eta[b], 1, -1)*tnp_weight_trk_pbpb(Btrk1Eta[b], 0);
 	      double sysLoTrg = tnp_weight_trg_pbpb(Bmu1pt[b], Bmu1eta[b], 1, -2)*tnp_weight_trk_pbpb(Btrk1Eta[b], 0)*tnp_weight_trg_pbpb(Bmu2pt[b], Bmu2eta[b], 1, -2)*tnp_weight_trk_pbpb(Btrk1Eta[b], 0);
@@ -170,12 +186,20 @@ void converter2(){
 	      double sysLoTrk = tnp_weight_trg_pbpb(Bmu1pt[b], Bmu1eta[b], 1, 0)*tnp_weight_trk_pbpb(Btrk1Eta[b], -2)*tnp_weight_trg_pbpb(Bmu2pt[b], Bmu2eta[b], 1, 0)*tnp_weight_trk_pbpb(Btrk1Eta[b], -2);
 	      double sysHiMuid = scale*tnp_weight_muid_pbpb(Bmu1pt[b], Bmu1eta[b], -1)*tnp_weight_muid_pbpb(Bmu2pt[b], Bmu2eta[b], -1);
 	      double sysLoMuid = scale*tnp_weight_muid_pbpb(Bmu1pt[b], Bmu1eta[b], -2)*tnp_weight_muid_pbpb(Bmu2pt[b], Bmu2eta[b], -2);
-	      hSysHiTrg ->Fill((float) Bpt[b], _weight*sysHiTrg);
-	      hSysHiTrk ->Fill((float) Bpt[b], _weight*sysHiTrk);
-	      hSysHiMuid->Fill((float) Bpt[b], _weight*sysHiMuid);
-	      hSysLoTrg ->Fill((float) Bpt[b], _weight*sysLoTrg);
-	      hSysLoTrk ->Fill((float) Bpt[b], _weight*sysLoTrk);
-	      hSysLoMuid->Fill((float) Bpt[b], _weight*sysLoMuid);
+	      hSysHiTrg ->Fill(Bpt[b], _weight*sysHiTrg);
+	      hSysHiTrk ->Fill(Bpt[b], _weight*sysHiTrk);
+	      hSysHiMuid->Fill(Bpt[b], _weight*sysHiMuid);
+	      hSysLoTrg ->Fill(Bpt[b], _weight*sysLoTrg);
+	      hSysLoTrk ->Fill(Bpt[b], _weight*sysLoTrk);
+	      hSysLoMuid->Fill(Bpt[b], _weight*sysLoMuid);
+
+	      if(sysHiTrg==0) cout<<"sysHiTrg problem!!!!!!"<<endl;
+	      if(sysHiTrk==0) cout<<"sysHiTrk problem!!!!!!"<<endl;
+	      if(sysHiMuid==0) cout<<"sysHiMuid problem!!!!!!"<<endl;
+	      if(sysLoTrg==0) cout<<"sysLoTrg problem!!!!!!"<<endl;
+	      if(sysLoTrk==0) cout<<"sysLoTrk problem!!!!!!"<<endl;
+	      if(sysLoMuid==0) cout<<"sysLoMuid problem!!!!!!"<<endl;
+
 	    }
       }
     }//Bsize loop

@@ -206,12 +206,11 @@ TH1D* hPtGen = new TH1D("hPtGen","",_nBins,_ptBins);
      TLegend* legPtCor = myLegend(0.55,0.80,0.90,0.94);
      legPtCor->AddEntry(hPtCor,"Corrected signal","pl");
      legPtCor->AddEntry(hPtGen,"Generated B^{+}","lf");
-     legPtCor->Draw("same");
+     //legPtCor->Draw("same");
      hPtCor->SetLineColor(kRed);
      hPtGen->SetLineColor(kBlue);
-     hPtCor->Draw("same");
-     hPtGen->Draw("same");
-     cPtCor->SaveAs("a.png");
+     //hPtCor->Draw("same");
+     //hPtGen->Draw("same");
    }
  
  TH1D* hPtSigma= (TH1D*)hPtCor->Clone("hPtSigma");
@@ -264,7 +263,8 @@ void getNPFnPar(TString npfname, float par[]){
   f->SetNpx(5000);
   f->SetLineWidth(5);
   
-  if(isMC==1) ntMC->Project(Form("h-%d",count),"Bmass",Form("%s*(%s&&Bpt>%f&&Bpt<%f)*(1/%s)",weight.Data(),seldata.Data(),ptmin,ptmax,weightdata.Data()));
+  //if(isMC==1) ntMC->Project(Form("h-%d",count),"Bmass",Form("%s*(%s&&Bpt>%f&&Bpt<%f)*(1/%s)",weight.Data(),seldata.Data(),ptmin,ptmax,weightdata.Data())); //Closure
+  if(isMC==1) ntMC->Project(Form("h-%d",count),"Bmass",Form("(%s&&Bgen==23333&&Bpt>%f&&Bpt<%f)*(1/%s)",seldata.Data(),ptmin,ptmax,weightdata.Data()));
   else nt->Project(Form("h-%d",count),"Bmass",Form("(%s&&Bpt>%f&&Bpt<%f)*(1/%s)",seldata.Data(),ptmin,ptmax,weightdata.Data()));   
   ntMC->Project(Form("hMCSignal-%d",count),"Bmass",Form("%s*(%s&&Bgen==23333&&Bpt>%f&&Bpt<%f)*(1/%s)",weight.Data(),selmc.Data(),ptmin,ptmax,weightdata.Data()));
 
@@ -285,23 +285,16 @@ void getNPFnPar(TString npfname, float par[]){
   f->SetParameter(2,setparam2);
   f->SetParameter(8,setparam3);
   f->FixParameter(1,fixparam1);
-  //f->FixParameter(3,0);
-  //f->FixParameter(4,0);
-  f->FixParameter(5,0);
-  if(weightdata != "1"){
-    int maxb = h->GetMaximumBin();
-    double _max = h->GetBinContent(maxb);
-    double _maxE = h->GetBinError(maxb);
-    _ErrCor = (_maxE/_max)/(1/sqrt(_max));
-    f->SetParLimits(0,0,1e5);
-    f->SetParLimits(4,-1e5,1e5);
-    f->SetParLimits(5,0,1e4);
-  }
-  h->GetEntries();
   
+  f->FixParameter(3,0);
+  f->FixParameter(4,0);
+  f->FixParameter(5,0);
+
+  h->GetEntries();
+
   hMCSignal->Fit(Form("f%d",count),"q","",minhisto,maxhisto);
   hMCSignal->Fit(Form("f%d",count),"q","",minhisto,maxhisto);
-  //f->ReleaseParameter(1);
+  f->ReleaseParameter(1);
   hMCSignal->Fit(Form("f%d",count),"L q","",minhisto,maxhisto);
   hMCSignal->Fit(Form("f%d",count),"L q","",minhisto,maxhisto);
   hMCSignal->Fit(Form("f%d",count),"L q","",minhisto,maxhisto);
@@ -314,10 +307,13 @@ void getNPFnPar(TString npfname, float par[]){
   f->FixParameter(7,f->GetParameter(7));
   f->FixParameter(8,f->GetParameter(8));
   
-  //f->ReleaseParameter(3);
-  //f->ReleaseParameter(4);
-  f->ReleaseParameter(5);
-  f->SetParLimits(5,0,1000);
+  if(isMC==0)
+  {
+    f->ReleaseParameter(3);
+    f->ReleaseParameter(4);
+    f->ReleaseParameter(5);
+    f->SetParLimits(5,0,1000);
+  }
   
   printf("Fixed para.:\n");
   printf("%f, %f, %f\n", f->GetParameter(2), f->GetParameter(7), f->GetParameter(8));
@@ -401,8 +397,7 @@ void getNPFnPar(TString npfname, float par[]){
   h->GetXaxis()->SetNdivisions(-50205);
   h->Draw("e");
   Bkpi->SetRange(5.00,5.60);
-  Bkpi->Draw("same");
-  background->Draw("same");   
+  if(isMC==0) {Bkpi->Draw("same"); background->Draw("same");}   
   mass->SetRange(5.16,5.40);
   mass->Draw("same");
   f->Draw("same");
@@ -424,11 +419,11 @@ void getNPFnPar(TString npfname, float par[]){
   leg->SetTextSize(0.045);
   leg->SetTextFont(42);
   leg->SetFillStyle(0);
-  leg->AddEntry(h,"Data","pl");
+  if(isMC==0) leg->AddEntry(h,"Data","pl");
+  if(isMC==1) leg->AddEntry(h,"MC","pl");
   leg->AddEntry(f,"Fit","l");
   leg->AddEntry(mass,"Signal","f");
-  leg->AddEntry(background,"Combinatorial","l");
-  leg->AddEntry(Bkpi,"B #rightarrow J/#psi X","f");
+  if(isMC==0) {leg->AddEntry(background,"Combinatorial","l"); leg->AddEntry(Bkpi,"B #rightarrow J/#psi X","f");}
   leg->Draw("same");
   
   TLatex* texYield = new TLatex(0.55,0.51,Form("Yield:%.2f#pm%.2f", yield, yieldErr));
@@ -502,23 +497,23 @@ void getNPFnPar(TString npfname, float par[]){
   if(weightdata!="1") _postfix = "_EFFCOR";
   if(isPbPb && isMC==0) 
     {
-      c->SaveAs(Form("plotFits/test_data_PbPb_pt%.0f-%.0f_cent%.0f-%.0f%s.png",ptmin,ptmax,centmin,centmax,_postfix.Data()));
-      c->SaveAs(Form("plotFits/test_data_PbPb_pt%.0f-%.0f_cent%.0f-%.0f%s.pdf",ptmin,ptmax,centmin,centmax,_postfix.Data()));
+      c->SaveAs(Form("plotFits/AN_data_PbPb_pt%.0f-%.0f_cent%.0f-%.0f%s.png",ptmin,ptmax,centmin,centmax,_postfix.Data()));
+      c->SaveAs(Form("plotFits/AN_data_PbPb_pt%.0f-%.0f_cent%.0f-%.0f%s.pdf",ptmin,ptmax,centmin,centmax,_postfix.Data()));
     }
   else if(isPbPb && isMC==1) 
     {
-      c->SaveAs(Form("plotFits/test_mc_PbPb_pt%.0f-%.0f_cent%.0f-%.0f%s.png",ptmin,ptmax,centmin,centmax,_postfix.Data()));
-      c->SaveAs(Form("plotFits/test_mc_PbPb_pt%.0f-%.0f_cent%.0f-%.0f%s.pdf",ptmin,ptmax,centmin,centmax,_postfix.Data()));
+      c->SaveAs(Form("plotFits/AN_mc_PbPb_pt%.0f-%.0f_cent%.0f-%.0f%s.png",ptmin,ptmax,centmin,centmax,_postfix.Data()));
+      c->SaveAs(Form("plotFits/AN_mc_PbPb_pt%.0f-%.0f_cent%.0f-%.0f%s.pdf",ptmin,ptmax,centmin,centmax,_postfix.Data()));
     }
   else if(!isPbPb && isMC==0) 
     {
-      c->SaveAs(Form("plotFits/test_data_pp_pt%.0f-%.0f.png",ptmin,ptmax));
-      c->SaveAs(Form("plotFits/test_data_pp_pt%.0f-%.0f.pdf",ptmin,ptmax));
+      c->SaveAs(Form("plotFits/AN_data_pp_pt%.0f-%.0f.png",ptmin,ptmax));
+      c->SaveAs(Form("plotFits/AN_data_pp_pt%.0f-%.0f.pdf",ptmin,ptmax));
     }
   else 
     {
-      c->SaveAs(Form("plotFits/test_mc_pp_pt%.0f-%.0f.png",ptmin,ptmax));
-      c->SaveAs(Form("plotFits/test_mc_pp_pt%.0f-%.0f.pdf",ptmin,ptmax));
+      c->SaveAs(Form("plotFits/AN_mc_pp_pt%.0f-%.0f.png",ptmin,ptmax));
+      c->SaveAs(Form("plotFits/AN_mc_pp_pt%.0f-%.0f.pdf",ptmin,ptmax));
     }
   return mass;
 }
