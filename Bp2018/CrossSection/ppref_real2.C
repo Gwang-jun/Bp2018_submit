@@ -24,7 +24,8 @@ double ptwidth_new[nBins_new] = {1., 1.5, 2.5, 2.5, 5., 10., 25.};
 TString inputname_ref_13 = "ppref_real_13.txt";
 TString inputname_ref_7 = "ppref_real_7.txt";
 TString outputname_ref = "ppref_extrapolation.root";
-TString inputmcname = "/afs/cern.ch/work/g/gwkim/private/samples/crab_Bfinder_20190624_Hydjet_Pythia8_Official_BuToJpsiK_1033p1_pt3tkpt0p7dls2_allpthat_pthatweight.root";
+TString inputmcname = "/mnt/T2_US_MIT/submit-hi2/scratch/gwangjun/crab_Bfinder_20190624_Hydjet_Pythia8_Official_BuToJpsiK_1033p1_pt3tkpt0p7dls2_allpthat_pthatweight.root";
+//TString inputmcname = "/export/d00/scratch/zzshi/CMSSW_7_5_8_patch3/Merge/2018Ana/Samples/FinalAnaSamples/PrivateMC-Data-Official/MC_Bs_PbPb_TMVA_BDT_PbPb.root";
 
 using namespace std;
 
@@ -153,7 +154,8 @@ void ppref_real2()
   x = y[0]*2./2.;
   dxl = x*(2./2.*y_l[0]/y[0]), dxl_d = x*(2./2.*y_l_d[0]/y[0]), dxl_f = x*(2./2.*y_l_f[0]/y[0]);
   dxh = x*(2./2.*y_h[0]/y[0]), dxh_d = x*(2./2.*y_h_d[0]/y[0]), dxh_f = x*(2./2.*y_h_f[0]/y[0]);
-  y_new[0] = x, y_new_l[0] = dxl, y_new_h[0] = dxh, y_new_l_d[0] = dxl_d, y_new_h_d[0] = dxh_d, y_new_l_f[0] = dxl_f, y_new_h_f[0] = dxh_f;
+  //y_new[0] = x, y_new_l[0] = dxl, y_new_h[0] = dxh, y_new_l_d[0] = dxl_d, y_new_h_d[0] = dxh_d, y_new_l_f[0] = dxl_f, y_new_h_f[0] = dxh_f;
+  y_new[0] = x*2, y_new_l[0] = dxl*1.4, y_new_h[0] = dxh*1.4, y_new_l_d[0] = dxl_d*1.4, y_new_h_d[0] = dxh_d*1.4, y_new_l_f[0] = dxl_f*1.4, y_new_h_f[0] = dxh_f*1.4;
 
   x = y[0]*3./3.;
   dxl = x*(3./3.*y_l[0]/y[0]), dxl_d = x*(3./3.*y_l_d[0]/y[0]), dxl_f = x*(3./3.*y_l_f[0]/y[0]);
@@ -274,17 +276,50 @@ void ppref_real2()
   FONLL_sym->Sumw2();
   FONLL_sym->Scale(1.0/FONLL_sym->Integral("width"));
 
+  TCanvas* c1 = new TCanvas("c1","",600,600);
+  c1->cd();
+  FONLL_sym->Draw("ep");
+  c1->SetLogy();                                                                                                                             
+
+  c1->SaveAs("Bptweight1.png");
+  c1->SaveAs("Bptweight1.pdf");  
+
   TFile* inputMC = new TFile(inputmcname.Data());
   TTree* Gen = (TTree*) inputMC->Get("Bfinder/ntGen");
   Gen->AddFriend("hiEvtAnalyzer/HiTree");
+  Gen->AddFriend("hltanalysis/HltTree");
+  Gen->AddFriend("skimanalysis/HltTree");
   TString weightgen = "pthatweight";
   //TString Bselection = "(GisSignal==1)&&(GcollisionId==0)&&((Gpt>5&&Gpt<10&&TMath::Abs(Gy)<2.4)||(Gpt>10&&Gpt<17&&TMath::Abs(Gy)<1.45)||(Gpt>17&&Gpt<100&&TMath::Abs(Gy)<2.1))";
-  TString Bselection = "(GisSignal==1)&&(GcollisionId==0)";
+  TString Bselection = "TMath::Abs(Gy)<2.4 && TMath::Abs(GpdgId)==521 && GisSignal==1 && GcollisionId==0";
   TH1D* Genpt = new TH1D("Genpt","",nBins_new,ptBins_new);
   Gen->Project("Genpt","Gpt",TCut(weightgen)*TCut(Bselection));
+  Genpt->GetXaxis()->SetTitle("p_{t} (GeV)");
+  Genpt->GetYaxis()->SetTitle("d#sigma/dp_{t} (pb/GeV)");
   //Genpt->Scale(1.0/Genpt->Integral(),"width");
   divideBinWidth(Genpt);
   Genpt->Scale(1.0/Genpt->Integral("width"));
+
+  TFile* MCoff = new TFile("MCstudiesPbPb.root");
+  TH1D* hEffoff = (TH1D*) MCoff->Get("hEff");
+  TFile* MCpri = new TFile("MCstudiesPbPb_private.root");
+  TH1D* hEffpri = (TH1D*) MCpri->Get("hEff");
+  hEffoff->Sumw2();
+  hEffpri->Sumw2();
+  hEffoff->Divide(hEffpri);
+
+  TCanvas* c100 = new TCanvas("c100","",600,600);
+  c100->cd();
+  hEffoff->Draw("ep");
+  c100->SaveAs("effcheck.png");
+
+  TCanvas* c2 = new TCanvas("c2","",600,600);
+  c2->cd();
+  Genpt->Draw("ep");
+  c2->SetLogy();                                                                                                                             
+
+  c2->SaveAs("Bptweight2.png");
+  c2->SaveAs("Bptweight2.pdf");
 
   //TH1D* Ratiopt = (TH1D*) real_ref_new_sym->Clone("Ratiopt");
   TH1D* Ratiopt = (TH1D*) FONLL_sym->Clone("Ratiopt");
@@ -292,30 +327,35 @@ void ppref_real2()
   Ratiopt->Divide(Genpt);
   //Ratiopt->Scale(1.0/Ratiopt->Integral("width"));
 
-  TF1 *f = new TF1("f1","[0]+[1]*x+[2]*x*x",5,100);
-  f->SetParameters(1,0.1,0.1,0.1,0.1);
-  f->SetParLimits(0,0,10);
-  f->SetParLimits(1,-10,10);
-  f->SetParLimits(2,-10,10);
+  TF1 *f = new TF1("f1","([0]+[1]*x+[2]*x*x)*TMath::Exp(-[3]*x)+[4]",5,100);
+  //f->SetParameters(1,0.1,0.1,0.1,0.1);
+  f->SetParLimits(0,-100,100);
+  f->SetParLimits(1,-100,100);
+  f->SetParLimits(2,-100,100);
+  f->SetParLimits(3,-100,100);
+  f->SetParLimits(4,0,2);
   //f->SetParLimits(3,-10,10);
   //f->SetParLimits(4,-10,10);
+  //f->SetParLimits(5,-10,10);
 
   Ratiopt->Fit(f,"R");
 
-  printf("Bpt weight function(MC Gpt): %f+%f*Bpt+%f*Bpt*Bpt\n",f->GetParameter(0),f->GetParameter(1),f->GetParameter(2));
+  printf("Bpt weight function(MC Gpt): (%f+%f*Bpt+%f*Bpt*Bpt)*TMath::Exp(-%f*Bpt)+%f\n",f->GetParameter(0),f->GetParameter(1),f->GetParameter(2),f->GetParameter(3),f->GetParameter(4));
 
   Ratiopt->SetTitle("");
   Ratiopt->GetXaxis()->SetTitle("p_{t} (GeV/c)");
   Ratiopt->GetYaxis()->SetTitle("Ref/Gen");
   Ratiopt->GetYaxis()->SetTitleOffset(1.0);  
 
-  TCanvas* c0 = new TCanvas("","",600,600);
-  c0->cd();
+  TCanvas* c3 = new TCanvas("c3","",600,600);
+  c3->cd();
   f->SetLineColor(kRed);
+  //Ratiopt->SetAxisRange(0.1,10,"Y"); 
   Ratiopt->Draw();  
   f->Draw("same");
-  //c0->SetLogy();
-  c0->SaveAs("Bptweight.png");
+  //c3->SetLogy();
+  c3->SaveAs("Bptweight3.png");
+  c3->SaveAs("Bptweight3.pdf");
 
   // Bpt reweight finished
 
@@ -346,8 +386,8 @@ void ppref_real2()
   pp2015_syst->SetMarkerStyle(20);
   pp2015_syst->SetMarkerSize(0.1);
 
-  TCanvas* c1 = new TCanvas("c1","",600,600);
-  c1->cd();
+  TCanvas* c4 = new TCanvas("c4","",600,600);
+  c4->cd();
   //real_ref_13->Draw("||");
   //real_ref_7->Draw("|| same");
   //real_ref->Draw("|| same");
@@ -356,7 +396,8 @@ void ppref_real2()
   real_ref_new_data->Draw("A2");
   real_ref_new_FONLL->Draw("ep same");
   //pp2015_data->Draw("ep same");
-  pp2015_syst->Draw("ep same");
+  //pp2015_syst->Draw("ep same");
+  FONLL_sym->Draw("ep same");
 
   TLegend *leg = new TLegend(0.45,0.70,0.75,0.80,NULL,"brNDC");
   leg->SetBorderSize(0);
@@ -366,9 +407,10 @@ void ppref_real2()
   //leg->AddEntry(real_ref_13,"scaled reference from 13TeV","l");
   //leg->AddEntry(real_ref_7,"scaled reference from 7TeV","l");
   //leg->AddEntry(real_ref,"scaled reference combined","l");
-  leg->AddEntry(real_ref_new_data,"scaled reference_data","f");
-  leg->AddEntry(real_ref_new_FONLL,"scaled reference_FONLL","l");
-  leg->AddEntry(pp2015_syst,"2015 pp cross-section","l");
+  leg->AddEntry(real_ref_new_data,"scaled_data error","f");
+  leg->AddEntry(real_ref_new_FONLL,"scaled_FONLL error","l");
+  //leg->AddEntry(pp2015_syst,"2015 pp cross-section","l");
+  leg->AddEntry(FONLL_sym,"FONLL reference","l");
   leg->Draw("same");
 
   TLatex* texcms = new TLatex(0.18,0.95,"CMS");
@@ -394,9 +436,10 @@ void ppref_real2()
   texCol->SetTextFont(42);
   texCol->Draw();
 
-  c1->RedrawAxis();
-  c1->SetLogy();
-  c1->SaveAs("pp_reference.png");
+  c4->RedrawAxis();
+  c4->SetLogy();
+  c4->SaveAs("pp_reference.png");
+  c4->SaveAs("pp_reference.pdf");
   
   TFile* output_ref = new TFile(outputname_ref.Data(),"recreate");
   output_ref->cd();

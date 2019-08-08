@@ -15,6 +15,11 @@ void ClosureTest(TString inputfile="",TString label="")
   hPtGen->Sumw2();
   hPtCor->Divide(hPtGen);
 
+  for(int i=0;i<nBins;i++)
+    {
+      printf("Corrected Yield/Generated Yield of pt %.0f-%.0f: %f #pm %f\n",ptBins[i],ptBins[i+1],hPtCor->GetBinContent(i+1),hPtCor->GetBinError(i+1));
+    }
+
   TCanvas*canvas=new TCanvas("canvas","canvas",550,500);
   canvas->cd();
   TH2F* hemptyClosure=new TH2F("hemptyClosure","",50,ptBins[0]-5,ptBins[nBins]+10,10,0.5,1.5);  

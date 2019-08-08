@@ -280,15 +280,15 @@ void NuclearModificationFactorCent(TString inputPP="", TString inputPbPb="", TSt
   canvasRAA->Update();
   canvasRAA->RedrawAxis();
 
-  TString _postfix = "";
+  TString _postfix = "%";
   if(doDataCor==1) _postfix = "_EFFCOR";
   if(!drawDRAA){
-    canvasRAA->SaveAs(Form("plotRAA/canvasRAA%s_%.0f_%.0f_Cent%s.pdf",label.Data(),centMin,centMax,_postfix.Data()));
-    canvasRAA->SaveAs(Form("plotRAA/canvasRAA%s_%.0f_%.0f_Cent%s.png",label.Data(),centMin,centMax,_postfix.Data()));
+    canvasRAA->SaveAs(Form("plotRAA/canvasRAA%s_%.0f_%.0f_Cent.pdf",label.Data(),centMin,centMax));
+    canvasRAA->SaveAs(Form("plotRAA/canvasRAA%s_%.0f_%.0f_Cent.png",label.Data(),centMin,centMax));
   }
   if(drawDRAA){
-    canvasRAA->SaveAs(Form("plotRAA/canvasRAA_DRAA_%s_%.0f_%.0f_Cent%s.pdf",label.Data(),centMin,centMax,_postfix.Data()));
-    canvasRAA->SaveAs(Form("plotRAA/canvasRAA_DRAA_%s_%.0f_%.0f_Cent%s.png",label.Data(),centMin,centMax,_postfix.Data()));
+    canvasRAA->SaveAs(Form("plotRAA/canvasRAA_DRAA_%s_%.0f_%.0f_Cent.pdf",label.Data(),centMin,centMax));
+    canvasRAA->SaveAs(Form("plotRAA/canvasRAA_DRAA_%s_%.0f_%.0f_Cent.png",label.Data(),centMin,centMax));
   }
   TFile *fRAA=new TFile(outputfile.Data(),"recreate");
   fRAA->cd();

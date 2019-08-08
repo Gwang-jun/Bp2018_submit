@@ -1,9 +1,9 @@
 #include "uti.h"
-//#include "parameters.h"
+#include "parameters.h"
 #include "TF1.h"
 
-const int nBins=1;
-double ptBins[nBins+1] = {5.,100.};
+//const int nBins=1;
+//double ptBins[nBins+1] = {5.,100.};
 
 Double_t minhisto=5.0;
 Double_t maxhisto=6.0;
@@ -76,13 +76,13 @@ void fitNP(int usePbPb=1, TString inputdata="" , TString inputmc="", TString trg
 	TTree* nt = (TTree*)inf->Get("Bfinder/ntKp");
 	nt->AddFriend("hltanalysis/HltTree");
 	nt->AddFriend("hiEvtAnalyzer/HiTree");
-	//nt->AddFriend("skimanalysis/HltTree");
+	nt->AddFriend("skimanalysis/HltTree");
 	nt->AddFriend("Bfinder/ntGen");
 
 	TTree* ntMC = (TTree*)inf->Get("Bfinder/ntKp");
 	ntMC->AddFriend("hltanalysis/HltTree");
 	ntMC->AddFriend("hiEvtAnalyzer/HiTree");
-	//ntMC->AddFreind("skimanalysis/HltTree");
+	ntMC->AddFriend("skimanalysis/HltTree");
 	ntMC->AddFriend("Bfinder/ntGen");
 
 	TF1 *totalmass;

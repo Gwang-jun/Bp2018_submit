@@ -20,19 +20,6 @@ TString inputmc;
 int _nBins = nBins;
 double *_ptBins = ptBins;
 
-/*
-int inwhichptbin(float pt)
-{
-  if(pt>5 && pt<7) return 1;
-  if(pt>7 && pt<10) return 2;
-  if(pt>10 && pt<15) return 3;
-  if(pt>15 && pt<20) return 4;
-  if(pt>20 && pt<30) return 5;
-  if(pt>30 && pt<50) return 6;
-  if(pt>50 && pt<100) return 7;
-}
-*/
-
 void converter2(){
   string label = "";
   if(ispp){
@@ -41,7 +28,7 @@ void converter2(){
   }
   else{
     label = "pbpb";
-    inputmc = "/afs/cern.ch/work/g/gwkim/private/samples/crab_Bfinder_20190624_Hydjet_Pythia8_Official_BuToJpsiK_1033p1_pt3tkpt0p7dls2_allpthat_pthatweight.root";
+    inputmc = "/mnt/T2_US_MIT/submit-hi2/scratch/gwangjun/crab_Bfinder_20190624_Hydjet_Pythia8_Official_BuToJpsiK_1033p1_pt3tkpt0p7dls2_allpthat_pthatweight.root";
   }
   TFile* infMC = new TFile(inputmc.Data());
   TTree* ntKp = (TTree*)infMC->Get("Bfinder/ntKp");
@@ -52,12 +39,14 @@ void converter2(){
   ntKp->AddFriend("hltanalysis/HltTree");
   ntKp->AddFriend("hiEvtAnalyzer/HiTree");
   ntKp->AddFriend("skimanalysis/HltTree");
+  ntKp->AddFriend("Bfinder/ntGen");
   setAddressTree(ntKp, ntHlt, ntSkim, ntHi, ntGen, ispp);
-  //int nevents_total = ntKp->GetEntries();
-  int nevents_total = 100000;
+  int nevents_total = ntKp->GetEntries();
+  //int nevents_total = 50000;
 
-  TFile *f= new TFile(Form("results_%s.root", label.c_str()), "recreate"); 
+  TFile *f= new TFile(Form("results_%s.root", label.c_str()), "recreate");
   TH1D* hGen = new TH1D("hGen","",_nBins,_ptBins);
+
   TH1D* hNominal = new TH1D("hNominal","",_nBins,_ptBins);
   TH1D* hScale = new TH1D("hScale","",_nBins,_ptBins);
 
@@ -75,18 +64,39 @@ void converter2(){
   TH1D* hSysLoTrk  = new TH1D("hSysLoTrk","",_nBins,_ptBins);
   TH1D* hSysLoMuid = new TH1D("hSysLoMuid","",_nBins,_ptBins);
 
+  TH1D* hNominal2 = new TH1D("hNominal2","",_nBins,_ptBins);
+  TH1D* hScale2 = new TH1D("hScale2","",_nBins,_ptBins);
+
+  TH1D* hStatHiTrg2 = new TH1D("hStatHiTrg2","",_nBins,_ptBins);
+  TH1D* hStatHiTrk2 = new TH1D("hStatHiTrk2","",_nBins,_ptBins);
+  TH1D* hStatHiMuid2 = new TH1D("hStatHiMuid2","",_nBins,_ptBins);
+  TH1D* hStatLoTrg2 = new TH1D("hStatLoTrg2","",_nBins,_ptBins);
+  TH1D* hStatLoTrk2 = new TH1D("hStatLoTrk2","",_nBins,_ptBins);
+  TH1D* hStatLoMuid2 = new TH1D("hStatLoMuid2","",_nBins,_ptBins);
+
+  TH1D* hSysHiTrg2  = new TH1D("hSysHiTrg2","",_nBins,_ptBins);
+  TH1D* hSysHiTrk2  = new TH1D("hSysHiTrk2","",_nBins,_ptBins);
+  TH1D* hSysHiMuid2 = new TH1D("hSysHiMuid2","",_nBins,_ptBins);
+  TH1D* hSysLoTrg2  = new TH1D("hSysLoTrg2","",_nBins,_ptBins);
+  TH1D* hSysLoTrk2  = new TH1D("hSysLoTrk2","",_nBins,_ptBins);
+  TH1D* hSysLoMuid2 = new TH1D("hSysLoMuid2","",_nBins,_ptBins);
+
   TH1D* hStatUnc = new TH1D("hStatUnc","",_nBins,_ptBins);
   TH1D* hSysUnc = new TH1D("hSysUnc","",_nBins,_ptBins);
   TH1D* hAllUnc = new TH1D("hAllUnc","",_nBins,_ptBins);
   TH1D* hSF = new TH1D("hSF","",_nBins,_ptBins);
-  for(int entry=0; entry<nevents_total; entry++){
-    if ((entry%10000) == 0) printf("Loading event #%d out of %d.\n",entry,nevents_total);
-    ntKp->GetEntry(entry);
-    ntHlt->GetEntry(entry);
-    ntSkim->GetEntry(entry);
-    ntHi->GetEntry(entry);
-    ntGen->GetEntry(entry);
-    for(int b=0; b<Bsize; b++){
+
+  for(int entry=0; entry<nevents_total; entry++)
+    {
+      if ((entry%10000) == 0) printf("Loading event #%d out of %d.\n",entry,nevents_total);
+      ntKp->GetEntry(entry);
+      ntHlt->GetEntry(entry);
+      ntSkim->GetEntry(entry);
+      ntHi->GetEntry(entry);
+      ntGen->GetEntry(entry);
+
+      for(int b=0;b<Bsize;b++)
+	{
       /*
 	if(ispp){
 	if(HLT_HIL1DoubleMu0ForPPRef_v1)
@@ -144,67 +154,118 @@ void converter2(){
 	      }
 	      }
       */      
-      if(!ispp){
-	if(HLT_HIL3Mu0NHitQ10_L2Mu0_MAXdR3p5_M1to5_v1)
-	  if(pclusterCompatibilityFilter&&pprimaryVertexFilter&&phfCoincFilter2Th4&&abs(PVz)<15&&TMath::Abs(By[b])<2.4&&TMath::Abs(Bmumumass[b]-3.096900)<0.15&&Bmass[b]>5&&Bmass[b]<6 && ((abs(Bmu1eta[b])<1.2 && Bmu1pt[b]>=3.5) || (abs(Bmu1eta[b])>=1.2 && abs(Bmu1eta[b])<2.1 && Bmu1pt[b]>=(5.77-1.89*abs(Bmu1eta[b]))) || (abs(Bmu1eta[b])>=2.1 && Bmu1pt[b]>=1.8)) && ((abs(Bmu2eta[b])<1.2 && Bmu2pt[b]>=3.5) || (abs(Bmu2eta[b])>=1.2 && abs(Bmu2eta[b])<2.1 && Bmu2pt[b]>=(5.77-1.89*abs(Bmu2eta[b]))) || (abs(Bmu2eta[b])>=2.1 && Bmu2pt[b]>=1.8)) && Bmu1SoftMuID[b] && Bmu2SoftMuID[b] && Bmu1isAcc[b] && Bmu2isAcc[b] && Bmu1isTriggered[b] && Bmu2isTriggered[b] && (Btrk1PixelHit[b]+Btrk1StripHit[b])>=11 && (Btrk1Chi2ndf[b]/(Btrk1nStripLayer[b]+Btrk1nPixelLayer[b]))<0.18 && TMath::Abs(Btrk1PtErr[b]/Btrk1Pt[b])<0.1 && (BsvpvDistance[b]/BsvpvDisErr[b])>2.0 && abs(Btrk1Eta[b])<2.4 && Btrk1Pt[b]>0.9 && Bchi2cl[b]>0.005 && ((Bpt[b]>5 && Bpt[b]<7 && (BsvpvDistance[b]/BsvpvDisErr[b])>13.028 && cos(Bdtheta[b])>-0.785 && TMath::Abs(Btrk1Dxy1[b]/Btrk1DxyError1[b])>3.664 && Btrk1Pt[b]>1.104 && Bchi2cl[b]>0.224) || (Bpt[b]>7 && Bpt[b]<10 && (BsvpvDistance[b]/BsvpvDisErr[b])>6.151 && cos(Bdtheta[b])>-0.279 && TMath::Abs(Btrk1Dxy1[b]/Btrk1DxyError1[b])>3.379 && TMath::Abs(Btrk1Dz1[b]/Btrk1DzError1[b])>0.628 && Btrk1Pt[b]>1.185) || (Bpt[b]>10 && Bpt[b]<15 && (BsvpvDistance[b]/BsvpvDisErr[b])>9.641 && cos(Bdtheta[b])>-0.510 && TMath::Abs(Btrk1Dxy1[b]/Btrk1DxyError1[b])>3.464 && Btrk1Pt[b]>1.287 && Bchi2cl[b]>0.185) || (Bpt[b]>15 && Bpt[b]<20 && (BsvpvDistance[b]/BsvpvDisErr[b])>6.520 && cos(Bdtheta[b])>0.971 && Btrk1Pt[b]>1.837 && Bchi2cl[b]>0.089) || (Bpt[b]>20 && Bpt[b]<30 && (BsvpvDistance[b]/BsvpvDisErr[b])>4.171 && cos(Bdtheta[b])>0.998 && Btrk1Pt[b]>1.692) || (Bpt[b]>30 && Bpt[b]<50 && (BsvpvDistance[b]/BsvpvDisErr[b])>3.850 && cos(Bdtheta[b])>0.571 && Btrk1Pt[b]>1.723) || (Bpt[b]>50 && Bpt[b]<100 && cos(Bdtheta[b])>0.743 && TMath::Abs(Btrk1Dxy1[b]/Btrk1DxyError1[b])>0.203 && Btrk1Pt[b]>2.973 && Bchi2cl[b]>0.062)) && Bgen[b]==23333)
+	  if(!ispp)
 	    {
-	      cout<<b<<"-st passed evt"<<endl;
+	      if(HLT_HIL3Mu0NHitQ10_L2Mu0_MAXdR3p5_M1to5_v1 && Bgen[b]==23333 && pprimaryVertexFilter && phfCoincFilter2Th4 && pclusterCompatibilityFilter && Btrk1Pt[b]>0.7 && Bpt[b]>5.0 && (BsvpvDistance[b]/BsvpvDisErr[b])>2.0 && Bchi2cl[b]>0.05 && TMath::Abs(Btrk1Eta[b])<2.4 && TMath::Abs(By[b])<2.4 && TMath::Abs(PVz)<15 && Bmass[b]>5 && Bmass[b]<6 && TMath::Abs(Bmumumass[b]-3.096900)<0.15 
+		 && Bmu1SoftMuID[b] && Bmu2SoftMuID[b] && Bmu1isAcc[b] && Bmu2isAcc[b] && Bmu1isTriggered[b] && Bmu2isTriggered[b] && (Btrk1PixelHit[b]+Btrk1StripHit[b])>=11 && (Btrk1Chi2ndf[b]/(Btrk1nStripLayer[b]+Btrk1nPixelLayer[b]))<0.18 && TMath::Abs(Btrk1PtErr[b]/Btrk1Pt[b])<0.1 && ((Bpt[b]>5 && Bpt[b]<7 && (BsvpvDistance[b]/BsvpvDisErr[b])>16.457 && cos(Bdtheta[b])>0.987 && TMath::Abs(Btrk1Dxy1[b]/Btrk1DxyError1[b])>0.005 && Btrk1Pt[b]>1.092 && Bchi2cl[b]>0.065) || (Bpt[b]>7 && Bpt[b]<10 && (BsvpvDistance[b]/BsvpvDisErr[b])>12.714 && cos(Bdtheta[b])>0.947 && TMath::Abs(Btrk1Dxy1[b]/Btrk1DxyError1[b])>2.928 && Btrk1Pt[b]>0.838 && Bchi2cl[b]>0.053) || (Bpt[b]>10 && Bpt[b]<15 && (BsvpvDistance[b]/BsvpvDisErr[b])>9.086 && cos(Bdtheta[b])>0.994 && TMath::Abs(Btrk1Dxy1[b]/Btrk1DxyError1[b])>1.540 && Btrk1Pt[b]>1.262 && Bchi2cl[b]>0.055) || (Bpt[b]>15 && Bpt[b]<20 && (BsvpvDistance[b]/BsvpvDisErr[b])>7.587 && cos(Bdtheta[b])>0.757 && TMath::Abs(Btrk1Dxy1[b]/Btrk1DxyError1[b])>0.000 && Btrk1Pt[b]>1.813 && Bchi2cl[b]>0.056) || (Bpt[b]>20 && Bpt[b]<30 && (BsvpvDistance[b]/BsvpvDisErr[b])>4.004 && cos(Bdtheta[b])>0.996 && TMath::Abs(Btrk1Dxy1[b]/Btrk1DxyError1[b])>0.000 && Btrk1Pt[b]>1.822 && Bchi2cl[b]>0.050) || (Bpt[b]>30 && Bpt[b]<50 && (BsvpvDistance[b]/BsvpvDisErr[b])>2.000 && cos(Bdtheta[b])>0.998 && TMath::Abs(Btrk1Dxy1[b]/Btrk1DxyError1[b])>0.000 && Btrk1Pt[b]>2.046 && Bchi2cl[b]>0.050) || (Bpt[b]>50 && Bpt[b]<100 && (BsvpvDistance[b]/BsvpvDisErr[b])>4.084 && cos(Bdtheta[b])>-0.112 && TMath::Abs(Btrk1Dxy1[b]/Btrk1DxyError1[b])>0.000 && Btrk1Pt[b]>1.645 && Bchi2cl[b]>0.050))
+		 ){
 
-	      double _weight = pthatweight*Ncoll*(TMath::Gaus(PVz,0.427450,4.873825)/(sqrt(2*3.14159)*4.873825))/(TMath::Gaus(PVz,0.909938,4.970989)/(sqrt(2*3.14159)*4.970989))*(0.889175+0.000791*Bgenpt[b]+0.000015*Bgenpt[b]*Bgenpt[b]);
-	      hNominal->Fill(Bpt[b], _weight);
-	      //passed and fill
-	      double scale = tnp_weight_trg_pbpb(Bmu1pt[b], Bmu1eta[b], 1, 0)*tnp_weight_trk_pbpb(Btrk1Eta[b], 0)*tnp_weight_trg_pbpb(Bmu2pt[b], Bmu2eta[b], 1, 0)*tnp_weight_trk_pbpb(Btrk1Eta[b], 0);
-	      hScale->Fill(Bpt[b], _weight*scale);	    
-	      
-	      if(Bpt[b]<5 || Bpt[b]>100) cout<<"Bpt out of range!!!!!!"<<endl;
-	      if(_weight==0) cout<<"_weight zero!!!!!!"<<endl;
-	      if(scale==0) cout<<"scale zero!!!!!!"<<endl;
-
-	      double statHiTrg = tnp_weight_trg_pbpb(Bmu1pt[b], Bmu1eta[b], 1, 1)*tnp_weight_trk_pbpb(Btrk1Eta[b], 0)*tnp_weight_trg_pbpb(Bmu2pt[b], Bmu2eta[b], 1, 1)*tnp_weight_trk_pbpb(Btrk1Eta[b], 0);
-	      double statLoTrg = tnp_weight_trg_pbpb(Bmu1pt[b], Bmu1eta[b], 1, 2)*tnp_weight_trk_pbpb(Btrk1Eta[b], 0)*tnp_weight_trg_pbpb(Bmu2pt[b], Bmu2eta[b], 1, 2)*tnp_weight_trk_pbpb(Btrk1Eta[b], 0);
-	      double statHiTrk = tnp_weight_trg_pbpb(Bmu1pt[b], Bmu1eta[b], 1, 0)*tnp_weight_trk_pbpb(Btrk1Eta[b], 1)*tnp_weight_trg_pbpb(Bmu2pt[b], Bmu2eta[b], 1, 0)*tnp_weight_trk_pbpb(Btrk1Eta[b], 1);
-	      double statLoTrk = tnp_weight_trg_pbpb(Bmu1pt[b], Bmu1eta[b], 1, 0)*tnp_weight_trk_pbpb(Btrk1Eta[b], 2)*tnp_weight_trg_pbpb(Bmu2pt[b], Bmu2eta[b], 1, 0)*tnp_weight_trk_pbpb(Btrk1Eta[b], 2);
-	      double statHiMuid = scale*tnp_weight_muid_pbpb(Bmu1pt[b], Bmu1eta[b], 1)*tnp_weight_muid_pbpb(Bmu2pt[b], Bmu2eta[b], 1);
-	      double statLoMuid = scale*tnp_weight_muid_pbpb(Bmu1pt[b], Bmu1eta[b], 2)*tnp_weight_muid_pbpb(Bmu2pt[b], Bmu2eta[b], 2);
-	      hStatHiTrg ->Fill(Bpt[b], _weight*statHiTrg);
-	      hStatHiTrk ->Fill(Bpt[b], _weight*statHiTrk);
-	      hStatHiMuid->Fill(Bpt[b], _weight*statHiMuid);
-	      hStatLoTrg ->Fill(Bpt[b], _weight*statLoTrg);
-	      hStatLoTrk ->Fill(Bpt[b], _weight*statLoTrk);
-	      hStatLoMuid->Fill(Bpt[b], _weight*statLoMuid);
-
-	      if(statHiTrg==0) cout<<"statHiTrg problem!!!!!!"<<endl;
-	      if(statHiTrk==0) cout<<"statHiTrk problem!!!!!!"<<endl;
-	      if(statHiMuid==0) cout<<"statHiMuid problem!!!!!!"<<endl;
-	      if(statLoTrg==0) cout<<"statLoTrg problem!!!!!!"<<endl;
-	      if(statLoTrk==0) cout<<"statLoTrk problem!!!!!!"<<endl;
-	      if(statLoMuid==0) cout<<"statLoMuid problem!!!!!!"<<endl;
-	      
-	      double sysHiTrg = tnp_weight_trg_pbpb(Bmu1pt[b], Bmu1eta[b], 1, -1)*tnp_weight_trk_pbpb(Btrk1Eta[b], 0)*tnp_weight_trg_pbpb(Bmu2pt[b], Bmu2eta[b], 1, -1)*tnp_weight_trk_pbpb(Btrk1Eta[b], 0);
-	      double sysLoTrg = tnp_weight_trg_pbpb(Bmu1pt[b], Bmu1eta[b], 1, -2)*tnp_weight_trk_pbpb(Btrk1Eta[b], 0)*tnp_weight_trg_pbpb(Bmu2pt[b], Bmu2eta[b], 1, -2)*tnp_weight_trk_pbpb(Btrk1Eta[b], 0);
-	      double sysHiTrk = tnp_weight_trg_pbpb(Bmu1pt[b], Bmu1eta[b], 1, 0)*tnp_weight_trk_pbpb(Btrk1Eta[b], -1)*tnp_weight_trg_pbpb(Bmu2pt[b], Bmu2eta[b], 1, 0)*tnp_weight_trk_pbpb(Btrk1Eta[b], -1);
-	      double sysLoTrk = tnp_weight_trg_pbpb(Bmu1pt[b], Bmu1eta[b], 1, 0)*tnp_weight_trk_pbpb(Btrk1Eta[b], -2)*tnp_weight_trg_pbpb(Bmu2pt[b], Bmu2eta[b], 1, 0)*tnp_weight_trk_pbpb(Btrk1Eta[b], -2);
-	      double sysHiMuid = scale*tnp_weight_muid_pbpb(Bmu1pt[b], Bmu1eta[b], -1)*tnp_weight_muid_pbpb(Bmu2pt[b], Bmu2eta[b], -1);
-	      double sysLoMuid = scale*tnp_weight_muid_pbpb(Bmu1pt[b], Bmu1eta[b], -2)*tnp_weight_muid_pbpb(Bmu2pt[b], Bmu2eta[b], -2);
-	      hSysHiTrg ->Fill(Bpt[b], _weight*sysHiTrg);
-	      hSysHiTrk ->Fill(Bpt[b], _weight*sysHiTrk);
-	      hSysHiMuid->Fill(Bpt[b], _weight*sysHiMuid);
-	      hSysLoTrg ->Fill(Bpt[b], _weight*sysLoTrg);
-	      hSysLoTrk ->Fill(Bpt[b], _weight*sysLoTrk);
-	      hSysLoMuid->Fill(Bpt[b], _weight*sysLoMuid);
-
-	      if(sysHiTrg==0) cout<<"sysHiTrg problem!!!!!!"<<endl;
-	      if(sysHiTrk==0) cout<<"sysHiTrk problem!!!!!!"<<endl;
-	      if(sysHiMuid==0) cout<<"sysHiMuid problem!!!!!!"<<endl;
-	      if(sysLoTrg==0) cout<<"sysLoTrg problem!!!!!!"<<endl;
-	      if(sysLoTrk==0) cout<<"sysLoTrk problem!!!!!!"<<endl;
-	      if(sysLoMuid==0) cout<<"sysLoMuid problem!!!!!!"<<endl;
-
+		cout<<b<<"-st passed evt"<<endl;
+		
+		double _weight = pthatweight*Ncoll*(TMath::Gaus(PVz,0.427450,4.873825)/(sqrt(2*3.14159)*4.873825))/(TMath::Gaus(PVz,0.909938,4.970989)/(sqrt(2*3.14159)*4.970989))*((2.907795+-0.436572*Bgenpt[b]+0.006372*Bgenpt[b]*Bgenpt[b])*TMath::Exp(-0.157563*Bgenpt[b])+1.01308);
+		hNominal->Fill(Bpt[b], _weight);
+		hNominal2->Fill(Bpt[b], 1);
+		
+		//passed and fill
+		double scale = tnp_weight_trg_pbpb(Bmu1pt[b], Bmu1eta[b], 1, 0)*tnp_weight_trk_pbpb(Btrk1Eta[b], 0)*tnp_weight_trg_pbpb(Bmu2pt[b], Bmu2eta[b], 1, 0)*tnp_weight_trk_pbpb(Btrk1Eta[b], 0);
+		hScale->Fill(Bpt[b], _weight*scale);
+		hScale2->Fill(Bpt[b], scale);
+		
+		if(_weight==0) cout<<"_weight zero!!!!!!"<<endl;
+		if(scale==0) cout<<"scale zero!!!!!!"<<endl;
+		
+		double statHiTrg = tnp_weight_trg_pbpb(Bmu1pt[b], Bmu1eta[b], 1, 1)*tnp_weight_trk_pbpb(Btrk1Eta[b], 0)*tnp_weight_trg_pbpb(Bmu2pt[b], Bmu2eta[b], 1, 1)*tnp_weight_trk_pbpb(Btrk1Eta[b], 0);
+		double statLoTrg = tnp_weight_trg_pbpb(Bmu1pt[b], Bmu1eta[b], 1, 2)*tnp_weight_trk_pbpb(Btrk1Eta[b], 0)*tnp_weight_trg_pbpb(Bmu2pt[b], Bmu2eta[b], 1, 2)*tnp_weight_trk_pbpb(Btrk1Eta[b], 0);
+		double statHiTrk = tnp_weight_trg_pbpb(Bmu1pt[b], Bmu1eta[b], 1, 0)*tnp_weight_trk_pbpb(Btrk1Eta[b], 1)*tnp_weight_trg_pbpb(Bmu2pt[b], Bmu2eta[b], 1, 0)*tnp_weight_trk_pbpb(Btrk1Eta[b], 1);
+		double statLoTrk = tnp_weight_trg_pbpb(Bmu1pt[b], Bmu1eta[b], 1, 0)*tnp_weight_trk_pbpb(Btrk1Eta[b], 2)*tnp_weight_trg_pbpb(Bmu2pt[b], Bmu2eta[b], 1, 0)*tnp_weight_trk_pbpb(Btrk1Eta[b], 2);
+		double statHiMuid = scale*tnp_weight_muid_pbpb(Bmu1pt[b], Bmu1eta[b], 1)*tnp_weight_muid_pbpb(Bmu2pt[b], Bmu2eta[b], 1);
+		double statLoMuid = scale*tnp_weight_muid_pbpb(Bmu1pt[b], Bmu1eta[b], 2)*tnp_weight_muid_pbpb(Bmu2pt[b], Bmu2eta[b], 2);
+		
+		hStatHiTrg ->Fill(Bpt[b], _weight*statHiTrg);
+		hStatHiTrk ->Fill(Bpt[b], _weight*statHiTrk);
+		hStatHiMuid->Fill(Bpt[b], _weight*statHiMuid);
+		hStatLoTrg ->Fill(Bpt[b], _weight*statLoTrg);
+		hStatLoTrk ->Fill(Bpt[b], _weight*statLoTrk);
+		hStatLoMuid->Fill(Bpt[b], _weight*statLoMuid);
+		
+		hStatHiTrg2 ->Fill(Bpt[b], statHiTrg);
+		hStatHiTrk2 ->Fill(Bpt[b], statHiTrk);
+		hStatHiMuid2->Fill(Bpt[b], statHiMuid);
+		hStatLoTrg2 ->Fill(Bpt[b], statLoTrg);
+		hStatLoTrk2 ->Fill(Bpt[b], statLoTrk);
+		hStatLoMuid2->Fill(Bpt[b], statLoMuid);
+		
+		if(statHiTrg==0) cout<<"statHiTrg problem!!!!!!"<<endl;
+		if(statHiTrk==0) cout<<"statHiTrk problem!!!!!!"<<endl;
+		if(statHiMuid==0) cout<<"statHiMuid problem!!!!!!"<<endl;
+		if(statLoTrg==0) cout<<"statLoTrg problem!!!!!!"<<endl;
+		if(statLoTrk==0) cout<<"statLoTrk problem!!!!!!"<<endl;
+		if(statLoMuid==0) cout<<"statLoMuid problem!!!!!!"<<endl;
+		
+		double sysHiTrg = tnp_weight_trg_pbpb(Bmu1pt[b], Bmu1eta[b], 1, -1)*tnp_weight_trk_pbpb(Btrk1Eta[b], 0)*tnp_weight_trg_pbpb(Bmu2pt[b], Bmu2eta[b], 1, -1)*tnp_weight_trk_pbpb(Btrk1Eta[b], 0);
+		double sysLoTrg = tnp_weight_trg_pbpb(Bmu1pt[b], Bmu1eta[b], 1, -2)*tnp_weight_trk_pbpb(Btrk1Eta[b], 0)*tnp_weight_trg_pbpb(Bmu2pt[b], Bmu2eta[b], 1, -2)*tnp_weight_trk_pbpb(Btrk1Eta[b], 0);
+		double sysHiTrk = tnp_weight_trg_pbpb(Bmu1pt[b], Bmu1eta[b], 1, 0)*tnp_weight_trk_pbpb(Btrk1Eta[b], -1)*tnp_weight_trg_pbpb(Bmu2pt[b], Bmu2eta[b], 1, 0)*tnp_weight_trk_pbpb(Btrk1Eta[b], -1);
+		double sysLoTrk = tnp_weight_trg_pbpb(Bmu1pt[b], Bmu1eta[b], 1, 0)*tnp_weight_trk_pbpb(Btrk1Eta[b], -2)*tnp_weight_trg_pbpb(Bmu2pt[b], Bmu2eta[b], 1, 0)*tnp_weight_trk_pbpb(Btrk1Eta[b], -2);
+		double sysHiMuid = scale*tnp_weight_muid_pbpb(Bmu1pt[b], Bmu1eta[b], -1)*tnp_weight_muid_pbpb(Bmu2pt[b], Bmu2eta[b], -1);
+		double sysLoMuid = scale*tnp_weight_muid_pbpb(Bmu1pt[b], Bmu1eta[b], -2)*tnp_weight_muid_pbpb(Bmu2pt[b], Bmu2eta[b], -2);
+		
+		hSysHiTrg ->Fill(Bpt[b], _weight*sysHiTrg);
+		hSysHiTrk ->Fill(Bpt[b], _weight*sysHiTrk);
+		hSysHiMuid->Fill(Bpt[b], _weight*sysHiMuid);
+		hSysLoTrg ->Fill(Bpt[b], _weight*sysLoTrg);
+		hSysLoTrk ->Fill(Bpt[b], _weight*sysLoTrk);
+		hSysLoMuid->Fill(Bpt[b], _weight*sysLoMuid);
+		
+		hSysHiTrg2 ->Fill(Bpt[b], sysHiTrg);
+		hSysHiTrk2 ->Fill(Bpt[b], sysHiTrk);
+		hSysHiMuid2->Fill(Bpt[b], sysHiMuid);
+		hSysLoTrg2 ->Fill(Bpt[b], sysLoTrg);
+		hSysLoTrk2 ->Fill(Bpt[b], sysLoTrk);
+		hSysLoMuid2->Fill(Bpt[b], sysLoMuid);
+		
+		if(sysHiTrg==0) cout<<"sysHiTrg problem!!!!!!"<<endl;
+		if(sysHiTrk==0) cout<<"sysHiTrk problem!!!!!!"<<endl;
+		if(sysHiMuid==0) cout<<"sysHiMuid problem!!!!!!"<<endl;
+		if(sysLoTrg==0) cout<<"sysLoTrg problem!!!!!!"<<endl;
+		if(sysLoTrk==0) cout<<"sysLoTrk problem!!!!!!"<<endl;
+		if(sysLoMuid==0) cout<<"sysLoMuid problem!!!!!!"<<endl;
+	      }
 	    }
-      }
-    }//Bsize loop
-  }//event loop
+	}//Bsize loop
+    }//event loop
   
+  f->cd();
+  hNominal->Write();
+  hScale->Write();
+  hStatHiTrg ->Write();
+  hStatHiTrk ->Write();
+  hStatHiMuid->Write();
+  hStatLoTrg ->Write();
+  hStatLoTrk ->Write();
+  hStatLoMuid->Write();
+  hSysHiTrg ->Write();
+  hSysHiTrk ->Write();
+  hSysHiMuid->Write();
+  hSysLoTrg ->Write();
+  hSysLoTrk ->Write();
+  hSysLoMuid->Write();
+
+  hNominal2->Write();
+  hScale2->Write();
+  hStatHiTrg2 ->Write();
+  hStatHiTrk2 ->Write();
+  hStatHiMuid2->Write();
+  hStatLoTrg2 ->Write();
+  hStatLoTrk2 ->Write();
+  hStatLoMuid2->Write();
+  hSysHiTrg2 ->Write();
+  hSysHiTrk2 ->Write();
+  hSysHiMuid2->Write();
+  hSysLoTrg2 ->Write();
+  hSysLoTrk2 ->Write();
+  hSysLoMuid2->Write();
+
+
   cout<<"Stat. unc."<<endl;
   cout<<"vNominal"<<endl;
   for(int i = 0; i < _nBins; i++){	printf("%.2f, ", hNominal->GetBinContent(i+1));}printf("\n");
@@ -265,14 +326,14 @@ void converter2(){
     hSysUnc->SetBinContent(i+1, Sysall);
   }
 
-  printf("sys + stat uncertainty:\n");
+  printf("sys uncertainty:\n");
   printf("double tnpUnc_%s[%d] = {", label.c_str(), _nBins);
   for(int i = 0; i < _nBins; i++){
     double sys = hSysUnc->GetBinContent(i+1);
     double stat = hStatUnc->GetBinContent(i+1);
     double all = sqrt(sys*sys + stat*stat);
-    hAllUnc->SetBinContent(i+1, all);	
-    printf("%4f, ", all*100.);
+    hAllUnc->SetBinContent(i+1, sys);	
+    printf("%4f, ", sys*100.);
     }printf("};\n");
   printf("scaling:\n");
   for(int i = 0; i < _nBins; i++){	

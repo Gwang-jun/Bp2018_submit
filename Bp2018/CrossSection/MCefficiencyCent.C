@@ -27,10 +27,10 @@ void MCefficiencyCent(int isPbPb=0,TString inputmc="", TString selmcgen="",TStri
   centMin = centmin;
   centMax = centmax;
 
-  selmcgen = selmcgen+Form("&&hiBin>=%f&&hiBin<=%f",hiBinMin,hiBinMax);
-  selmcgenacceptance=selmcgenacceptance+Form("&&hiBin>=%f&&hiBin<=%f",hiBinMin,hiBinMax);
-  cut_recoonly=cut_recoonly+Form("&&hiBin>=%f&&hiBin<=%f",hiBinMin,hiBinMax);
-  cut=cut+Form("&&hiBin>=%f&&hiBin<=%f",hiBinMin,hiBinMax);
+  selmcgen = selmcgen+Form("&&hiBin>=%f&&hiBin<=%f&&Gpt>%f&&Gpt<%f",hiBinMin,hiBinMax,ptBinsInc[0],ptBinsInc[1]);
+  selmcgenacceptance=selmcgenacceptance+Form("&&hiBin>=%f&&hiBin<=%f&&Gpt>%f&&Gpt<%f",hiBinMin,hiBinMax,ptBinsInc[0],ptBinsInc[1]);
+  cut_recoonly=cut_recoonly+Form("&&hiBin>=%f&&hiBin<=%f&&Bpt>%f&&Bpt<%f",hiBinMin,hiBinMax,ptBinsInc[0],ptBinsInc[1]);
+  cut=cut+Form("&&hiBin>=%f&&hiBin<=%f&&Bpt>%f&&Bpt<%f",hiBinMin,hiBinMax,ptBinsInc[0],ptBinsInc[1]);
 
   //selmcgenref = selmcgen;
   //selmcgenacceptanceref = selmcgenacceptance;
@@ -77,8 +77,10 @@ void MCefficiencyCent(int isPbPb=0,TString inputmc="", TString selmcgen="",TStri
     weighpthat = "pthatweight";
     weightHiBin = "Ncoll";
     weightPVz = "(TMath::Gaus(PVz,0.427450,4.873825)/(sqrt(2*3.14159)*4.873825))/(TMath::Gaus(PVz,0.909938,4.970989)/(sqrt(2*3.14159)*4.970989))";
-    weightGpt = "0.889175+0.000791*Gpt+0.000015*Gpt*Gpt";
-    weightBgenpt = "0.889175+0.000791*Bgenpt+0.000015*Bgenpt*Bgenpt";
+    weightGpt = "(2.907795+-0.436572*Gpt+0.006372*Gpt*Gpt)*TMath::Exp(-0.157563*Gpt)+1.01308";
+    weightBgenpt = "(2.907795+-0.436572*Bgenpt+0.006372*Bgenpt*Bgenpt)*TMath::Exp(-0.157563*Bgenpt)+1.01308";
+    //weightGpt = "0.889175+0.000791*Gpt+0.000015*Gpt*Gpt";
+    //weightBgenpt = "0.889175+0.000791*Bgenpt+0.000015*Bgenpt*Bgenpt";
     //weightPVz = "1.034350*TMath::Exp(-0.000844*(PVz+3.502992)*(PVz+3.502992))"; // private MC
     //weightGpt = "0.715021+0.039896*Gpt-0.000834*Gpt*Gpt+0.000006*Gpt*Gpt*Gpt"; // private MC Gpt
     //weightBgenpt = "0.715021+0.039896*Bgenpt-0.000834*Bgenpt*Bgenpt+0.000006*Bgenpt*Bgenpt*Bgenpt"; // private MC Gpt
@@ -139,7 +141,7 @@ void MCefficiencyCent(int isPbPb=0,TString inputmc="", TString selmcgen="",TStri
       printf("%f\n",hEff->GetBinContent(j+1));
     }
 
-  TH2F* hemptyEff=new TH2F("hemptyEff","",50,0.,200.,20,0.,0.1);  
+  TH2F* hemptyEff=new TH2F("hemptyEff","",50,0.,200.,20,0.,0.2);  
   hemptyEff->GetXaxis()->CenterTitle();
   hemptyEff->GetYaxis()->CenterTitle();
   //hemptyEff->GetYaxis()->SetTitle("acceptance x #epsilon_{reco} x #epsilon_{sel} ");
@@ -319,7 +321,90 @@ void MCefficiencyCent(int isPbPb=0,TString inputmc="", TString selmcgen="",TStri
   hEffSelection->Write();
   hEff->Write();
   hPtMC->Write();
-  fout->Close();  
+  fout->Close();
+
+  /*
+  //x-section
+
+  TFile* hPtfile = new TFile("ROOTfiles/hPtSpectrumBplusPbPb_CENT.root");
+  TH1F* hPtSigma = (TH1F*)hPtfile->Get("hPt");
+  hPtSigma->Sumw2();
+  hPtSigma->Divide(hEff);
+  //hPtSigma->Scale(1./(2*BRchain));
+
+  //double lumi = 56.564165324;
+  
+  
+  for(int k=0;k<_nBins;k++)
+    {      
+      hPtSigma->SetBinContent(k+1,hPtSigma->GetBinContent(k+1)/TAA[k]);
+      hPtSigma->SetBinError(k+1,hPtSigma->GetBinError(k+1)/TAA[k]);
+    }  
+  
+
+  hPtSigma->SetName("hPtSigma");
+  hPtSigma->GetXaxis()->CenterTitle();
+  hPtSigma->GetYaxis()->CenterTitle();
+  //hPtSigma->GetYaxis()->SetTitle("#frac{d#sigma}{dp_{T}} ( pb GeV^{-1}c)");
+  //if(isPbPb) hPtSigma->GetYaxis()->SetTitle("#frac{1}{T_{AA}} #frac{dN}{dp_{T}} ( pb GeV^{-1}c)");
+  hPtSigma->GetYaxis()->SetTitle("Corrected p_{T} differential yield (GeV^{-1}c)");
+  hPtSigma->GetXaxis()->SetTitle("hiBin");
+  hPtSigma->GetXaxis()->SetTitleOffset(1.);
+  hPtSigma->GetYaxis()->SetTitleOffset(1.2);
+  hPtSigma->GetXaxis()->SetTitleFont(42);
+  hPtSigma->GetYaxis()->SetTitleFont(42);
+  hPtSigma->GetXaxis()->SetLabelFont(42);
+  hPtSigma->GetYaxis()->SetLabelFont(42);
+
+  TCanvas* c100 = new TCanvas("","",600,600);
+  c100->cd();
+  hPtSigma->GetXaxis()->SetTitle("hiBin");
+  hPtSigma->Draw();
+
+  TLatex* texcms = new TLatex(0.50,0.87,"CMS");
+  texcms->SetNDC();
+  texcms->SetTextAlign(13);
+  texcms->SetTextFont(62);
+  texcms->SetTextSize(0.08);
+  texcms->SetLineWidth(2);
+  texcms->Draw();
+
+  TLatex* texB = new TLatex(0.50,0.73,"B^{+}+B^{-}");
+  texB->SetNDC();
+  texB->SetTextFont(42);
+  texB->SetTextSize(0.07);
+  texB->SetLineWidth(2);
+  texB->Draw();
+
+  TLatex* texCol;
+  if(!isPbPb) texCol= new TLatex(0.945,0.94, Form("28.0 pb^{-1} (%s 5.02 TeV)","pp"));
+  else texCol= new TLatex(0.94,0.93, Form("1.5 nb^{-1} (%s 5.02 TeV)","PbPb"));
+  texCol->SetNDC();
+  texCol->SetTextAlign(32);
+  texCol->SetTextSize(0.06);
+  texCol->SetTextFont(42);
+  texCol->Draw();
+
+  TLatex* tex;
+  tex = new TLatex(0.50,0.65,Form("%.0f<p_{T}<%.0f GeV/c",ptBinsInc[0],ptBinsInc[1]));
+  tex->SetNDC();
+  tex->SetTextFont(42);
+  tex->SetTextSize(0.05);
+  tex->SetLineWidth(2);
+  tex->Draw();
+
+  c100->SaveAs("Crosssection_Cent1.png");
+  c100->SaveAs("Crosssection_Cent1.pdf");
+  c100->Close();
+
+  for(int k=0;k<_nBins;k++){
+    printf("hibin %.0f-%.0f     Corr Yield: %f #pm %f\n", _ptBins[k], _ptBins[k+1], hPtSigma->GetBinContent(k+1), hPtSigma->GetBinError(k+1));}
+
+  TFile* hPtoutput = new TFile("Crosssection_Cent1.root","recreate");
+  hPtoutput->cd();
+  hPtSigma->Write();
+  hPtoutput->Close();
+  */
 
 }
 

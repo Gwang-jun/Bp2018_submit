@@ -220,8 +220,16 @@ void fitBvar(TString collsyst="", TString inputfile ="", TString npfile="", floa
   c->cd();
   leg->Draw("Same");
 
-  if(nBins == 1) c->SaveAs(Form("SystPDF/total_var_%s.pdf",collisionsystem.Data()));  
-  else c->SaveAs(Form("SystPDF/var_%s.pdf",collisionsystem.Data()));  
+  if(nBins == 1)
+    {
+      c->SaveAs(Form("SystPDF/total_var_%s.png",collisionsystem.Data()));  
+      c->SaveAs(Form("SystPDF/total_var_%s.pdf",collisionsystem.Data()));
+    }  
+  else
+    {
+      c->SaveAs(Form("SystPDF/var_%s.png",collisionsystem.Data()));  
+      c->SaveAs(Form("SystPDF/var_%s.pdf",collisionsystem.Data()));
+    }  
 }
 
 TF1* fit(float ptmin, float ptmax, int s, int b, int widVar)
@@ -448,7 +456,7 @@ TF1* fit(float ptmin, float ptmax, int s, int b, int widVar)
   texCms->Draw();
 
   TLatex* texCol;
-  if(collisionsystem=="pp"||collisionsystem=="PP") texCol= new TLatex(0.39,0.94, Form("25.8 pb^{-1} (%s #sqrt{s_{NN}} = 5.02 TeV)","pp"));
+  if(collisionsystem=="pp"||collisionsystem=="PP") texCol= new TLatex(0.39,0.94, Form("28.0 pb^{-1} (%s #sqrt{s_{NN}} = 5.02 TeV)","pp"));
   else texCol= new TLatex(0.35,0.94, Form("1.5 nb^{-1} (%s #sqrt{s_{NN}} = 5.02 TeV)","PbPb"));
   texCol->SetNDC();
   texCol->SetTextSize(0.05);
@@ -490,10 +498,16 @@ TF1* fit(float ptmin, float ptmax, int s, int b, int widVar)
   tex->SetLineWidth(2);
   tex->Draw();
 
-    if(widVar==0) 
-      c->SaveAs(Form("SystPDF/%s_%s_%s_%.0f_%.0f.pdf",collisionsystem.Data(),signame[s].Data(),bkgname[b].Data(),ptmin,ptmax));
+    if(widVar==0)
+      {
+	c->SaveAs(Form("SystPDF/%s_%s_%s_%.0f_%.0f.png",collisionsystem.Data(),signame[s].Data(),bkgname[b].Data(),ptmin,ptmax));
+	c->SaveAs(Form("SystPDF/%s_%s_%s_%.0f_%.0f.pdf",collisionsystem.Data(),signame[s].Data(),bkgname[b].Data(),ptmin,ptmax));
+      }
     else
-      c->SaveAs(Form("SystPDF/%s_%s_%.0f_%.0f.pdf",collisionsystem.Data(),"widvar",ptmin,ptmax));
+      {
+	c->SaveAs(Form("SystPDF/%s_%s_%.0f_%.0f.png",collisionsystem.Data(),"widvar",ptmin,ptmax));
+	c->SaveAs(Form("SystPDF/%s_%s_%.0f_%.0f.pdf",collisionsystem.Data(),"widvar",ptmin,ptmax));
+      }
 
     return mass;
 }

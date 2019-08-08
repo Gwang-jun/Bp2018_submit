@@ -1,5 +1,5 @@
 const int nBins=7;
-//double ptBins[nBins+1] = {5., 7.};
+//double ptBins[nBins+1] = {30., 50.};
 //double ptBins[nBins+1] = {5., 100.};
 double ptBins[nBins+1] = {5., 7., 10., 15., 20., 30., 50., 100.};
 

@@ -1,6 +1,6 @@
 #include "TTree.h"
-#define MAX_XB       20000
-#define MAX_GEN      6000
+#define MAX_XB       3000000
+#define MAX_GEN      1500000
 //pp
 int     pBeamScrapingFilter;
 int     pPAprimaryVertexFilter;
@@ -16,8 +16,9 @@ float   pthatweight;
 int     Gsize;
 float   Gpt[MAX_GEN];
 float   Gy[MAX_GEN];
-int   GpdgId[MAX_GEN];   
-int   GisSignal[MAX_GEN];
+int     GpdgId[MAX_GEN];   
+int     GisSignal[MAX_GEN];
+int     GcollisionId[MAX_GEN];
 int     Bsize;
 float   Bgen[MAX_XB];
 float   Bgenpt[MAX_XB];
@@ -55,12 +56,12 @@ float   Bchi2cl[MAX_XB];
 float   BsvpvDistance[MAX_XB];
 float   BsvpvDisErr[MAX_XB];
 float   Bdtheta[MAX_XB];
-bool   Bmu1SoftMuID[MAX_XB];
-bool   Bmu2SoftMuID[MAX_XB];
-bool   Bmu1isAcc[MAX_XB];
-bool   Bmu2isAcc[MAX_XB];
-bool   Bmu1isTriggered[MAX_XB];
-bool   Bmu2isTriggered[MAX_XB];
+bool    Bmu1SoftMuID[MAX_XB];
+bool    Bmu2SoftMuID[MAX_XB];
+bool    Bmu1isAcc[MAX_XB];
+bool    Bmu2isAcc[MAX_XB];
+bool    Bmu1isTriggered[MAX_XB];
+bool    Bmu2isTriggered[MAX_XB];
 float   Btrk1PixelHit[MAX_XB];
 float   Btrk1StripHit[MAX_XB];
 float   Btrk1Chi2ndf[MAX_XB];
@@ -90,6 +91,7 @@ void setAddressTree(TTree* ntKp, TTree* ntHlt, TTree* ntSkim, TTree* ntHi, TTree
 	ntGen->SetBranchAddress("Gy",Gy);
 	ntGen->SetBranchAddress("GpdgId",GpdgId);
 	ntGen->SetBranchAddress("GisSignal",GisSignal);
+	ntGen->SetBranchAddress("GcollisionId",GcollisionId);
 	ntKp->SetBranchAddress("Bsize",&Bsize);
 	ntKp->SetBranchAddress("Bgen",Bgen);
 	ntKp->SetBranchAddress("Bgenpt",Bgenpt);

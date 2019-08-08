@@ -18,7 +18,7 @@ Float_t hiBinMin,hiBinMax,centMin,centMax;
 int _nBins = nBins;
 double *_ptBins = ptBins;
 
-void MCefficiency(int isPbPb=0,TString inputmc="", TString selmcgen="",TString selmcgenacceptance="", TString cut_recoonly="", TString cut="",TString label="PP",TString outputfile="test", int useweight=1,Float_t centmin=0., Float_t centmax=100.)
+void MCefficiency(int isPbPb=0,TString inputmc="", TString selmcgen="",TString selmcgenacceptance="", TString cut_recoonly="", TString cut="",TString label="PP",TString outputfile="test", int useweight=1,Float_t centmin=0., Float_t centmax=90.)
 { 
   if(label=="ppInc"){
     _nBins = nBinsInc;
@@ -57,6 +57,7 @@ void MCefficiency(int isPbPb=0,TString inputmc="", TString selmcgen="",TString s
   gStyle->SetEndErrorSize(0);
   gStyle->SetMarkerStyle(20);
  
+  
   //For 2018 PbPb MC
   TFile* infMC = new TFile(inputmc.Data());
   TTree* ntMC = (TTree*)infMC->Get("Bfinder/ntKp");
@@ -69,9 +70,9 @@ void MCefficiency(int isPbPb=0,TString inputmc="", TString selmcgen="",TString s
   ntGen->AddFriend("hiEvtAnalyzer/HiTree");
   ntGen->AddFriend("Bfinder/ntKp");
   ntGen->AddFriend("skimanalysis/HltTree");
-
+  
   /*
-  For 2015 PbPb, pp MC
+  //For 2015 PbPb, pp MC
   TFile* infMC = new TFile(inputmc.Data());
   TTree* ntMC = (TTree*)infMC->Get("ntKp");
   ntMC->AddFriend("ntHlt");
@@ -102,8 +103,12 @@ void MCefficiency(int isPbPb=0,TString inputmc="", TString selmcgen="",TString s
     weighpthat = "pthatweight";
     weightHiBin = "Ncoll";
     weightPVz = "(TMath::Gaus(PVz,0.427450,4.873825)/(sqrt(2*3.14159)*4.873825))/(TMath::Gaus(PVz,0.909938,4.970989)/(sqrt(2*3.14159)*4.970989))";
-    weightGpt = "0.889175+0.000791*Gpt+0.000015*Gpt*Gpt";
-    weightBgenpt = "0.889175+0.000791*Bgenpt+0.000015*Bgenpt*Bgenpt";
+    weightGpt = "(2.907795+-0.436572*Gpt+0.006372*Gpt*Gpt)*TMath::Exp(-0.157563*Gpt)+1.01308";
+    weightBgenpt = "(2.907795+-0.436572*Bgenpt+0.006372*Bgenpt*Bgenpt)*TMath::Exp(-0.157563*Bgenpt)+1.01308";
+    //weightGpt = "0.889175+0.000791*Gpt+0.000015*Gpt*Gpt";
+    //weightBgenpt = "0.889175+0.000791*Bgenpt+0.000015*Bgenpt*Bgenpt";
+    //weightGpt = "0.094376+0.028350*Gpt+-0.000225*Gpt*Gpt+5.369348/Gpt";
+    //weightBgenpt = "0.094376+0.028350*Bgenpt+-0.000225*Bgenpt*Bgenpt+5.369348/Bgenpt";
     //weightPVz = "1.034350*TMath::Exp(-0.000844*(PVz+3.502992)*(PVz+3.502992))"; // private MC
     //weightGpt = "0.715021+0.039896*Gpt-0.000834*Gpt*Gpt+0.000006*Gpt*Gpt*Gpt"; // private MC Gpt
     //weightBgenpt = "0.715021+0.039896*Bgenpt-0.000834*Bgenpt*Bgenpt+0.000006*Bgenpt*Bgenpt*Bgenpt"; // private MC Gpt
@@ -233,7 +238,7 @@ void MCefficiency(int isPbPb=0,TString inputmc="", TString selmcgen="",TString s
   
   for(int j=0;j<_nBins;j++)
     {
-      printf("p_t bins %.0f-%.0f hEff: %f hEffAcc: %f\n",_ptBins[j],_ptBins[j+1],hEff->GetBinContent(j+1),hEffAcc->GetBinContent(j+1));
+      printf("p_t bins %.0f-%.0f hEff: %f hEffErr: %f\n",_ptBins[j],_ptBins[j+1],hEff->GetBinContent(j+1),hEff->GetBinError(j+1));
     }
   
   TH2F* hemptyPthat=new TH2F("hemptyPthat","",50,0.,500.,10,1e-5,1e9);  

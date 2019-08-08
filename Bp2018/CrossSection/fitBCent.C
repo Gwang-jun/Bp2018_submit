@@ -69,10 +69,12 @@ void fitBCent(int usePbPb=0, TString inputdata="" , TString inputmc="", TString 
     }
   else
     {
-      //weightgen="pthatweight*Ncoll*(1.034350*TMath::Exp(-0.000844*(PVz+3.502992)*(PVz+3.502992)))*(0.715021+0.039896*Gpt-0.000834*Gpt*Gpt+0.000006*Gpt*Gpt*Gpt)"; // MC Gpt
-      //weight="pthatweight*Ncoll*(1.034350*TMath::Exp(-0.000844*(PVz+3.502992)*(PVz+3.502992)))*(0.715021+0.039896*Bgenpt-0.000834*Bgenpt*Bgenpt+0.000006*Bgenpt*Bgenpt*Bgenpt)"; // MC Gpt
-      weightgen="pthatweight*(0.889175+0.000791*Gpt+0.000015*Gpt*Gpt)";
-      weight="pthatweight*Ncoll*(TMath::Gaus(PVz,0.427450,4.873825)/(sqrt(2*3.14159)*4.873825))/(TMath::Gaus(PVz,0.909938,4.970989)/(sqrt(2*3.14159)*4.970989))*(0.889175+0.000791*Bgenpt+0.000015*Bgenpt*Bgenpt)";
+      weightgen="pthatweight*((2.907795+-0.436572*Gpt+0.006372*Gpt*Gpt)*TMath::Exp(-0.157563*Gpt)+1.01308)";
+      weight="pthatweight*Ncoll*(TMath::Gaus(PVz,0.427450,4.873825)/(sqrt(2*3.14159)*4.873825))/(TMath::Gaus(PVz,0.909938,4.970989)/(sqrt(2*3.14159)*4.970989))*((2.907795+-0.436572*Bgenpt+0.006372*Bgenpt*Bgenpt)*TMath::Exp(-0.157563*Bgenpt)+1.01308)";
+      //weightgen="pthatweight*(0.889175+0.000791*Gpt+0.000015*Gpt*Gpt)";
+      //weight="pthatweight*Ncoll*(TMath::Gaus(PVz,0.427450,4.873825)/(sqrt(2*3.14159)*4.873825))/(TMath::Gaus(PVz,0.909938,4.970989)/(sqrt(2*3.14159)*4.970989))*(0.889175+0.000791*Bgenpt+0.000015*Bgenpt*Bgenpt)";
+      //weightgen="pthatweight*Ncoll*(1.034350*TMath::Exp(-0.000844*(PVz+3.502992)*(PVz+3.502992)))*(0.715021+0.039896*Gpt-0.000834*Gpt*Gpt+0.000006*Gpt*Gpt*Gpt)"; // private MC Gpt
+      //weight="pthatweight*Ncoll*(1.034350*TMath::Exp(-0.000844*(PVz+3.502992)*(PVz+3.502992)))*(0.715021+0.039896*Bgenpt-0.000834*Bgenpt*Bgenpt+0.000006*Bgenpt*Bgenpt*Bgenpt)"; // private MC Gpt
     }
 
   std::cout<<"we are using weight="<<weight<<std::endl;
@@ -258,7 +260,8 @@ void getNPFnPar(TString npfname, float par[]){
    f->SetNpx(5000);
    f->SetLineWidth(5);
    
-   if(isMC==1) ntMC->Project(Form("h-%d",count),"Bmass",Form("%s*(%s&&Bpt>%f&&Bpt<%f)*(1/%s)",weight.Data(),seldata.Data(),ptmin,ptmax,weightdata.Data()));
+   //if(isMC==1) ntMC->Project(Form("h-%d",count),"Bmass",Form("%s*(%s&&Bpt>%f&&Bpt<%f)*(1/%s)",weight.Data(),seldata.Data(),ptmin,ptmax,weightdata.Data())); //Closure
+   if(isMC==1) ntMC->Project(Form("h-%d",count),"Bmass",Form("(%s&&Bpt>%f&&Bpt<%f)*(1/%s)",seldata.Data(),ptmin,ptmax,weightdata.Data()));
    else nt->Project(Form("h-%d",count),"Bmass",Form("(%s&&Bpt>%f&&Bpt<%f)*(1/%s)",seldata.Data(),ptmin,ptmax,weightdata.Data()));
    ntMC->Project(Form("hMCSignal-%d",count),"Bmass",Form("%s*(%s&&Bgen==23333&&Bpt>%f&&Bpt<%f)*(1/%s)",weight.Data(),selmc.Data(),ptmin,ptmax,weightdata.Data()));
 
@@ -279,8 +282,8 @@ void getNPFnPar(TString npfname, float par[]){
    f->SetParameter(8,setparam3);
    f->FixParameter(1,fixparam1);
    f->FixParameter(5,0);
-   //f->FixParameter(3,0);
-   //f->FixParameter(4,0);
+   f->FixParameter(3,0);
+   f->FixParameter(4,0);
    if(weightdata != "1"){
      int maxb = h->GetMaximumBin();
      double _max = h->GetBinContent(maxb);
@@ -294,7 +297,7 @@ void getNPFnPar(TString npfname, float par[]){
 
    hMCSignal->Fit(Form("f%d",count),"q","",minhisto,maxhisto);
    hMCSignal->Fit(Form("f%d",count),"q","",minhisto,maxhisto);
-   //f->ReleaseParameter(1);
+   f->ReleaseParameter(1);
    hMCSignal->Fit(Form("f%d",count),"L q","",minhisto,maxhisto);
    hMCSignal->Fit(Form("f%d",count),"L q","",minhisto,maxhisto);
    hMCSignal->Fit(Form("f%d",count),"L q","",minhisto,maxhisto);
@@ -307,8 +310,8 @@ void getNPFnPar(TString npfname, float par[]){
    f->FixParameter(7,f->GetParameter(7));
    f->FixParameter(8,f->GetParameter(8));
 
-   //f->ReleaseParameter(3);
-   //f->ReleaseParameter(4);
+   f->ReleaseParameter(3);
+   f->ReleaseParameter(4);
    f->ReleaseParameter(5);
    f->SetParLimits(5,0,1000);
 
@@ -471,13 +474,13 @@ void getNPFnPar(TString npfname, float par[]){
   if(weightdata!="1") _postfix = "_EFFCOR";
   if(isPbPb && isMC==0)
     { 
-      c->SaveAs(Form("plotFits/Fullcut_Cent_data_PbPb_%.0f-%.0f%s.png",centMin,centMax,_postfix.Data()));
-      c->SaveAs(Form("plotFits/Fullcut_Cent_data_PbPb_%.0f-%.0f%s.pdf",centMin,centMax,_postfix.Data()));
+      c->SaveAs(Form("plotFits/AN_Cent_data_PbPb_%.0f-%.0f.png",centMin,centMax));
+      c->SaveAs(Form("plotFits/AN_Cent_data_PbPb_%.0f-%.0f.pdf",centMin,centMax));
     }
   else if(isPbPb && isMC==1) 
     {
-      c->SaveAs(Form("plotFits/Fullcut_Cent_mc_PbPb_%.0f%.0f%s.png",centMin,centMax,_postfix.Data()));
-      c->SaveAs(Form("plotFits/Fullcut_Cent_mc_PbPb_%.0f%.0f%s.pdf",centMin,centMax,_postfix.Data()));
+      c->SaveAs(Form("plotFits/AN_Cent_mc_PbPb_%.0f-%.0f.png",centMin,centMax));
+      c->SaveAs(Form("plotFits/AN_Cent_mc_PbPb_%.0f-%.0f.pdf",centMin,centMax));
     }
   else if(!isPbPb && isMC==0) 
     {

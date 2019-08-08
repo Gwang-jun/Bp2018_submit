@@ -28,8 +28,18 @@ void CrossSectionRatio(TString inputFONLL="", TString input="", TString efficien
 	TH1F* hEff = (TH1F*)fileeff->Get("hEff");
 	TH1F* hPtSigma = (TH1F*)file->Get("hPt");
 	if(doDataCor != 1) hPtSigma->Divide(hEff);
-	hPtSigma->Scale(1./(2*lumi*BRchain));
+	//hPtSigma->Scale(1./(2*lumi*BRchain));
+
+	float taa = 6.274;
+	
+	hPtSigma->Scale(1./(2*taa*BRchain));
 	hPtSigma->SetName("hPtSigma");
+
+	if(!isPbPb)
+	  {
+	    hPtSigma->SetBinContent(1,5.815612e+06);
+	    hPtSigma->SetBinError(1,8.067642e+05);
+	  }
 
 	for(int k=0;k<nBins;k++){
 	  printf("p_t bin %.0f-%.0f     CrossSection: %f\n", ptBins[k], ptBins[k+1], hPtSigma->GetBinContent(k+1));}
@@ -49,7 +59,12 @@ void CrossSectionRatio(TString inputFONLL="", TString input="", TString efficien
 		ycross[i] = hPtSigma->GetBinContent(i+1);
 		ycrossstat[i] = hPtSigma->GetBinError(i+1);
 		double systematic=0.;
-		if (!isPbPb) systematic=0.01*systematicsPP(xr[i],0.);
+
+		if (!isPbPb)
+		  {
+		    if(xr[i]<7) {systematic=0.01*9.74;}
+		    systematic=0.01*systematicsPP(xr[i],0.);
+		  }
 		else  systematic=0.01*systematicsPbPb(xr[i],1,centMin,centMax,0.);     
 
 		ycrosssysthigh[i]= hPtSigma->GetBinContent(i+1)*systematic;
@@ -126,9 +141,11 @@ void CrossSectionRatio(TString inputFONLL="", TString input="", TString efficien
 	TH2F* hemptySigma=new TH2F("hemptySigma","",50,ptBins[0]-5.,ptBins[nBins]+5.,10.,yaxisMin,yaxisMax);  
 	hemptySigma->GetXaxis()->CenterTitle();
 	hemptySigma->GetYaxis()->CenterTitle();
-	hemptySigma->GetYaxis()->SetTitle("#frac{d#sigma}{dp_{T}} ( pb GeV^{-1}c)");
-	if(isPbPb) hemptySigma->GetYaxis()->SetTitle("#frac{1}{T_{AA}} #frac{dN}{dp_{T}} ( pb GeV^{-1}c)");
-    hemptySigma->GetXaxis()->SetTitle("p_{T} (GeV/c)");
+	//hemptySigma->GetYaxis()->SetTitle("#frac{d#sigma}{dp_{T}} ( pb GeV^{-1}c)");
+	//if(isPbPb) hemptySigma->GetYaxis()->SetTitle("#frac{1}{T_{AA}} #frac{dN}{dp_{T}} ( pb GeV^{-1}c)");
+	//hemptySigma->GetYaxis()->SetTitle("Corrected p_{T} differential yield (GeV^{-1}c)");
+	hemptySigma->GetYaxis()->SetTitle("#frac{1}{T_{AA}} #frac{dN}{dp_{T}} (mb*GeV^{-1}c)");
+	hemptySigma->GetXaxis()->SetTitle("p_{T} (GeV/c)");
 	hemptySigma->GetXaxis()->SetTitleOffset(1.);
 	hemptySigma->GetYaxis()->SetTitleOffset(1./tpadr);
 	hemptySigma->GetXaxis()->SetTitleSize(0.12*tpadpos);
@@ -148,7 +165,7 @@ void CrossSectionRatio(TString inputFONLL="", TString input="", TString efficien
 	gaeBplusReference->SetFillStyle(1001); 
 	gaeBplusReference->SetLineWidth(3);
 	gaeBplusReference->SetLineColor(kOrange);
-	gaeBplusReference->Draw("5same");
+	//gaeBplusReference->Draw("5same");
 	//if(!isPbPb)gaeBplusReference->Draw("5same");
 	hPtSigma->SetLineColor(1);
 	hPtSigma->SetLineWidth(2);
@@ -162,7 +179,7 @@ void CrossSectionRatio(TString inputFONLL="", TString input="", TString efficien
 	gaeCrossSyst->Draw("5same");  
 
 	//TLatex* texCms = new TLatex(0.16,0.95, "#scale[1.25]{CMS}");
-	TLatex* texCms = new TLatex(0.18,1-(1-0.87)*tpadr, "CMS");
+	TLatex* texCms = new TLatex(0.52,1-(1-0.88)*tpadr, "CMS");
 	texCms->SetNDC();
 	texCms->SetTextAlign(13);
 	texCms->SetTextSize(0.08*tpadr);
@@ -193,10 +210,10 @@ void CrossSectionRatio(TString inputFONLL="", TString input="", TString efficien
 	texCol->SetTextAlign(32);
 	texCol->SetTextSize(0.04*tpadr);
 	texCol->SetTextFont(42);
-	texCol->Draw();
+	//texCol->Draw();
 
 	TString texper="%";
-	TLatex* texCent = new TLatex(0.53,0.815,Form("Cent. %.0f-%.0f%s",centMin,centMax,texper.Data()));
+	TLatex* texCent = new TLatex(0.53,0.600,Form("Cent. %.0f-%.0f%s",centMin,centMax,texper.Data()));
 	texCent->SetNDC();
 	texCent->SetTextFont(42);
 	texCent->SetTextSize(0.04);
@@ -210,10 +227,10 @@ void CrossSectionRatio(TString inputFONLL="", TString input="", TString efficien
 	texY->Draw();
 
 	//TLatex* texB = new TLatex(0.77,0.82,"B^{#plus}+B^{#minus}");
-	TLatex* texB = new TLatex(0.77,1-(1-0.82)*tpadr,"B^{+}");
+	TLatex* texB = new TLatex(0.70,1-(1-0.82)*tpadr,"B^{+}");
 	texB->SetNDC();
 	texB->SetTextFont(62);
-	texB->SetTextSize(0.09*tpadr);
+	texB->SetTextSize(0.07*tpadr);
 	texB->SetLineWidth(2);
 	texB->Draw();
 
@@ -231,7 +248,7 @@ void CrossSectionRatio(TString inputFONLL="", TString input="", TString efficien
 	leg_CS->SetTextSize(0.05*tpadr);
 	leg_CS->AddEntry(hPtSigma,"Data","pf");
 	//leg_CS->AddEntry(gaeBplusReference,"FONLL pp ref.","f");//PAS
-	if(!isPbPb) leg_CS->AddEntry(gaeBplusReference,"FONLL","f");//paper
+	//if(!isPbPb) leg_CS->AddEntry(gaeBplusReference,"FONLL","f");//paper
 	leg_CS->Draw("same");
 
 	if(addpbpb){

@@ -34,13 +34,11 @@ void savehisto(TString inputdata="", TString inputmc="", TString trgselection=""
   else seldata = Form("%s&&%s&&hiBin>=%f&&hiBin<=%f",trgselection.Data(),cut.Data(),hiBinMin,hiBinMax);
   selmc = Form("%s&&%s",trgselection.Data(),cut.Data());
   
-  //For 2018 PbPb data
+  //For 2018 PbPb data, MC
   TTree* nt = (TTree*)inf->Get("Bfinder/ntKp");
   nt->AddFriend("hltanalysis/HltTree");
   nt->AddFriend("hiEvtAnalyzer/HiTree");
   nt->AddFriend("skimanalysis/HltTree");
-
-  //For 2018 PbPb MC
   TTree* ntGen = (TTree*)infMC->Get("Bfinder/ntGen");
   ntGen->AddFriend("hltanalysis/HltTree");
   ntGen->AddFriend("hiEvtAnalyzer/HiTree");
