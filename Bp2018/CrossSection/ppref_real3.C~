@@ -135,16 +135,16 @@ void ppref_real3()
   y[0] = y_7[0];
   y_l[0] = y_7_l[0], y_l_d[0] = y_7_l_d[0], y_l_f[0] = y_7_l_f[0];
   y_h[0] = y_7_h[0], y_h_d[0] = y_7_h_d[0], y_h_f[0] = y_7_h_f[0];
-  printf("pt %.0f-%.0f: %e (central) %e (low) %e (high)\n",ptBins[0],ptBins[1],y[0],y_l[0],y_h[0]);
-  printf("pt %.0f-%.0f: %e (low_data) %e (low_FONLL) %e (high_data) %e (high_FONLL)\n",ptBins[0],ptBins[1],y_l_d[0],y_l_f[0],y_h_d[0],y_h_f[0]);
+  //printf("pt %.0f-%.0f: %e (central) %e (low) %e (high)\n",ptBins[0],ptBins[1],y[0],y_l[0],y_h[0]);
+  //printf("pt %.0f-%.0f: %e (low_data) %e (low_FONLL) %e (high_data) %e (high_FONLL)\n",ptBins[0],ptBins[1],y_l_d[0],y_l_f[0],y_h_d[0],y_h_f[0]);
 
   for(i=1;i<nBins;i++)
     {
       y[i] = y_13[i-1];
       y_l[i] = y_13_l[i-1], y_l_d[i] = y_13_l_d[i-1], y_l_f[i] = y_13_l_f[i-1];
       y_h[i] = y_13_h[i-1], y_h_d[i] = y_13_h_d[i-1], y_h_f[i] = y_13_h_f[i-1];
-      printf("pt %.0f-%.0f: %e (central) %e (low) %e (high)\n",ptBins[i],ptBins[i+1],y[i],y_l[i],y_h[i]);
-      printf("pt %.0f-%.0f: %e (low_data) %e (low_FONLL) %e (high_data) %e (high_FONLL)\n",ptBins[i],ptBins[i+1],y_l_d[i],y_l_f[i],y_h_d[i],y_h_f[i]);
+      //printf("pt %.0f-%.0f: %e (central) %e (low) %e (high)\n",ptBins[i],ptBins[i+1],y[i],y_l[i],y_h[i]);
+      //printf("pt %.0f-%.0f: %e (low_data) %e (low_FONLL) %e (high_data) %e (high_FONLL)\n",ptBins[i],ptBins[i+1],y_l_d[i],y_l_f[i],y_h_d[i],y_h_f[i]);
     }
 
   
