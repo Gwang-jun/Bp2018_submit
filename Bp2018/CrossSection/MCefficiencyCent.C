@@ -77,8 +77,10 @@ void MCefficiencyCent(int isPbPb=0,TString inputmc="", TString selmcgen="",TStri
     weighpthat = "pthatweight";
     weightHiBin = "Ncoll";
     weightPVz = "(TMath::Gaus(PVz,0.427450,4.873825)/(sqrt(2*3.14159)*4.873825))/(TMath::Gaus(PVz,0.909938,4.970989)/(sqrt(2*3.14159)*4.970989))";
-    weightGpt = "(2.907795+-0.436572*Gpt+0.006372*Gpt*Gpt)*TMath::Exp(-0.157563*Gpt)+1.01308";
-    weightBgenpt = "(2.907795+-0.436572*Bgenpt+0.006372*Bgenpt*Bgenpt)*TMath::Exp(-0.157563*Bgenpt)+1.01308";
+    weightGpt = "(3.506006+0.963473*Gpt+-0.258731*Gpt*Gpt)*TMath::Exp(-0.386065*Gpt)+1.139897";
+    weightBgenpt = "(3.506006+0.963473*Bgenpt+-0.258731*Bgenpt*Bgenpt)*TMath::Exp(-0.386065*Bgenpt)+1.139897";
+    //weightGpt = "(2.907795+-0.436572*Gpt+0.006372*Gpt*Gpt)*TMath::Exp(-0.157563*Gpt)+1.01308";
+    //weightBgenpt = "(2.907795+-0.436572*Bgenpt+0.006372*Bgenpt*Bgenpt)*TMath::Exp(-0.157563*Bgenpt)+1.01308";
     //weightGpt = "0.889175+0.000791*Gpt+0.000015*Gpt*Gpt";
     //weightBgenpt = "0.889175+0.000791*Bgenpt+0.000015*Bgenpt*Bgenpt";
     //weightPVz = "1.034350*TMath::Exp(-0.000844*(PVz+3.502992)*(PVz+3.502992))"; // private MC

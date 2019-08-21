@@ -1,7 +1,7 @@
 void canvas1DhEff_PbPb()
 {
 //=========Macro generated from canvas: canvas1D/
-//=========  (Fri Jul 26 23:54:52 2019) by ROOT version 6.12/07
+//=========  (Wed Aug 14 10:28:49 2019) by ROOT version 6.12/07
    TCanvas *canvas1D = new TCanvas("canvas1D", "",0,0,600,600);
    gStyle->SetOptStat(0);
    gStyle->SetOptTitle(0);
@@ -45,21 +45,23 @@ void canvas1DhEff_PbPb()
    Double_t xAxis1[8] = {5, 7, 10, 15, 20, 30, 50, 100}; 
    
    TH1D *hEff__2 = new TH1D("hEff__2","",7, xAxis1);
-   hEff__2->SetBinContent(1,0.0004153229);
-   hEff__2->SetBinContent(2,0.004195909);
-   hEff__2->SetBinContent(3,0.0233498);
-   hEff__2->SetBinContent(4,0.06718186);
-   hEff__2->SetBinContent(5,0.136143);
-   hEff__2->SetBinContent(6,0.2096156);
-   hEff__2->SetBinContent(7,0.2416709);
-   hEff__2->SetBinError(1,8.23838e-05);
-   hEff__2->SetBinError(2,0.0002464451);
-   hEff__2->SetBinError(3,0.0006086048);
-   hEff__2->SetBinError(4,0.001264789);
-   hEff__2->SetBinError(5,0.001818501);
-   hEff__2->SetBinError(6,0.002784902);
-   hEff__2->SetBinError(7,0.003428047);
-   hEff__2->SetEntries(18747.38);
+   hEff__2->SetBinContent(1,0.001615218);
+   hEff__2->SetBinContent(2,0.008872033);
+   hEff__2->SetBinContent(3,0.04159644);
+   hEff__2->SetBinContent(4,0.10135);
+   hEff__2->SetBinContent(5,0.1633318);
+   hEff__2->SetBinContent(6,0.2329052);
+   hEff__2->SetBinContent(7,0.2578004);
+   hEff__2->SetBinContent(8,0.2088338);
+   hEff__2->SetBinError(1,0.0001525724);
+   hEff__2->SetBinError(2,0.0003639885);
+   hEff__2->SetBinError(3,0.0008121937);
+   hEff__2->SetBinError(4,0.00151185);
+   hEff__2->SetBinError(5,0.001939232);
+   hEff__2->SetBinError(6,0.002876196);
+   hEff__2->SetBinError(7,0.003428416);
+   hEff__2->SetBinError(8,0.01048486);
+   hEff__2->SetEntries(24248.84);
    hEff__2->SetStats(0);
    hEff__2->SetLineColor(2);
    hEff__2->SetMarkerColor(2);

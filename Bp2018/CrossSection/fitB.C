@@ -90,8 +90,10 @@ TF1* fit (TTree* nt, TTree* ntMC, double ptmin, double ptmax, int isMC,bool, TF1
    {
      //weightgen="pthatweight*(0.715021+0.039896*Gpt-0.000834*Gpt*Gpt+0.000006*Gpt*Gpt*Gpt)"; // private MC
      //weight="pthatweight*Ncoll*(1.034350*TMath::Exp(-0.000844*(PVz+3.502992)*(PVz+3.502992)))*(0.715021+0.039896*Bgenpt-0.000834*Bgenpt*Bgenpt+0.000006*Bgenpt*Bgenpt*Bgenpt)"; // private MC
-     weightgen="pthatweight*((2.907795+-0.436572*Gpt+0.006372*Gpt*Gpt)*TMath::Exp(-0.157563*Gpt)+1.01308)";
-     weight="pthatweight*Ncoll*(TMath::Gaus(PVz,0.427450,4.873825)/(sqrt(2*3.14159)*4.873825))/(TMath::Gaus(PVz,0.909938,4.970989)/(sqrt(2*3.14159)*4.970989))*((2.907795+-0.436572*Bgenpt+0.006372*Bgenpt*Bgenpt)*TMath::Exp(-0.157563*Bgenpt)+1.01308)";     
+     weightgen="pthatweight*((3.506006+0.963473*Gpt+-0.258731*Gpt*Gpt)*TMath::Exp(-0.386065*Gpt)+1.139897)";
+     weight="pthatweight*Ncoll*(TMath::Gaus(PVz,0.427450,4.873825)/(sqrt(2*3.14159)*4.873825))/(TMath::Gaus(PVz,0.909938,4.970989)/(sqrt(2*3.14159)*4.970989))*((3.506006+0.963473*Bgenpt+-0.258731*Bgenpt*Bgenpt)*TMath::Exp(-0.386065*Bgenpt)+1.139897)";     
+     //weightgen="pthatweight*((2.907795+-0.436572*Gpt+0.006372*Gpt*Gpt)*TMath::Exp(-0.157563*Gpt)+1.01308)";
+     //weight="pthatweight*Ncoll*(TMath::Gaus(PVz,0.427450,4.873825)/(sqrt(2*3.14159)*4.873825))/(TMath::Gaus(PVz,0.909938,4.970989)/(sqrt(2*3.14159)*4.970989))*((2.907795+-0.436572*Bgenpt+0.006372*Bgenpt*Bgenpt)*TMath::Exp(-0.157563*Bgenpt)+1.01308)";     
      //weightgen="pthatweight*(0.889175+0.000791*Gpt+0.000015*Gpt*Gpt)";
      //weight="pthatweight*Ncoll*(TMath::Gaus(PVz,0.427450,4.873825)/(sqrt(2*3.14159)*4.873825))/(TMath::Gaus(PVz,0.909938,4.970989)/(sqrt(2*3.14159)*4.970989))*(0.889175+0.000791*Bgenpt+0.000015*Bgenpt*Bgenpt)";
      //weightgen="pthatweight";
@@ -358,19 +360,19 @@ void getNPFnPar(TString npfname, float par[]){
   background->SetRange(minhisto,maxhisto);
   //background->SetLineStyle(2);//PAS
   background->SetLineStyle(7);//paper
-  background->SetLineWidth(9);
+  background->SetLineWidth(5);
   
   TF1 *Bkpi = new TF1(Form("fBkpi%d",count),"[0]*("+iNP+")");
   Bkpi->SetParameter(0,f->GetParameter(5));
   Bkpi->SetRange(minhisto,maxhisto);
-  Bkpi->SetLineStyle(1);
+  Bkpi->SetLineStyle(7);
   //Bkpi->SetFillStyle(3004);//PAS
   Bkpi->SetFillStyle(3005);//paper
   //Bkpi->SetLineColor(kGreen+1);//PAS
   //Bkpi->SetFillColor(kGreen+1);//PAS
   Bkpi->SetLineColor(kGreen+4);//paper
   Bkpi->SetFillColor(kGreen+4);//paper
-  Bkpi->SetLineWidth(9);
+  Bkpi->SetLineWidth(5);
   
   TF1 *mass = new TF1(Form("fmass%d",count),"[0]*([3]*TMath::Gaus(x,[1],[2])/(sqrt(2*3.14159)*[2])+(1-[3])*TMath::Gaus(x,[1],[4])/(sqrt(2*3.14159)*[4]))");
   mass->SetParameters(f->GetParameter(0),f->GetParameter(1),f->GetParameter(2),f->GetParameter(7),f->GetParameter(8));
@@ -385,7 +387,7 @@ void getNPFnPar(TString npfname, float par[]){
   mass->SetLineColor(kOrange-3);//paper
   //mass->SetFillStyle(3004);//PAS
   mass->SetFillStyle(3002);//paper
-  mass->SetLineWidth(9);
+  mass->SetLineWidth(5);
   //mass->SetLineStyle(2);//PAS
   mass->SetLineStyle(7);//paper
   
@@ -417,9 +419,9 @@ void getNPFnPar(TString npfname, float par[]){
   h->SetStats(0);
   h->GetXaxis()->SetNdivisions(-50205);
   h->Draw("e");
-  Bkpi->SetRange(5.00,5.60);
+  Bkpi->SetRange(5.00,6.00);
   if(isMC==0) {Bkpi->Draw("same"); background->Draw("same");}   
-  mass->SetRange(5.16,5.40);
+  mass->SetRange(5.00,6.00);
   mass->Draw("same");
   f->Draw("same");
   c->RedrawAxis();
